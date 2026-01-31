@@ -1,0 +1,35 @@
+{
+  "productName": "Voice Assistant",
+  "version": "0.1.0",
+  "identifier": "com.voiceassistant.app",
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "devUrl": "http://localhost:3000",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../out"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Voice Assistant - Second Brain",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 1000,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": false,
+    "targets": "all",
+    "publisher": "Voice Assistant",
+    "copyright": "© 2024 Voice Assistant",
+    "shortDescription": "AI-powered voice recording and transcription",
+    "longDescription": "An intelligent desktop application that records your voice, transcribes it, and uses AI to classify and organize your thoughts into actionable items, research answers, drafts, and notes."
+  }
+}
