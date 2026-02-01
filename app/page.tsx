@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { DetailView } from '@/components/DetailView';
+import { EmptyState } from '@/components/EmptyState';
 import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -182,12 +183,7 @@ export default function Home() {
             onDelete={handleDelete}
           />
         ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center text-muted-foreground">
-              <p className="text-lg mb-2">No item selected</p>
-              <p className="text-sm">Select an item from the sidebar or create a new recording</p>
-            </div>
-          </div>
+          <EmptyState onNewRecording={handleNewRecording} />
         )}
       </div>
 

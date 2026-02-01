@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { MarkdownRenderer } from './MarkdownRenderer';
 import type { VoiceItem } from '@/types/voice-item';
 
 interface ResearchViewProps {
@@ -15,16 +16,12 @@ export function ResearchView({ item }: ResearchViewProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Research Answer</CardTitle>
+    <Card className="border-l-4 border-l-[hsl(var(--intent-research))]">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg font-semibold tracking-tight">Research Answer</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="prose prose-sm max-w-none">
-          <div className="whitespace-pre-wrap text-sm leading-relaxed">
-            {answer}
-          </div>
-        </div>
+      <CardContent className="pt-0">
+        <MarkdownRenderer content={answer} />
       </CardContent>
     </Card>
   );
