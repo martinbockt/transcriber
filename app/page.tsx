@@ -44,10 +44,14 @@ export default function Home() {
     }
   }, []);
 
-  // Save items to localStorage whenever they change
+  // Save items to localStorage with 500ms debounce
   useEffect(() => {
     if (items.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      const timeoutId = setTimeout(() => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      }, 500);
+
+      return () => clearTimeout(timeoutId);
     }
   }, [items]);
 
