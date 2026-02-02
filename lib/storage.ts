@@ -55,3 +55,74 @@ export function clearSettings(): void {
     throw err;
   }
 }
+
+/**
+ * Storage usage information
+ */
+export interface StorageUsage {
+  used: number; // bytes used
+  total: number; // total bytes available (estimate)
+  percentage: number; // percentage used
+  itemCount: number; // number of items in storage
+}
+
+/**
+ * Calculates the size of a string in bytes
+ * @param str - The string to measure
+ * @returns Size in bytes
+ */
+export function calculateStorageSize(str: string): number {
+  try {
+    // Use Blob to accurately calculate byte size (handles multi-byte characters)
+    return new Blob([str]).size;
+  } catch (err) {
+    console.error('Failed to calculate storage size:', err);
+    // Fallback: estimate 2 bytes per character for UTF-16
+    return str.length * 2;
+  }
+}
+
+/**
+ * Retrieves current localStorage usage information
+ * @returns Storage usage statistics
+ */
+export function getStorageUsage(): StorageUsage {
+  try {
+    let totalSize = 0;
+    let itemCount = 0;
+
+    // Calculate size of all items in localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) {
+        const value = localStorage.getItem(key);
+        if (value) {
+          // Calculate size of both key and value
+          totalSize += calculateStorageSize(key);
+          totalSize += calculateStorageSize(value);
+          itemCount++;
+        }
+      }
+    }
+
+    // Most browsers provide ~5-10MB for localStorage
+    // Use 5MB (5 * 1024 * 1024 bytes) as conservative estimate
+    const estimatedTotal = 5 * 1024 * 1024;
+    const percentage = (totalSize / estimatedTotal) * 100;
+
+    return {
+      used: totalSize,
+      total: estimatedTotal,
+      percentage: Math.min(percentage, 100), // Cap at 100%
+      itemCount,
+    };
+  } catch (err) {
+    console.error('Failed to get storage usage:', err);
+    return {
+      used: 0,
+      total: 5 * 1024 * 1024,
+      percentage: 0,
+      itemCount: 0,
+    };
+  }
+}
