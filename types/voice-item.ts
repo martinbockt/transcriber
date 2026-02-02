@@ -12,11 +12,21 @@ export interface VoiceItem {
   summary: string;     // 2-3 sentence summary
   keyFacts: string[];  // Bullet points with hard facts (names, dates, money)
 
+  // --- Original AI-Generated Content (for edit tracking) ---
+  originalAITitle?: string;       // Original AI-generated title before edits
+  originalAISummary?: string;     // Original AI-generated summary before edits
+  originalAIKeyFacts?: string[];  // Original AI-generated key facts before edits
+
   // --- Dynamic Modules (Intent based) ---
   intent: IntentType;
   data: {
     todos?: Array<{ task: string; done: boolean; due?: string }>;
     researchAnswer?: string; // AI generated answer
     draftContent?: string;   // Polished text
+
+    // Original AI-generated dynamic content
+    originalAITodos?: Array<{ task: string; done: boolean; due?: string }>;
+    originalAIResearchAnswer?: string;
+    originalAIDraftContent?: string;
   };
 }
