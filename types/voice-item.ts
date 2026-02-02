@@ -5,7 +5,7 @@ export interface VoiceItem {
   createdAt: string; // ISO String
   originalTranscript: string;
   audioData?: string; // Base64-encoded audio for playback (optional)
-  pinned: boolean; // Whether item is pinned to top of list
+  pinned?: boolean; // Whether item is pinned to top of list
 
   // --- Standard Modules (Always present) ---
   title: string;       // Generated short title
