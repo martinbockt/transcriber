@@ -22,16 +22,37 @@
     ],
     "security": {
       "csp": {
+        // Fallback for all resource types - allows local app resources and Tauri protocol
         "default-src": ["'self'", "tauri://localhost", "asset:", "http://tauri.localhost"],
+
+        // JavaScript execution - 'wasm-unsafe-eval' needed for Next.js WebAssembly and code splitting
         "script-src": ["'self'", "'wasm-unsafe-eval'"],
+
+        // CSS styles - 'unsafe-inline' required for Next.js dynamic inline styles and CSS-in-JS
         "style-src": ["'self'", "'unsafe-inline'"],
+
+        // Network requests - allows OpenAI API for transcription and AI processing
         "connect-src": ["'self'", "https://api.openai.com", "tauri://localhost"],
+
+        // Images - supports data URIs and blob URLs for dynamic image content
         "img-src": ["'self'", "data:", "blob:"],
+
+        // Audio/video - blob: and data: needed for audio recording playback from MediaRecorder
         "media-src": ["'self'", "blob:", "data:"],
+
+        // Fonts - only load fonts bundled with the application
         "font-src": ["'self'"],
+
+        // Plugins - block all plugins (Flash, Java, etc.) for security
         "object-src": ["'none'"],
+
+        // Document base URL - restrict to same origin only
         "base-uri": ["'self'"],
+
+        // Form submission - restrict form actions to same origin
         "form-action": ["'self'"],
+
+        // Iframe embedding - prevent app from being embedded in other pages (clickjacking protection)
         "frame-ancestors": ["'none'"]
       }
     }
