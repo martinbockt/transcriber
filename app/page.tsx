@@ -228,9 +228,14 @@ export default function Home() {
     }
   };
 
-  // Filter items based on search criteria
+  // Filter and sort items (pinned items first)
   const filteredItems = useMemo(() => {
-    return searchVoiceItems(items, searchQuery, selectedIntents, dateRange);
+    const filtered = searchVoiceItems(items, searchQuery, selectedIntents, dateRange);
+    // Sort so pinned items appear at top, maintaining chronological order within each group
+    return filtered.sort((a, b) => {
+      if (a.pinned === b.pinned) return 0; // Maintain existing order within group
+      return a.pinned ? -1 : 1; // Pinned items come first
+    });
   }, [items, searchQuery, selectedIntents, dateRange]);
 
   const handleExportAll = () => {
