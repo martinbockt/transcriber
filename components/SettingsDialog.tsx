@@ -12,6 +12,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { useTheme } from '@/components/theme-provider';
 
 interface SettingsDialogProps {
   open: boolean;
@@ -24,6 +26,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const [apiKey, setApiKey] = useState('');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'validating' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const { theme, setTheme } = useTheme();
 
   // Load API key from localStorage on mount
   useEffect(() => {
@@ -140,11 +143,42 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
             <Separator />
 
-            {/* Preferences Section - to be implemented in phase 3 */}
+            {/* Preferences Section */}
             <section>
               <h3 className="text-sm font-medium mb-3">Preferences</h3>
-              <div className="text-sm text-muted-foreground">
-                Theme and other preferences will be added here
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="theme-toggle">Theme</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Choose your preferred color theme for the application
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={theme === 'light' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTheme('light')}
+                      className="flex-1"
+                    >
+                      Light
+                    </Button>
+                    <Button
+                      variant={theme === 'dark' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTheme('dark')}
+                      className="flex-1"
+                    >
+                      Dark
+                    </Button>
+                    <Button
+                      variant={theme === 'system' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTheme('system')}
+                      className="flex-1"
+                    >
+                      System
+                    </Button>
+                  </div>
+                </div>
               </div>
             </section>
 
