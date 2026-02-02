@@ -352,6 +352,7 @@ export default function Home() {
         items={filteredItems}
         activeItemId={activeItemId}
         onSelectItem={setActiveItemId}
+        onTogglePin={handleTogglePin}
         onNewRecording={handleNewRecording}
         onExportAll={handleExportAll}
         isRecording={isRecording}
