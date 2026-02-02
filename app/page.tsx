@@ -9,7 +9,7 @@ import { ExportDialog } from "@/components/ExportDialog";
 import { SettingsDialog } from "@/components/SettingsDialog";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { processVoiceRecording } from "@/lib/ai";
+import { processVoiceRecording, RateLimitError } from "@/lib/ai";
 import { searchVoiceItems } from "@/lib/search";
 import { MOCK_HISTORY } from "@/lib/mock-data";
 import type { VoiceItem, IntentType } from "@/types/voice-item";
@@ -169,7 +169,16 @@ export default function Home() {
       setActiveItemId(newItem.id);
     } catch (err) {
       console.error("Processing error:", err);
-      setError(err instanceof Error ? err.message : "Failed to process audio");
+
+      // Handle rate limit errors with user-friendly message
+      if (err instanceof RateLimitError) {
+        const retrySeconds = Math.ceil(err.retryAfterMs / 1000);
+        setError(
+          `${err.message} Try recording again in ${retrySeconds} second${retrySeconds !== 1 ? 's' : ''}.`
+        );
+      } else {
+        setError(err instanceof Error ? err.message : "Failed to process audio");
+      }
     } finally {
       setIsProcessing(false);
     }
