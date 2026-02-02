@@ -12,6 +12,7 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { processVoiceRecording } from "@/lib/ai";
 import { searchVoiceItems } from "@/lib/search";
 import { MOCK_HISTORY } from "@/lib/mock-data";
+import { encryptData, decryptData } from "@/lib/crypto";
 import type { VoiceItem, IntentType } from "@/types/voice-item";
 import type { DateRange } from "@/components/SearchBar";
 
@@ -93,39 +94,67 @@ export default function Home() {
 
   // Load items from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setItems(parsed);
-        // Initialize history with loaded state
-        history.current = [JSON.parse(JSON.stringify(parsed))];
-        historyIndex.current = 0;
-        if (parsed.length > 0) {
-          setActiveItemId(parsed[0].id);
+    const loadItems = async () => {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try {
+          // Try to decrypt (new encrypted format)
+          const decrypted = await decryptData(stored);
+          const parsed = JSON.parse(decrypted);
+          setItems(parsed);
+          // Initialize history with loaded state
+          history.current = [JSON.parse(JSON.stringify(parsed))];
+          historyIndex.current = 0;
+          if (parsed.length > 0) {
+            setActiveItemId(parsed[0].id);
+          }
+        } catch (decryptErr) {
+          // Fallback: try parsing as plain JSON (backwards compatibility)
+          try {
+            const parsed = JSON.parse(stored);
+            setItems(parsed);
+            // Initialize history with loaded state
+            history.current = [JSON.parse(JSON.stringify(parsed))];
+            historyIndex.current = 0;
+            if (parsed.length > 0) {
+              setActiveItemId(parsed[0].id);
+            }
+            // Re-save as encrypted for migration
+            const jsonString = JSON.stringify(parsed);
+            const encrypted = await encryptData(jsonString);
+            localStorage.setItem(STORAGE_KEY, encrypted);
+          } catch (parseErr) {
+            console.error("Failed to parse stored items:", parseErr);
+            // Fallback to mock data
+            setItems(MOCK_HISTORY);
+            history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
+            historyIndex.current = 0;
+            setActiveItemId(MOCK_HISTORY[0]?.id || null);
+          }
         }
-      } catch (err) {
-        console.error("Failed to parse stored items:", err);
-        // Fallback to mock data
+      } else {
+        // Use mock data on first load
         setItems(MOCK_HISTORY);
         history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
         historyIndex.current = 0;
         setActiveItemId(MOCK_HISTORY[0]?.id || null);
       }
-    } else {
-      // Use mock data on first load
-      setItems(MOCK_HISTORY);
-      history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
-      historyIndex.current = 0;
-      setActiveItemId(MOCK_HISTORY[0]?.id || null);
-    }
+    };
+
+    loadItems();
   }, []);
 
   // Save items to localStorage with 500ms debounce
   useEffect(() => {
     if (items.length > 0) {
-      const timeoutId = setTimeout(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      const timeoutId = setTimeout(async () => {
+        try {
+          const jsonString = JSON.stringify(items);
+          const encrypted = await encryptData(jsonString);
+          localStorage.setItem(STORAGE_KEY, encrypted);
+        } catch (err) {
+          console.error("Failed to encrypt and save items:", err);
+        }
       }, 500);
 
       return () => clearTimeout(timeoutId);
