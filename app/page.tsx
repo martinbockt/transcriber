@@ -178,7 +178,7 @@ export default function Home() {
   };
 
   const handleNewRecording = async () => {
-    if (isRecording) {
+    if (isRecording || countdown !== null) {
       stop();
     } else {
       setError(null);
