@@ -116,6 +116,38 @@ export default function Home() {
     }
   };
 
+  const handleUpdateTitle = (itemId: string, newTitle: string) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId ? { ...item, title: newTitle } : item
+      )
+    );
+  };
+
+  const handleUpdateSummary = (itemId: string, newSummary: string) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId ? { ...item, summary: newSummary } : item
+      )
+    );
+  };
+
+  const handleUpdateTranscript = (itemId: string, newTranscript: string) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId ? { ...item, originalTranscript: newTranscript } : item
+      )
+    );
+  };
+
+  const handleUpdateTags = (itemId: string, newTags: string[]) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId ? { ...item, tags: newTags } : item
+      )
+    );
+  };
+
   const activeItem = items.find((item) => item.id === activeItemId);
 
   // Keyboard shortcuts
@@ -180,6 +212,10 @@ export default function Home() {
             item={activeItem}
             onToggleTodo={handleToggleTodo}
             onDelete={handleDelete}
+            onUpdateTitle={handleUpdateTitle}
+            onUpdateSummary={handleUpdateSummary}
+            onUpdateTranscript={handleUpdateTranscript}
+            onUpdateTags={handleUpdateTags}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center">

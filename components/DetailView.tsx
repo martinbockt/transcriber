@@ -29,6 +29,10 @@ interface DetailViewProps {
   item: VoiceItem;
   onToggleTodo?: (itemId: string, todoIndex: number) => void;
   onDelete?: (itemId: string) => void;
+  onUpdateTitle?: (itemId: string, newTitle: string) => void;
+  onUpdateSummary?: (itemId: string, newSummary: string) => void;
+  onUpdateTranscript?: (itemId: string, newTranscript: string) => void;
+  onUpdateTags?: (itemId: string, newTags: string[]) => void;
 }
 
 const intentLabels = {
@@ -45,7 +49,15 @@ const intentVariants = {
   NOTE: 'outline',
 } as const;
 
-export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
+export function DetailView({
+  item,
+  onToggleTodo,
+  onDelete,
+  onUpdateTitle,
+  onUpdateSummary,
+  onUpdateTranscript,
+  onUpdateTags
+}: DetailViewProps) {
   const [showTranscript, setShowTranscript] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState(item.title);
@@ -59,16 +71,21 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
   const handleAddTag = () => {
     const trimmedTag = newTag.trim();
     if (trimmedTag && !tags.includes(trimmedTag)) {
-      setTags([...tags, trimmedTag]);
+      const newTags = [...tags, trimmedTag];
+      setTags(newTags);
+      onUpdateTags?.(item.id, newTags);
       setNewTag('');
     }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove));
+    const newTags = tags.filter((tag) => tag !== tagToRemove);
+    setTags(newTags);
+    onUpdateTags?.(item.id, newTags);
   };
 
   const handleSaveTranscript = () => {
+    onUpdateTranscript?.(item.id, editedTranscript);
     setIsEditingTranscript(false);
   };
 
@@ -89,6 +106,7 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
                 onChange={(e) => setEditedTitle(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
+                    onUpdateTitle?.(item.id, editedTitle);
                     setIsEditingTitle(false);
                   } else if (e.key === 'Escape') {
                     setEditedTitle(item.title);
@@ -96,6 +114,7 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
                   }
                 }}
                 onBlur={() => {
+                  onUpdateTitle?.(item.id, editedTitle);
                   setIsEditingTitle(false);
                 }}
                 autoFocus
@@ -179,6 +198,7 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
                   }
                 }}
                 onBlur={() => {
+                  onUpdateSummary?.(item.id, editedSummary);
                   setIsEditingSummary(false);
                 }}
                 autoFocus
