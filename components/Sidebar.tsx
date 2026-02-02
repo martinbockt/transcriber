@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
+import Image from "next/image";
 import {
   Mic,
   ListTodo,
@@ -113,7 +114,16 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(
       <div className="w-80 border-r bg-muted/10 flex flex-col h-screen">
         <div className="p-4 space-y-2">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold">Voice Assistant</h1>
+            <div className="flex items-center gap-3">
+              <Image
+                src="/logo.svg"
+                alt="Voice Assistant Logo"
+                width={32}
+                height={32}
+                className="w-8 h-8"
+              />
+              <h1 className="text-2xl font-bold">Voice Assistant</h1>
+            </div>
             {onOpenSettings && (
               <Button
                 variant="ghost"
@@ -127,7 +137,6 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(
           </div>
           <Button
             onClick={onNewRecording}
-            disabled={isRecording}
             size="lg"
             className="w-full"
           >
