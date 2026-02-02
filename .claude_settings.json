@@ -1,0 +1,39 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(./**)",
+      "Write(./**)",
+      "Edit(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Read(/Users/martinbock/Development/transcriber/.auto-claude/worktrees/tasks/004-settings-page/**)",
+      "Write(/Users/martinbock/Development/transcriber/.auto-claude/worktrees/tasks/004-settings-page/**)",
+      "Edit(/Users/martinbock/Development/transcriber/.auto-claude/worktrees/tasks/004-settings-page/**)",
+      "Glob(/Users/martinbock/Development/transcriber/.auto-claude/worktrees/tasks/004-settings-page/**)",
+      "Grep(/Users/martinbock/Development/transcriber/.auto-claude/worktrees/tasks/004-settings-page/**)",
+      "Read(/Users/martinbock/Development/transcriber/.auto-claude/worktrees/tasks/004-settings-page/.auto-claude/specs/004-settings-page/**)",
+      "Write(/Users/martinbock/Development/transcriber/.auto-claude/worktrees/tasks/004-settings-page/.auto-claude/specs/004-settings-page/**)",
+      "Edit(/Users/martinbock/Development/transcriber/.auto-claude/worktrees/tasks/004-settings-page/.auto-claude/specs/004-settings-page/**)",
+      "Read(/Users/martinbock/Development/transcriber/.auto-claude/**)",
+      "Write(/Users/martinbock/Development/transcriber/.auto-claude/**)",
+      "Edit(/Users/martinbock/Development/transcriber/.auto-claude/**)",
+      "Glob(/Users/martinbock/Development/transcriber/.auto-claude/**)",
+      "Grep(/Users/martinbock/Development/transcriber/.auto-claude/**)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__context7__resolve-library-id(*)",
+      "mcp__context7__get-library-docs(*)",
+      "mcp__graphiti-memory__search_nodes(*)",
+      "mcp__graphiti-memory__search_facts(*)",
+      "mcp__graphiti-memory__add_episode(*)",
+      "mcp__graphiti-memory__get_episodes(*)",
+      "mcp__graphiti-memory__get_entity_edge(*)"
+    ]
+  }
+}
