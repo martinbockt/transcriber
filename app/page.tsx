@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { DetailView } from '@/components/DetailView';
 import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
@@ -19,7 +19,54 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false);
 
+  // Undo/redo history management
+  const history = useRef<VoiceItem[][]>([]);
+  const historyIndex = useRef<number>(-1);
+  const isUndoRedoAction = useRef<boolean>(false);
+
   const { isRecording, audioBlob, start, stop, error: recorderError } = useAudioRecorder();
+
+  // Push current state to history (for undo/redo)
+  const pushToHistory = (newItems: VoiceItem[]) => {
+    if (isUndoRedoAction.current) {
+      // Don't add to history if this is an undo/redo action
+      isUndoRedoAction.current = false;
+      return;
+    }
+
+    // Remove any forward history if we're not at the end
+    if (historyIndex.current < history.current.length - 1) {
+      history.current = history.current.slice(0, historyIndex.current + 1);
+    }
+
+    // Add new state to history
+    history.current.push(JSON.parse(JSON.stringify(newItems)));
+    historyIndex.current = history.current.length - 1;
+
+    // Limit history to 50 states
+    if (history.current.length > 50) {
+      history.current.shift();
+      historyIndex.current--;
+    }
+  };
+
+  // Undo last change
+  const handleUndo = () => {
+    if (historyIndex.current > 0) {
+      historyIndex.current--;
+      isUndoRedoAction.current = true;
+      setItems(JSON.parse(JSON.stringify(history.current[historyIndex.current])));
+    }
+  };
+
+  // Redo last undone change
+  const handleRedo = () => {
+    if (historyIndex.current < history.current.length - 1) {
+      historyIndex.current++;
+      isUndoRedoAction.current = true;
+      setItems(JSON.parse(JSON.stringify(history.current[historyIndex.current])));
+    }
+  };
 
   // Load items from localStorage on mount
   useEffect(() => {
@@ -28,6 +75,9 @@ export default function Home() {
       try {
         const parsed = JSON.parse(stored);
         setItems(parsed);
+        // Initialize history with loaded state
+        history.current = [JSON.parse(JSON.stringify(parsed))];
+        historyIndex.current = 0;
         if (parsed.length > 0) {
           setActiveItemId(parsed[0].id);
         }
@@ -35,11 +85,15 @@ export default function Home() {
         console.error('Failed to parse stored items:', err);
         // Fallback to mock data
         setItems(MOCK_HISTORY);
+        history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
+        historyIndex.current = 0;
         setActiveItemId(MOCK_HISTORY[0]?.id || null);
       }
     } else {
       // Use mock data on first load
       setItems(MOCK_HISTORY);
+      history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
+      historyIndex.current = 0;
       setActiveItemId(MOCK_HISTORY[0]?.id || null);
     }
   }, []);
@@ -52,6 +106,25 @@ export default function Home() {
       }, 500);
 
       return () => clearTimeout(timeoutId);
+    }
+  }, [items]);
+
+  // Track items changes for undo/redo history
+  useEffect(() => {
+    // Skip if items is empty (initial state) or if this is the initial load
+    if (items.length === 0 || history.current.length === 0) {
+      return;
+    }
+
+    // Skip if this was an undo/redo action
+    if (isUndoRedoAction.current) {
+      return;
+    }
+
+    // Check if items actually changed (deep comparison of current vs last history state)
+    const lastHistoryState = history.current[historyIndex.current];
+    if (JSON.stringify(items) !== JSON.stringify(lastHistoryState)) {
+      pushToHistory(items);
     }
   }, [items]);
 
@@ -174,6 +247,8 @@ export default function Home() {
     onHelp: () => {
       setShowHelp(true);
     },
+    onUndo: handleUndo,
+    onRedo: handleRedo,
   });
 
   return (

@@ -8,6 +8,8 @@ export interface KeyboardShortcuts {
   onNew?: () => void;
   onEscape?: () => void;
   onHelp?: () => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
 }
 
 export function useKeyboardShortcuts(shortcuts: KeyboardShortcuts) {
@@ -51,6 +53,17 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcuts) {
       if (event.code === 'Slash' && event.shiftKey && shortcuts.onHelp) {
         event.preventDefault();
         shortcuts.onHelp();
+      }
+
+      // Cmd+Shift+Z - Redo
+      if (event.code === 'KeyZ' && event.metaKey && event.shiftKey && shortcuts.onRedo) {
+        event.preventDefault();
+        shortcuts.onRedo();
+      }
+      // Cmd+Z - Undo (check this after redo to avoid conflicts)
+      else if (event.code === 'KeyZ' && event.metaKey && !event.shiftKey && shortcuts.onUndo) {
+        event.preventDefault();
+        shortcuts.onUndo();
       }
     };
 
