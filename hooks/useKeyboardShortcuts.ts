@@ -12,6 +12,8 @@ export interface KeyboardShortcuts {
   onSettings?: () => void;
   onUndo?: () => void;
   onRedo?: () => void;
+  onArrowLeft?: () => void;
+  onArrowRight?: () => void;
 }
 
 export function useKeyboardShortcuts(shortcuts: KeyboardShortcuts) {
@@ -50,6 +52,18 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcuts) {
       if (event.code === "Space" && shortcuts.onSpace) {
         event.preventDefault();
         shortcuts.onSpace();
+      }
+
+      // Arrow Left - Rewind
+      if (event.code === "ArrowLeft" && shortcuts.onArrowLeft) {
+        event.preventDefault();
+        shortcuts.onArrowLeft();
+      }
+
+      // Arrow Right - Fast forward
+      if (event.code === "ArrowRight" && shortcuts.onArrowRight) {
+        event.preventDefault();
+        shortcuts.onArrowRight();
       }
 
       // Delete or Backspace - Delete current item

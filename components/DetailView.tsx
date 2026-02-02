@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { ChevronDown, ChevronUp, Trash2, Download, Edit2, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,7 +22,7 @@ import {
 import { TodoView } from './TodoView';
 import { ResearchView } from './ResearchView';
 import { DraftView } from './DraftView';
-import { AudioPlayer } from './AudioPlayer';
+import { AudioPlayer, AudioPlayerRef } from './AudioPlayer';
 import { ExportDialog } from './ExportDialog';
 import type { VoiceItem } from '@/types/voice-item';
 
@@ -56,14 +56,15 @@ const intentBorderColors = {
   NOTE: 'border-l-[hsl(var(--intent-note))]',
 } as const;
 
-export function DetailView({
-  item,
-  onToggleTodo,
-  onDelete,
-  onUpdateTitle,
-  onUpdateSummary,
-  onUpdateTranscript
-}: DetailViewProps) {
+export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(
+  function DetailView({
+    item,
+    onToggleTodo,
+    onDelete,
+    onUpdateTitle,
+    onUpdateSummary,
+    onUpdateTranscript
+  }, ref) {
   const [showTranscript, setShowTranscript] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -189,7 +190,7 @@ export function DetailView({
             </div>
           )}
           {item.audioData ? (
-            <AudioPlayer audioData={item.audioData} className="mb-2" />
+            <AudioPlayer ref={ref} audioData={item.audioData} className="mb-2" />
           ) : (
             <p className="text-xs text-muted-foreground italic mb-2">
               No audio available for this recording
@@ -351,4 +352,4 @@ export function DetailView({
       />
     </div>
   );
-}
+});
