@@ -6,8 +6,22 @@ import type { VoiceItem, IntentType } from '@/types/voice-item';
 
 const STORAGE_KEY = 'openai_api_key';
 
-function getApiKey(): string {
-  // Check localStorage first (user-provided key)
+async function getApiKey(): Promise<string> {
+  // Check Tauri secure storage first (user-provided key)
+  if (typeof window !== 'undefined' && '__TAURI__' in window) {
+    try {
+      const { invoke } = await import('@tauri-apps/api/core');
+      const storedKey = await invoke<string>('get_secure_value', { key: STORAGE_KEY });
+      if (storedKey) {
+        return storedKey;
+      }
+    } catch (error) {
+      console.error('Failed to retrieve API key from secure storage:', error);
+      // Fall through to environment variable
+    }
+  }
+
+  // Fall back to localStorage for web-only mode (development)
   if (typeof window !== 'undefined') {
     const storedKey = localStorage.getItem(STORAGE_KEY);
     if (storedKey) {
@@ -42,7 +56,7 @@ const VoiceItemSchema = z.object({
 });
 
 export async function transcribeAudio(audioBlob: Blob): Promise<string> {
-  const apiKey = getApiKey();
+  const apiKey = await getApiKey();
 
   try {
     const formData = new FormData();
@@ -71,7 +85,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 }
 
 export async function processContent(transcript: string): Promise<Omit<VoiceItem, 'id' | 'createdAt' | 'originalTranscript'>> {
-  const apiKey = getApiKey();
+  const apiKey = await getApiKey();
 
   try {
     const openai = createOpenAI({ apiKey });

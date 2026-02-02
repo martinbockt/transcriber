@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { invoke } from '@tauri-apps/api/core';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useTheme } from '@/components/theme-provider';
+import { getStorageUsage } from '@/lib/storage';
 
 interface SettingsDialogProps {
   open: boolean;
@@ -38,19 +40,6 @@ const shortcuts = [
   { key: 'Cmd+,', description: 'Open settings' },
 ];
 
-// Utility function to calculate localStorage usage
-const calculateStorageUsage = (): number => {
-  let total = 0;
-  for (let key in localStorage) {
-    if (localStorage.hasOwnProperty(key)) {
-      const value = localStorage.getItem(key) || '';
-      // Calculate size in bytes (UTF-16, 2 bytes per character)
-      total += (key.length + value.length) * 2;
-    }
-  }
-  return total;
-};
-
 // Utility function to format bytes to KB/MB
 const formatStorageSize = (bytes: number): string => {
   if (bytes < 1024) {
@@ -70,21 +59,28 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const { theme, setTheme } = useTheme();
 
-  // Load API key from localStorage on mount
+  // Load API key from Tauri secure storage on mount
   useEffect(() => {
-    const savedKey = localStorage.getItem(STORAGE_KEY);
-    if (savedKey) {
-      setApiKey(savedKey);
-    }
+    const loadApiKey = async () => {
+      try {
+        const savedKey = await invoke<string>('get_secure_value', { key: STORAGE_KEY });
+        if (savedKey) {
+          setApiKey(savedKey);
+        }
+      } catch (error) {
+        console.error('Failed to load API key:', error);
+      }
+    };
+    loadApiKey();
   }, []);
 
   // Calculate storage usage when dialog opens or when save status changes
   useEffect(() => {
     if (open) {
-      const bytes = calculateStorageUsage();
+      const usage = getStorageUsage();
       setStorageUsage({
-        bytes,
-        formatted: formatStorageSize(bytes),
+        bytes: usage.used,
+        formatted: formatStorageSize(usage.used),
       });
     }
   }, [open, saveStatus, showClearConfirm]);
@@ -134,8 +130,12 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
     try {
       await validateApiKey(apiKey);
 
-      // Save to localStorage
-      localStorage.setItem(STORAGE_KEY, apiKey);
+      // Save to Tauri secure storage instead of localStorage
+      await invoke('set_secure_value', {
+        key: STORAGE_KEY,
+        value: apiKey,
+      });
+
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
@@ -146,7 +146,14 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
     }
   };
 
-  const handleClearAllData = () => {
+  const handleClearAllData = async () => {
+    // Clear API key from secure storage
+    try {
+      await invoke('delete_secure_value', { key: STORAGE_KEY });
+    } catch (error) {
+      console.error('Failed to delete API key from secure storage:', error);
+    }
+
     // Clear all localStorage data
     localStorage.clear();
 
@@ -181,7 +188,7 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">
                   Enter your OpenAI API key to enable voice transcription and AI processing.
-                  Your key is stored locally in your browser.
+                  Your key is stored securely using OS-level encryption.
                 </p>
                 <div className="flex gap-2">
                   <Input
@@ -322,7 +329,10 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                     variant="outline"
                     size="sm"
                     className="flex-1"
-                    onClick={() => window.open('https://github.com/yourusername/voice-assistant#readme', '_blank')}
+                    onClick={() => {
+                      // TODO: Replace with actual documentation URL
+                      alert('Documentation link not configured. Please add your documentation URL.');
+                    }}
                   >
                     Documentation
                   </Button>
@@ -330,7 +340,10 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                     variant="outline"
                     size="sm"
                     className="flex-1"
-                    onClick={() => window.open('https://github.com/yourusername/voice-assistant', '_blank')}
+                    onClick={() => {
+                      // TODO: Replace with actual GitHub repository URL
+                      alert('GitHub repository link not configured. Please add your repository URL.');
+                    }}
                   >
                     GitHub Repository
                   </Button>
