@@ -9,9 +9,10 @@ import { ExportDialog } from "@/components/ExportDialog";
 import { SettingsDialog } from "@/components/SettingsDialog";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { processVoiceRecording } from "@/lib/ai";
+import { processVoiceRecording, RateLimitError } from "@/lib/ai";
 import { searchVoiceItems } from "@/lib/search";
 import { MOCK_HISTORY } from "@/lib/mock-data";
+import { logError } from "@/lib/error-sanitizer";
 import type { VoiceItem, IntentType } from "@/types/voice-item";
 import type { DateRange } from "@/components/SearchBar";
 import type { AudioPlayerRef } from "@/components/AudioPlayer";
@@ -109,7 +110,7 @@ export default function Home() {
           setActiveItemId(parsed[0].id);
         }
       } catch (err) {
-        console.error("Failed to parse stored items:", err);
+        logError("Failed to parse stored items", err);
         // Fallback to mock data
         setItems(MOCK_HISTORY);
         history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
@@ -172,8 +173,17 @@ export default function Home() {
       setItems((prev) => [newItem, ...prev]);
       setActiveItemId(newItem.id);
     } catch (err) {
-      console.error("Processing error:", err);
-      setError(err instanceof Error ? err.message : "Failed to process audio");
+      logError("Processing error", err);
+
+      // Handle rate limit errors with user-friendly message
+      if (err instanceof RateLimitError) {
+        const retrySeconds = Math.ceil(err.retryAfterMs / 1000);
+        setError(
+          `${err.message} Try recording again in ${retrySeconds} second${retrySeconds !== 1 ? 's' : ''}.`
+        );
+      } else {
+        setError(err instanceof Error ? err.message : "Failed to process audio");
+      }
     } finally {
       setIsProcessing(false);
     }

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useCallback } from 'react';
+import { validateAudioBlob } from '@/lib/validation';
+import { logError } from '@/lib/error-sanitizer';
 
 export interface UseAudioRecorderReturn {
   isRecording: boolean;
@@ -65,9 +67,26 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
         }
       };
 
-      mediaRecorder.onstop = () => {
+      mediaRecorder.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
-        setAudioBlob(blob);
+
+        // Validate audio blob before setting it
+        try {
+          const validationResult = await validateAudioBlob(blob);
+
+          if (!validationResult.valid) {
+            setError(validationResult.error || 'Audio validation failed');
+            logError('Audio validation failed', { error: validationResult.error, details: validationResult.details });
+            setAudioBlob(null);
+          } else {
+            setAudioBlob(blob);
+          }
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'Audio validation error');
+          logError('Audio validation error', err);
+          setAudioBlob(null);
+        }
+
         stream.getTracks().forEach(track => track.stop());
       };
 
@@ -82,7 +101,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
       }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start recording');
-      throw err;
+      logError('Error starting recording', err);
     }
   }, [updateAudioLevel]);
 

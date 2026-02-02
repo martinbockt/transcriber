@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { logError } from '@/lib/error-sanitizer';
 
 export interface UseAudioPlayerReturn {
   isPlaying: boolean;
@@ -71,7 +72,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to play audio');
-      console.error('Audio playback error:', err);
+      logError('Audio playback error', err);
     }
   }, [updateTime]);
 
