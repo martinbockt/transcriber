@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, Trash2, X, Plus, Edit2, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -67,6 +67,16 @@ export function DetailView({
   const [editedTranscript, setEditedTranscript] = useState(item.originalTranscript);
   const [tags, setTags] = useState<string[]>(item.tags);
   const [newTag, setNewTag] = useState('');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Track unsaved changes in transcript
+  useEffect(() => {
+    if (isEditingTranscript && editedTranscript !== item.originalTranscript) {
+      setHasUnsavedChanges(true);
+    } else if (!isEditingTranscript) {
+      setHasUnsavedChanges(false);
+    }
+  }, [isEditingTranscript, editedTranscript, item.originalTranscript]);
 
   const handleAddTag = () => {
     const trimmedTag = newTag.trim();
@@ -87,11 +97,13 @@ export function DetailView({
   const handleSaveTranscript = () => {
     onUpdateTranscript?.(item.id, editedTranscript);
     setIsEditingTranscript(false);
+    setHasUnsavedChanges(false);
   };
 
   const handleCancelTranscript = () => {
     setEditedTranscript(item.originalTranscript);
     setIsEditingTranscript(false);
+    setHasUnsavedChanges(false);
   };
 
   return (
@@ -176,6 +188,12 @@ export function DetailView({
             <p className="text-xs text-muted-foreground italic mb-2">
               No audio available for this recording
             </p>
+          )}
+          {hasUnsavedChanges && (
+            <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-500 mt-2">
+              <div className="h-2 w-2 rounded-full bg-amber-600 dark:bg-amber-500 animate-pulse" />
+              <span className="font-medium">Unsaved changes</span>
+            </div>
           )}
         </div>
 
