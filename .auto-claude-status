@@ -3,7 +3,7 @@
   "spec": "005-enable-content-security-policy-csp-for-tauri-app",
   "state": "building",
   "subtasks": {
-    "completed": 5,
+    "completed": 6,
     "total": 9,
     "in_progress": 1,
     "failed": 0
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 7,
+    "number": 8,
     "started_at": "2026-02-02T23:00:26.442304"
   },
-  "last_update": "2026-02-02T23:21:01.186430"
+  "last_update": "2026-02-02T23:25:10.096805"
 }
