@@ -139,6 +139,7 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(
             onClick={onNewRecording}
             size="lg"
             className="w-full"
+            variant={isRecording ? "destructive" : "default"}
           >
             <Mic
               className={cn("mr-2 h-5 w-5", isRecording && "animate-pulse")}
