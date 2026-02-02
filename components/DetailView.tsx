@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, Trash2, X, Plus, Edit2, Check } from 'lucide-react';
+import { ChevronDown, ChevronUp, Trash2, Download, X, Plus, Edit2, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ import { TodoView } from './TodoView';
 import { ResearchView } from './ResearchView';
 import { DraftView } from './DraftView';
 import { AudioPlayer } from './AudioPlayer';
+import { ExportDialog } from './ExportDialog';
 import type { VoiceItem } from '@/types/voice-item';
 
 interface DetailViewProps {
@@ -59,6 +60,7 @@ export function DetailView({
   onUpdateTags
 }: DetailViewProps) {
   const [showTranscript, setShowTranscript] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState(item.title);
   const [isEditingSummary, setIsEditingSummary] = useState(false);
@@ -144,6 +146,14 @@ export function DetailView({
               <Badge variant={intentVariants[item.intent]}>
                 {intentLabels[item.intent]}
               </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => setShowExportDialog(true)}
+              >
+                <Download className="h-4 w-4" />
+              </Button>
               {onDelete && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
@@ -382,6 +392,13 @@ export function DetailView({
           )}
         </Card>
       </div>
+
+      {/* Export Dialog */}
+      <ExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        items={[item]}
+      />
     </div>
   );
 }

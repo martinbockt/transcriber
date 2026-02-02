@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { DetailView } from '@/components/DetailView';
 import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
+import { ExportDialog } from '@/components/ExportDialog';
 import { SettingsDialog } from '@/components/SettingsDialog';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -19,6 +20,7 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
   // Undo/redo history management
@@ -195,6 +197,10 @@ export default function Home() {
     }
   };
 
+  const handleExportAll = () => {
+    setShowExportDialog(true);
+  };
+  
   const handleClearAllData = () => {
     // Clear all items and reset active item
     setItems([]);
@@ -293,6 +299,7 @@ export default function Home() {
         activeItemId={activeItemId}
         onSelectItem={setActiveItemId}
         onNewRecording={handleNewRecording}
+        onExportAll={handleExportAll}
         isRecording={isRecording}
         onOpenSettings={() => setShowSettings(true)}
       />
@@ -345,6 +352,11 @@ export default function Home() {
       {/* Keyboard Shortcuts Help Dialog */}
       <KeyboardShortcutsDialog open={showHelp} onOpenChange={setShowHelp} />
 
+      {/* Export Dialog */}
+      <ExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        items={items}
       {/* Settings Dialog */}
       <SettingsDialog
         open={showSettings}
