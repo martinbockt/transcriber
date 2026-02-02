@@ -120,6 +120,38 @@ Tauri configuration ([src-tauri/tauri.conf.json](src-tauri/tauri.conf.json)):
 - Strict mode enabled
 - All imports use `@/` prefix (e.g., `@/components/Sidebar`)
 
+### Content Security Policy (CSP)
+
+The app implements a Content Security Policy for enhanced security in desktop mode. CSP configuration is located in [src-tauri/tauri.conf.json](src-tauri/tauri.conf.json) under `app.security.csp`.
+
+**Current Policy:**
+- `default-src: 'self'` - Only allow resources from the app itself
+- `connect-src: 'self' https://api.openai.com` - Allow API calls to OpenAI
+- `script-src: 'self' 'unsafe-inline'` - Allow inline scripts (required for Next.js)
+- `style-src: 'self' 'unsafe-inline'` - Allow inline styles (required for Tailwind)
+- `img-src: 'self' data: blob:` - Allow data URLs and blobs for images/audio
+- `media-src: 'self' data: blob:` - Allow audio playback from blobs
+
+**Troubleshooting CSP Errors:**
+
+If you see CSP violations in the console or DevTools:
+
+1. **Check the error message** - It will indicate which directive blocked the resource
+2. **Common issues:**
+   - External API calls blocked → Add domain to `connect-src`
+   - Inline scripts blocked → Verify `'unsafe-inline'` is in `script-src`
+   - Images/audio not loading → Check `img-src` and `media-src` directives
+   - External fonts blocked → Add font source to `font-src`
+
+3. **Testing CSP changes:**
+   - Modify `src-tauri/tauri.conf.json`
+   - Restart `pnpm tauri:dev` to apply changes
+   - Check DevTools console for any remaining violations
+
+4. **CSP only applies in desktop mode** - Web mode (`pnpm dev`) doesn't enforce these policies
+
+**Security Note:** Avoid using `'unsafe-eval'` or overly permissive wildcards (`*`) in CSP directives. Only add sources that are absolutely necessary for the app to function.
+
 ## Environment Variables
 
 Required environment variable:
