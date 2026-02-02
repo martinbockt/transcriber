@@ -120,6 +120,43 @@ Tauri configuration ([src-tauri/tauri.conf.json](src-tauri/tauri.conf.json)):
 - Strict mode enabled
 - All imports use `@/` prefix (e.g., `@/components/Sidebar`)
 
+### Content Security Policy (CSP)
+
+The app implements a Content Security Policy for enhanced security in desktop mode. CSP configuration is located in [src-tauri/tauri.conf.json](src-tauri/tauri.conf.json) under `app.security.csp`.
+
+**Current Policy:**
+- `default-src: 'self' tauri://localhost asset: http://tauri.localhost` - Fallback for all resource types, allows local app resources and Tauri protocol
+- `script-src: 'self' 'wasm-unsafe-eval'` - Allow WebAssembly compilation (required for Next.js)
+- `style-src: 'self' 'unsafe-inline'` - Allow inline styles (required for Tailwind CSS and Next.js dynamic styles)
+- `connect-src: 'self' https://api.openai.com tauri://localhost` - Allow API calls to OpenAI and Tauri protocol
+- `img-src: 'self' data: blob:` - Allow data URLs and blobs for images
+- `media-src: 'self' blob: data:` - Allow audio playback from blobs (required for MediaRecorder)
+- `font-src: 'self'` - Only load fonts bundled with the application
+- `object-src: 'none'` - Block all plugins (Flash, Java, etc.) for security
+- `base-uri: 'self'` - Restrict document base URL to same origin
+- `form-action: 'self'` - Restrict form submissions to same origin
+- `frame-ancestors: 'none'` - Prevent app from being embedded in iframes (clickjacking protection)
+
+**Troubleshooting CSP Errors:**
+
+If you see CSP violations in the console or DevTools:
+
+1. **Check the error message** - It will indicate which directive blocked the resource
+2. **Common issues:**
+   - External API calls blocked → Add domain to `connect-src`
+   - WebAssembly compilation blocked → Verify `'wasm-unsafe-eval'` is in `script-src`
+   - Images/audio not loading → Check `img-src` and `media-src` directives
+   - External fonts blocked → Add font source to `font-src`
+
+3. **Testing CSP changes:**
+   - Modify `src-tauri/tauri.conf.json`
+   - Restart `pnpm tauri:dev` to apply changes
+   - Check DevTools console for any remaining violations
+
+4. **CSP only applies in desktop mode** - Web mode (`pnpm dev`) doesn't enforce these policies
+
+**Security Note:** Avoid using `'unsafe-eval'` or overly permissive wildcards (`*`) in CSP directives. Only add sources that are absolutely necessary for the app to function.
+
 ## Environment Variables
 
 Required environment variable:
