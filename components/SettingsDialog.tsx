@@ -317,6 +317,24 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                 <p className="text-sm text-muted-foreground">
                   A voice-powered assistant that transcribes and processes your audio recordings using OpenAI's advanced AI technology.
                 </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => window.open('https://github.com/yourusername/voice-assistant#readme', '_blank')}
+                  >
+                    Documentation
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => window.open('https://github.com/yourusername/voice-assistant', '_blank')}
+                  >
+                    GitHub Repository
+                  </Button>
+                </div>
               </div>
             </section>
           </div>
