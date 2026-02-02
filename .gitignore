@@ -38,3 +38,6 @@ next-env.d.ts
 
 # tauri
 /src-tauri/target
+
+# Auto Claude data directory
+.auto-claude/
