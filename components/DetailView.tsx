@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import {
   AlertDialog,
@@ -45,6 +46,8 @@ const intentVariants = {
 
 export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
   const [showTranscript, setShowTranscript] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(item.title);
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -52,7 +55,32 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
         {/* Header */}
         <div>
           <div className="flex items-start justify-between mb-2">
-            <h1 className="text-3xl font-bold">{item.title}</h1>
+            {isEditingTitle ? (
+              <Input
+                value={editedTitle}
+                onChange={(e) => setEditedTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setIsEditingTitle(false);
+                  } else if (e.key === 'Escape') {
+                    setEditedTitle(item.title);
+                    setIsEditingTitle(false);
+                  }
+                }}
+                onBlur={() => {
+                  setIsEditingTitle(false);
+                }}
+                autoFocus
+                className="text-3xl font-bold h-auto py-1"
+              />
+            ) : (
+              <h1
+                className="text-3xl font-bold cursor-pointer hover:text-primary/80 transition-colors"
+                onClick={() => setIsEditingTitle(true)}
+              >
+                {editedTitle}
+              </h1>
+            )}
             <div className="flex items-center gap-2">
               <Badge variant={intentVariants[item.intent]}>
                 {intentLabels[item.intent]}
