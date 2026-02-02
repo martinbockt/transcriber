@@ -206,6 +206,18 @@ export default function Home() {
     );
   };
 
+  const handleTogglePin = (itemId: string) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
+        return {
+          ...item,
+          pinned: !item.pinned,
+        };
+      }),
+    );
+  };
+
   const handleDelete = (itemId: string) => {
     setItems((prev) => prev.filter((item) => item.id !== itemId));
 
