@@ -8,6 +8,55 @@ import { createRateLimiter } from '@/lib/rate-limiter';
 const STORAGE_KEY = 'openai_api_key';
 
 /**
+ * Sanitizes an error object to remove sensitive information like API keys
+ * before logging to console
+ */
+function sanitizeError(error: unknown): string {
+  if (!error) {
+    return 'Unknown error';
+  }
+
+  // Convert error to string representation
+  let errorStr = '';
+  if (error instanceof Error) {
+    errorStr = `${error.name}: ${error.message}`;
+    if (error.stack) {
+      errorStr += `\n${error.stack}`;
+    }
+  } else if (typeof error === 'string') {
+    errorStr = error;
+  } else {
+    try {
+      errorStr = JSON.stringify(error);
+    } catch {
+      errorStr = String(error);
+    }
+  }
+
+  // Remove API keys (various formats)
+  errorStr = errorStr.replace(/sk-[a-zA-Z0-9]{32,}/g, '[REDACTED_API_KEY]');
+  errorStr = errorStr.replace(/Bearer\s+sk-[a-zA-Z0-9]{32,}/gi, 'Bearer [REDACTED_API_KEY]');
+
+  // Remove authorization headers
+  errorStr = errorStr.replace(/authorization['":\s]+[^,}\s]+/gi, 'authorization: [REDACTED]');
+  errorStr = errorStr.replace(/"Authorization":\s*"[^"]+"/gi, '"Authorization": "[REDACTED]"');
+
+  // Remove any other potential keys (env vars, tokens, etc.)
+  errorStr = errorStr.replace(/api[_-]?key['":\s]*[a-zA-Z0-9_-]{16,}/gi, 'api_key: [REDACTED]');
+  errorStr = errorStr.replace(/token['":\s]*[a-zA-Z0-9_-]{16,}/gi, 'token: [REDACTED]');
+
+  return errorStr;
+}
+
+/**
+ * Logs an error to console with sensitive information removed
+ */
+function logSanitizedError(message: string, error: unknown): void {
+  const sanitized = sanitizeError(error);
+  console.error(`${message}`, sanitized);
+}
+
+/**
  * Custom error class for rate limiting errors
  */
 export class RateLimitError extends Error {
@@ -43,7 +92,7 @@ async function getApiKey(): Promise<string> {
         return storedKey;
       }
     } catch (error) {
-      console.error('Failed to retrieve API key from secure storage:', error);
+      logSanitizedError('Failed to retrieve API key from secure storage:', error);
       // Fall through to environment variable
     }
   }
@@ -117,7 +166,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     const data = await response.json();
     return data.text;
   } catch (error) {
-    console.error('Transcription error:', error);
+    logSanitizedError('Transcription error:', error);
     throw error;
   }
 }
@@ -169,7 +218,7 @@ Be thorough and accurate. Ensure the output is immediately useful to the user.`,
 
     return result.object;
   } catch (error) {
-    console.error('Processing error:', error);
+    logSanitizedError('Processing error:', error);
     throw error;
   }
 }
