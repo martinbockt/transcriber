@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,10 +45,17 @@ const intentLabels = {
 };
 
 const intentVariants = {
-  TODO: 'default',
-  RESEARCH: 'secondary',
-  DRAFT: 'secondary',
-  NOTE: 'outline',
+  TODO: 'todo',
+  RESEARCH: 'research',
+  DRAFT: 'draft',
+  NOTE: 'note',
+} as const;
+
+const intentBorderColors = {
+  TODO: 'border-l-[hsl(var(--intent-todo))]',
+  RESEARCH: 'border-l-[hsl(var(--intent-research))]',
+  DRAFT: 'border-l-[hsl(var(--intent-draft))]',
+  NOTE: 'border-l-[hsl(var(--intent-note))]',
 } as const;
 
 export function DetailView({
@@ -110,7 +118,7 @@ export function DetailView({
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="max-w-4xl mx-auto p-8 space-y-6">
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 animate-fadeIn">
         {/* Header */}
         <div>
           <div className="flex items-start justify-between mb-2">
@@ -192,6 +200,15 @@ export function DetailView({
               minute: '2-digit',
             })}
           </div>
+          {item.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {item.tags.map((tag) => (
+                <Badge key={`${item.id}-${tag}`} variant="tag" className="text-xs font-medium">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
           {item.audioData ? (
             <AudioPlayer audioData={item.audioData} className="mb-2" />
           ) : (
@@ -294,19 +311,25 @@ export function DetailView({
 
         {/* Key Facts */}
         {item.keyFacts.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Key Facts</CardTitle>
+          <Card className={`border-l-4 ${intentBorderColors[item.intent]}`}>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold tracking-tight">Key Facts</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {item.keyFacts.map((fact, index) => (
-                  <li key={index} className="text-sm flex gap-2">
-                    <span className="text-primary">•</span>
-                    <span>{fact}</span>
-                  </li>
-                ))}
-              </ul>
+            <CardContent className="pt-0">
+              <Table>
+                <TableBody>
+                  {item.keyFacts.map((fact, index) => (
+                    <TableRow key={`${item.id}-fact-${index}`}>
+                      <TableCell className="font-semibold text-primary/70 w-16 text-center">
+                        <div className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-xs">
+                          {index + 1}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm leading-relaxed">{fact}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
         )}
@@ -388,6 +411,7 @@ export function DetailView({
                   {editedTranscript}
                 </p>
               )}
+
             </CardContent>
           )}
         </Card>

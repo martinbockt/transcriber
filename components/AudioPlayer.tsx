@@ -35,39 +35,41 @@ export function AudioPlayer({ audioData, className }: AudioPlayerProps) {
 
   return (
     <div className={className}>
-      <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handlePlayPause}
-          className="h-8 w-8 p-0"
-        >
-          {isPlaying ? (
-            <Pause className="h-4 w-4" />
-          ) : (
-            <Play className="h-4 w-4" />
-          )}
-        </Button>
+      <div className="bg-muted/30 border border-border rounded-lg p-3 backdrop-blur-sm">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handlePlayPause}
+            className="h-9 w-9 p-0 rounded-full hover:bg-primary/10 transition-colors"
+          >
+            {isPlaying ? (
+              <Pause className="h-4 w-4 fill-current" />
+            ) : (
+              <Play className="h-4 w-4 ml-0.5 fill-current" />
+            )}
+          </Button>
 
-        <div className="flex-1 space-y-1">
-          <Slider
-            value={[currentTime]}
-            max={duration || 100}
-            step={0.1}
-            onValueChange={handleSeek}
-            className="cursor-pointer"
-            disabled={!duration}
-          />
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{formatTime(currentTime)}</span>
-            <span>{duration ? formatTime(duration) : '--:--'}</span>
+          <div className="flex-1 space-y-1.5">
+            <Slider
+              value={[currentTime]}
+              max={duration || 100}
+              step={0.1}
+              onValueChange={handleSeek}
+              className="cursor-pointer"
+              disabled={!duration}
+            />
+            <div className="flex justify-between text-xs text-muted-foreground font-medium tabular-nums">
+              <span>{formatTime(currentTime)}</span>
+              <span>{duration ? formatTime(duration) : '--:--'}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {error && (
-        <p className="text-xs text-destructive mt-2">{error}</p>
-      )}
+        {error && (
+          <p className="text-xs text-destructive mt-2 font-medium">{error}</p>
+        )}
+      </div>
     </div>
   );
 }

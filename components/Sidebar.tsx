@@ -35,10 +35,17 @@ const intentIcons: Record<IntentType, typeof ListTodo> = {
 };
 
 const intentColors: Record<IntentType, string> = {
-  TODO: 'text-blue-600',
-  RESEARCH: 'text-purple-600',
-  DRAFT: 'text-green-600',
-  NOTE: 'text-gray-600',
+  TODO: 'text-[hsl(var(--intent-todo))]',
+  RESEARCH: 'text-[hsl(var(--intent-research))]',
+  DRAFT: 'text-[hsl(var(--intent-draft))]',
+  NOTE: 'text-[hsl(var(--intent-note))]',
+};
+
+const intentBorderColors: Record<IntentType, string> = {
+  TODO: 'border-l-[hsl(var(--intent-todo))]',
+  RESEARCH: 'border-l-[hsl(var(--intent-research))]',
+  DRAFT: 'border-l-[hsl(var(--intent-draft))]',
+  NOTE: 'border-l-[hsl(var(--intent-note))]',
 };
 
 // Helper function to highlight search terms in text
@@ -167,8 +174,9 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
                 <Card
                   key={item.id}
                   className={cn(
-                    "p-3 cursor-pointer transition-colors hover:bg-accent",
-                    isActive && "bg-accent border-primary"
+                    "p-3 cursor-pointer transition-all duration-200 hover:bg-accent border-l-2",
+                    intentBorderColors[item.intent],
+                    isActive && "bg-accent shadow-sm"
                   )}
                   onClick={() => onSelectItem(item.id)}
                 >
@@ -188,13 +196,13 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
                       </p>
                       {item.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1">
-                          {item.tags.slice(0, 2).map((tag, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
+                          {item.tags.slice(0, 2).map((tag) => (
+                            <Badge key={`${item.id}-sidebar-${tag}`} variant="tag" className="text-[10px] px-2 py-0">
                               {tag}
                             </Badge>
                           ))}
                           {item.tags.length > 2 && (
-                            <Badge variant="secondary" className="text-xs">
+                            <Badge key={`${item.id}-sidebar-more`} variant="tag" className="text-[10px] px-2 py-0">
                               +{item.tags.length - 2}
                             </Badge>
                           )}

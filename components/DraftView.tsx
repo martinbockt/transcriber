@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { MarkdownRenderer } from './MarkdownRenderer';
 import type { VoiceItem } from '@/types/voice-item';
 
 interface DraftViewProps {
@@ -25,15 +26,15 @@ export function DraftView({ item }: DraftViewProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Draft Content</CardTitle>
+    <Card className="border-l-4 border-l-[hsl(var(--intent-draft))]">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between gap-3">
+          <CardTitle className="text-lg font-semibold tracking-tight">Draft Content</CardTitle>
           <Button
             variant="outline"
             size="sm"
             onClick={handleCopy}
-            className="gap-2"
+            className="gap-2 shrink-0"
           >
             {copied ? (
               <>
@@ -49,11 +50,9 @@ export function DraftView({ item }: DraftViewProps) {
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="bg-muted/50 p-4 rounded-md">
-          <div className="whitespace-pre-wrap text-sm leading-relaxed font-mono">
-            {draftContent}
-          </div>
+      <CardContent className="pt-0">
+        <div className="bg-[hsl(var(--intent-draft))]/5 border border-[hsl(var(--intent-draft))]/20 p-4 rounded-lg">
+          <MarkdownRenderer content={draftContent} />
         </div>
       </CardContent>
     </Card>
