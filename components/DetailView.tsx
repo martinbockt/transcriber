@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from 'react';
-import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronDown, ChevronUp, Trash2, Download, X, Plus, Edit2, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import {
   AlertDialog,
@@ -21,12 +23,17 @@ import { TodoView } from './TodoView';
 import { ResearchView } from './ResearchView';
 import { DraftView } from './DraftView';
 import { AudioPlayer } from './AudioPlayer';
+import { ExportDialog } from './ExportDialog';
 import type { VoiceItem } from '@/types/voice-item';
 
 interface DetailViewProps {
   item: VoiceItem;
   onToggleTodo?: (itemId: string, todoIndex: number) => void;
   onDelete?: (itemId: string) => void;
+  onUpdateTitle?: (itemId: string, newTitle: string) => void;
+  onUpdateSummary?: (itemId: string, newSummary: string) => void;
+  onUpdateTranscript?: (itemId: string, newTranscript: string) => void;
+  onUpdateTags?: (itemId: string, newTags: string[]) => void;
 }
 
 const intentLabels = {
@@ -43,8 +50,63 @@ const intentVariants = {
   NOTE: 'outline',
 } as const;
 
-export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
+export function DetailView({
+  item,
+  onToggleTodo,
+  onDelete,
+  onUpdateTitle,
+  onUpdateSummary,
+  onUpdateTranscript,
+  onUpdateTags
+}: DetailViewProps) {
   const [showTranscript, setShowTranscript] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(item.title);
+  const [isEditingSummary, setIsEditingSummary] = useState(false);
+  const [editedSummary, setEditedSummary] = useState(item.summary);
+  const [isEditingTranscript, setIsEditingTranscript] = useState(false);
+  const [editedTranscript, setEditedTranscript] = useState(item.originalTranscript);
+  const [tags, setTags] = useState<string[]>(item.tags);
+  const [newTag, setNewTag] = useState('');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Track unsaved changes in transcript
+  useEffect(() => {
+    if (isEditingTranscript && editedTranscript !== item.originalTranscript) {
+      setHasUnsavedChanges(true);
+    } else if (!isEditingTranscript) {
+      setHasUnsavedChanges(false);
+    }
+  }, [isEditingTranscript, editedTranscript, item.originalTranscript]);
+
+  const handleAddTag = () => {
+    const trimmedTag = newTag.trim();
+    if (trimmedTag && !tags.includes(trimmedTag)) {
+      const newTags = [...tags, trimmedTag];
+      setTags(newTags);
+      onUpdateTags?.(item.id, newTags);
+      setNewTag('');
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    const newTags = tags.filter((tag) => tag !== tagToRemove);
+    setTags(newTags);
+    onUpdateTags?.(item.id, newTags);
+  };
+
+  const handleSaveTranscript = () => {
+    onUpdateTranscript?.(item.id, editedTranscript);
+    setIsEditingTranscript(false);
+    setHasUnsavedChanges(false);
+  };
+
+  const handleCancelTranscript = () => {
+    setEditedTranscript(item.originalTranscript);
+    setIsEditingTranscript(false);
+    setHasUnsavedChanges(false);
+  };
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -52,11 +114,46 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
         {/* Header */}
         <div>
           <div className="flex items-start justify-between mb-2">
-            <h1 className="text-3xl font-bold">{item.title}</h1>
+            {isEditingTitle ? (
+              <Input
+                value={editedTitle}
+                onChange={(e) => setEditedTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    onUpdateTitle?.(item.id, editedTitle);
+                    setIsEditingTitle(false);
+                  } else if (e.key === 'Escape') {
+                    setEditedTitle(item.title);
+                    setIsEditingTitle(false);
+                  }
+                }}
+                onBlur={() => {
+                  onUpdateTitle?.(item.id, editedTitle);
+                  setIsEditingTitle(false);
+                }}
+                autoFocus
+                className="text-3xl font-bold h-auto py-1"
+              />
+            ) : (
+              <h1
+                className="text-3xl font-bold cursor-pointer hover:text-primary/80 transition-colors"
+                onClick={() => setIsEditingTitle(true)}
+              >
+                {editedTitle}
+              </h1>
+            )}
             <div className="flex items-center gap-2">
               <Badge variant={intentVariants[item.intent]}>
                 {intentLabels[item.intent]}
               </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => setShowExportDialog(true)}
+              >
+                <Download className="h-4 w-4" />
+              </Button>
               {onDelete && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
@@ -102,6 +199,12 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
               No audio available for this recording
             </p>
           )}
+          {hasUnsavedChanges && (
+            <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-500 mt-2">
+              <div className="h-2 w-2 rounded-full bg-amber-600 dark:bg-amber-500 animate-pulse" />
+              <span className="font-medium">Unsaved changes</span>
+            </div>
+          )}
         </div>
 
         <Separator />
@@ -112,27 +215,82 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
             <CardTitle className="text-lg">Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm leading-relaxed">{item.summary}</p>
+            {isEditingSummary ? (
+              <Textarea
+                value={editedSummary}
+                onChange={(e) => setEditedSummary(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setEditedSummary(item.summary);
+                    setIsEditingSummary(false);
+                  }
+                }}
+                onBlur={() => {
+                  onUpdateSummary?.(item.id, editedSummary);
+                  setIsEditingSummary(false);
+                }}
+                autoFocus
+                className="text-sm leading-relaxed min-h-[100px]"
+              />
+            ) : (
+              <p
+                className="text-sm leading-relaxed cursor-pointer hover:text-primary/80 transition-colors"
+                onClick={() => setIsEditingSummary(true)}
+              >
+                {editedSummary}
+              </p>
+            )}
           </CardContent>
         </Card>
 
         {/* Tags */}
-        {item.tags.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Tags</CardTitle>
-            </CardHeader>
-            <CardContent>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Tags</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                {item.tags.map((tag, index) => (
-                  <Badge key={index} variant="secondary">
-                    {tag}
+                {tags.map((tag, index) => (
+                  <Badge key={index} variant="secondary" className="group pr-1">
+                    <span className="mr-1">{tag}</span>
+                    <button
+                      onClick={() => handleRemoveTag(tag)}
+                      className="inline-flex items-center justify-center rounded-full hover:bg-secondary-foreground/20 transition-colors"
+                      aria-label={`Remove ${tag} tag`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
                   </Badge>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
+              <div className="flex gap-2">
+                <Input
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddTag();
+                    }
+                  }}
+                  placeholder="Add a tag..."
+                  className="text-sm"
+                />
+                <Button
+                  onClick={handleAddTag}
+                  size="sm"
+                  variant="secondary"
+                  className="shrink-0"
+                  disabled={!newTag.trim()}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Key Facts */}
         {item.keyFacts.length > 0 && (
@@ -166,28 +324,81 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
         {/* Original Transcript */}
         <Card>
           <CardHeader>
-            <Button
-              variant="ghost"
-              className="w-full justify-between p-0 h-auto hover:bg-transparent"
-              onClick={() => setShowTranscript(!showTranscript)}
-            >
-              <CardTitle className="text-lg">Original Transcript</CardTitle>
-              {showTranscript ? (
-                <ChevronUp className="h-5 w-5" />
-              ) : (
-                <ChevronDown className="h-5 w-5" />
+            <div className="flex items-center justify-between w-full">
+              <Button
+                variant="ghost"
+                className="flex-1 justify-between p-0 h-auto hover:bg-transparent"
+                onClick={() => setShowTranscript(!showTranscript)}
+              >
+                <CardTitle className="text-lg">Original Transcript</CardTitle>
+                {showTranscript ? (
+                  <ChevronUp className="h-5 w-5" />
+                ) : (
+                  <ChevronDown className="h-5 w-5" />
+                )}
+              </Button>
+              {showTranscript && !isEditingTranscript && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsEditingTranscript(true)}
+                  className="ml-2"
+                >
+                  <Edit2 className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
               )}
-            </Button>
+            </div>
           </CardHeader>
           {showTranscript && (
             <CardContent>
-              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                {item.originalTranscript}
-              </p>
+              {isEditingTranscript ? (
+                <div className="space-y-3">
+                  <Textarea
+                    value={editedTranscript}
+                    onChange={(e) => setEditedTranscript(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape') {
+                        handleCancelTranscript();
+                      }
+                    }}
+                    autoFocus
+                    className="text-sm leading-relaxed min-h-[200px] font-mono"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleSaveTranscript}
+                      size="sm"
+                      variant="default"
+                    >
+                      <Check className="h-4 w-4 mr-1" />
+                      Save
+                    </Button>
+                    <Button
+                      onClick={handleCancelTranscript}
+                      size="sm"
+                      variant="outline"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {editedTranscript}
+                </p>
+              )}
             </CardContent>
           )}
         </Card>
       </div>
+
+      {/* Export Dialog */}
+      <ExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        items={[item]}
+      />
     </div>
   );
 }

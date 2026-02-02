@@ -1,15 +1,15 @@
 {
   "active": true,
-  "spec": "001-full-text-search",
+  "spec": "004-settings-page",
   "state": "building",
   "subtasks": {
-    "completed": 8,
-    "total": 9,
+    "completed": 17,
+    "total": 18,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Polish & Keyboard Shortcuts",
+    "current": "Integration & Polish",
     "id": null,
     "total": 2
   },
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 10,
-    "started_at": "2026-02-02T15:45:56.312746"
+    "number": 19,
+    "started_at": "2026-02-02T16:22:00.438775"
   },
-  "last_update": "2026-02-02T16:08:00.823232"
+  "last_update": "2026-02-02T16:53:06.237920"
 }

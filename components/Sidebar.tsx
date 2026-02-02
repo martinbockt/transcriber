@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef } from 'react';
-import { Mic, ListTodo, FileQuestion, FileEdit, StickyNote } from 'lucide-react';
+import { Mic, ListTodo, FileQuestion, FileEdit, StickyNote, Download, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,7 @@ interface SidebarProps {
   activeItemId: string | null;
   onSelectItem: (id: string) => void;
   onNewRecording: () => void;
+  onExportAll: () => void;
   isRecording: boolean;
   searchQuery: string;
   onSearchChange: (query: string) => void;
@@ -23,6 +24,7 @@ interface SidebarProps {
   onIntentsChange: (intents: IntentType[]) => void;
   dateRange: DateRange;
   onDateRangeChange: (range: DateRange) => void;
+  onOpenSettings?: () => void;
 }
 
 const intentIcons: Record<IntentType, typeof ListTodo> = {
@@ -64,6 +66,7 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
   activeItemId,
   onSelectItem,
   onNewRecording,
+  onExportAll,
   isRecording,
   searchQuery,
   onSearchChange,
@@ -79,10 +82,24 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
   // For now, we show count when filters are active
   const showResultCount = hasActiveFilters && items.length > 0;
 
+  onOpenSettings,
+}: SidebarProps) {
   return (
     <div className="w-80 border-r bg-muted/10 flex flex-col h-screen">
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Voice Assistant</h1>
+      <div className="p-4 space-y-2"">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-bold mb-4">Voice Assistant</h1>
+          {onOpenSettings && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onOpenSettings}
+              className="h-8 w-8"
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
+          )}
+        </div>
         <Button
           onClick={onNewRecording}
           disabled={isRecording}
@@ -91,6 +108,16 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
         >
           <Mic className={cn("mr-2 h-5 w-5", isRecording && "animate-pulse")} />
           {isRecording ? 'Recording...' : 'New Recording'}
+        </Button>
+        <Button
+          onClick={onExportAll}
+          disabled={items.length === 0}
+          variant="outline"
+          size="lg"
+          className="w-full"
+        >
+          <Download className="mr-2 h-5 w-5" />
+          Export All
         </Button>
       </div>
 
