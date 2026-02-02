@@ -1,9 +1,16 @@
 use tauri::Manager;
 
+mod commands;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .invoke_handler(tauri::generate_handler![
+            commands::get_secure_value,
+            commands::set_secure_value,
+            commands::delete_secure_value,
+        ])
         .setup(|app| {
             #[cfg(debug_assertions)]
             {

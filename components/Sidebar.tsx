@@ -1,6 +1,6 @@
 "use client";
 
-import { Mic, ListTodo, FileQuestion, FileEdit, StickyNote } from 'lucide-react';
+import { Mic, ListTodo, FileQuestion, FileEdit, StickyNote, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,7 @@ interface SidebarProps {
   onSelectItem: (id: string) => void;
   onNewRecording: () => void;
   isRecording: boolean;
+  onOpenSettings?: () => void;
 }
 
 const intentIcons: Record<IntentType, typeof ListTodo> = {
@@ -37,11 +38,24 @@ export function Sidebar({
   onSelectItem,
   onNewRecording,
   isRecording,
+  onOpenSettings,
 }: SidebarProps) {
   return (
     <div className="w-80 border-r bg-muted/10 flex flex-col h-screen">
       <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">Voice Assistant</h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-bold">Voice Assistant</h1>
+          {onOpenSettings && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onOpenSettings}
+              className="h-8 w-8"
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
+          )}
+        </div>
         <Button
           onClick={onNewRecording}
           disabled={isRecording}

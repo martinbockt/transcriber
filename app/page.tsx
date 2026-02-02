@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { DetailView } from '@/components/DetailView';
 import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
+import { SettingsDialog } from '@/components/SettingsDialog';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { processVoiceRecording } from '@/lib/ai';
@@ -18,6 +19,7 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Undo/redo history management
   const history = useRef<VoiceItem[][]>([]);
@@ -193,6 +195,12 @@ export default function Home() {
     }
   };
 
+  const handleClearAllData = () => {
+    // Clear all items and reset active item
+    setItems([]);
+    setActiveItemId(null);
+  };
+    // Note: localStorage is already cleared by SettingsDialog
   const handleUpdateTitle = (itemId: string, newTitle: string) => {
     setItems((prev) =>
       prev.map((item) => {
@@ -271,6 +279,9 @@ export default function Home() {
     onHelp: () => {
       setShowHelp(true);
     },
+    onSettings: () => {
+      setShowSettings(true);
+    },
     onUndo: handleUndo,
     onRedo: handleRedo,
   });
@@ -283,6 +294,7 @@ export default function Home() {
         onSelectItem={setActiveItemId}
         onNewRecording={handleNewRecording}
         isRecording={isRecording}
+        onOpenSettings={() => setShowSettings(true)}
       />
 
       <div className="flex-1 flex flex-col">
@@ -332,6 +344,13 @@ export default function Home() {
 
       {/* Keyboard Shortcuts Help Dialog */}
       <KeyboardShortcutsDialog open={showHelp} onOpenChange={setShowHelp} />
+
+      {/* Settings Dialog */}
+      <SettingsDialog
+        open={showSettings}
+        onOpenChange={setShowSettings}
+        onDataCleared={handleClearAllData}
+      />
     </div>
   );
 }
