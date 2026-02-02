@@ -4,6 +4,26 @@ import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import type { VoiceItem, IntentType } from '@/types/voice-item';
 
+const STORAGE_KEY = 'openai_api_key';
+
+function getApiKey(): string {
+  // Check localStorage first (user-provided key)
+  if (typeof window !== 'undefined') {
+    const storedKey = localStorage.getItem(STORAGE_KEY);
+    if (storedKey) {
+      return storedKey;
+    }
+  }
+
+  // Fall back to environment variable
+  const envKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+  if (envKey) {
+    return envKey;
+  }
+
+  throw new Error('OpenAI API key is not configured. Please add your API key in Settings.');
+}
+
 const VoiceItemSchema = z.object({
   title: z.string().describe('A short, descriptive title (max 60 characters)'),
   tags: z.array(z.string()).describe('2-5 relevant tags for categorization'),
@@ -22,11 +42,7 @@ const VoiceItemSchema = z.object({
 });
 
 export async function transcribeAudio(audioBlob: Blob): Promise<string> {
-  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('OpenAI API key is not configured. Please set NEXT_PUBLIC_OPENAI_API_KEY in your environment.');
-  }
+  const apiKey = getApiKey();
 
   try {
     const formData = new FormData();
@@ -55,11 +71,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 }
 
 export async function processContent(transcript: string): Promise<Omit<VoiceItem, 'id' | 'createdAt' | 'originalTranscript'>> {
-  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('OpenAI API key is not configured. Please set NEXT_PUBLIC_OPENAI_API_KEY in your environment.');
-  }
+  const apiKey = getApiKey();
 
   try {
     const openai = createOpenAI({ apiKey });

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -9,13 +10,57 @@ import {
 } from '@/components/ui/alert-dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+const STORAGE_KEY = 'openai_api_key';
+
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
+  const [apiKey, setApiKey] = useState('');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Load API key from localStorage on mount
+  useEffect(() => {
+    const savedKey = localStorage.getItem(STORAGE_KEY);
+    if (savedKey) {
+      setApiKey(savedKey);
+    }
+  }, []);
+
+  const handleSaveApiKey = () => {
+    // Basic validation
+    if (!apiKey.trim()) {
+      setErrorMessage('API key cannot be empty');
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+      return;
+    }
+
+    // Validate OpenAI API key format (should start with sk-)
+    if (!apiKey.startsWith('sk-')) {
+      setErrorMessage('Invalid API key format. OpenAI keys should start with "sk-"');
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+      return;
+    }
+
+    // Save to localStorage
+    try {
+      localStorage.setItem(STORAGE_KEY, apiKey);
+      setSaveStatus('success');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } catch (error) {
+      setErrorMessage('Failed to save API key');
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    }
+  };
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="max-w-2xl max-h-[80vh]">
@@ -30,11 +75,37 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
         <ScrollArea className="flex-1 pr-4">
           <div className="space-y-6 py-4">
-            {/* API Key Section - to be implemented in phase 2 */}
+            {/* API Key Section */}
             <section>
-              <h3 className="text-sm font-medium mb-3">API Key</h3>
-              <div className="text-sm text-muted-foreground">
-                API key configuration will be added here
+              <h3 className="text-sm font-medium mb-3">OpenAI API Key</h3>
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Enter your OpenAI API key to enable voice transcription and AI processing.
+                  Your key is stored locally in your browser.
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    type="password"
+                    placeholder="sk-..."
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button
+                    onClick={handleSaveApiKey}
+                    variant={saveStatus === 'success' ? 'default' : 'outline'}
+                  >
+                    {saveStatus === 'success' ? 'Saved!' : 'Save'}
+                  </Button>
+                </div>
+                {saveStatus === 'error' && (
+                  <p className="text-sm text-destructive">{errorMessage}</p>
+                )}
+                {saveStatus === 'success' && (
+                  <p className="text-sm text-green-600 dark:text-green-400">
+                    API key saved successfully
+                  </p>
+                )}
               </div>
             </section>
 
