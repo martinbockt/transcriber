@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate Limiter Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .success { color: #4ec9b0; }
+        .fail { color: #f48771; }
+        .info { color: #9cdcfe; }
+        button {
+            padding: 10px 20px;
+            margin: 10px 0;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        pre {
+            background: #252526;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rate Limiter Test</h1>
+    <button onclick="runTests()">Run Tests</button>
+    <pre id="output"></pre>
+
+    <script type="module">
+        // Inline the rate limiter code for testing
+        class RateLimiter {
+            constructor(config) {
+                this.maxTokens = config.maxTokens;
+                this.refillRate = config.refillRate;
+                this.tokens = config.initialTokens ?? config.maxTokens;
+                this.lastRefillTime = Date.now();
+            }
+
+            refill() {
+                try {
+                    const now = Date.now();
+                    const timeSinceLastRefill = (now - this.lastRefillTime) / 1000;
+                    const tokensToAdd = timeSinceLastRefill * this.refillRate;
+                    this.tokens = Math.min(this.maxTokens, this.tokens + tokensToAdd);
+                    this.lastRefillTime = now;
+                } catch (err) {
+                    console.error('Failed to refill tokens:', err);
+                }
+            }
+
+            acquire(cost = 1) {
+                try {
+                    if (cost <= 0) {
+                        throw new Error('Token cost must be positive');
+                    }
+                    if (cost > this.maxTokens) {
+                        throw new Error('Token cost exceeds maximum bucket capacity');
+                    }
+
+                    this.refill();
+
+                    if (this.tokens >= cost) {
+                        this.tokens -= cost;
+                        return true;
+                    }
+
+                    return false;
+                } catch (err) {
+                    console.error('Failed to acquire token:', err);
+                    return false;
+                }
+            }
+
+            getAvailableTokens() {
+                try {
+                    this.refill();
+                    return Math.floor(this.tokens);
+                } catch (err) {
+                    console.error('Failed to get available tokens:', err);
+                    return 0;
+                }
+            }
+
+            getTimeUntilTokensAvailable(tokens = 1) {
+                try {
+                    this.refill();
+                    if (this.tokens >= tokens) {
+                        return 0;
+                    }
+                    const tokensNeeded = tokens - this.tokens;
+                    const timeNeeded = (tokensNeeded / this.refillRate) * 1000;
+                    return Math.ceil(timeNeeded);
+                } catch (err) {
+                    console.error('Failed to calculate time until tokens available:', err);
+                    return 0;
+                }
+            }
+
+            reset(tokens) {
+                try {
+                    this.tokens = tokens ?? this.maxTokens;
+                    this.lastRefillTime = Date.now();
+                } catch (err) {
+                    console.error('Failed to reset rate limiter:', err);
+                }
+            }
+        }
+
+        function createRateLimiter(requestsPerMinute, burst) {
+            const refillRate = requestsPerMinute / 60;
+            const maxTokens = burst ?? requestsPerMinute;
+            return new RateLimiter({ maxTokens, refillRate });
+        }
+
+        // Make runTests available globally
+        window.runTests = async function() {
+            const output = document.getElementById('output');
+            output.innerHTML = '';
+
+            function log(msg, type = 'info') {
+                const line = document.createElement('div');
+                line.className = type;
+                line.textContent = msg;
+                output.appendChild(line);
+            }
+
+            log('=== Test 1: Basic Rate Limiting ===', 'info');
+            const limiter = new RateLimiter({
+                maxTokens: 5,
+                refillRate: 1,
+            });
+
+            log(`Initial tokens: ${limiter.getAvailableTokens()}`, 'info');
+
+            let successCount = 0;
+            let failCount = 0;
+
+            for (let i = 0; i < 10; i++) {
+                const success = limiter.acquire();
+                if (success) {
+                    successCount++;
+                    log(`Request ${i + 1}: ✓ Success (${limiter.getAvailableTokens()} tokens left)`, 'success');
+                } else {
+                    failCount++;
+                    log(`Request ${i + 1}: ✗ Rate limited (${limiter.getAvailableTokens()} tokens left)`, 'fail');
+                }
+            }
+
+            log(`\nResults: ${successCount} successful, ${failCount} rate-limited`, 'info');
+            log('Expected: First 5 succeed, next 5 fail', 'info');
+
+            if (successCount === 5 && failCount === 5) {
+                log('✓ Test 1 PASSED', 'success');
+            } else {
+                log('✗ Test 1 FAILED', 'fail');
+            }
+
+            // Test 2: Token refill
+            log('\n=== Test 2: Token Refill ===', 'info');
+            log('Waiting 2 seconds for token refill...', 'info');
+
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            const tokensAfter = limiter.getAvailableTokens();
+            log(`Tokens after 2 seconds: ${tokensAfter}`, 'info');
+            log('Expected: ~2 tokens (2 seconds × 1 token/second)', 'info');
+
+            if (tokensAfter >= 1 && tokensAfter <= 2) {
+                log('✓ Test 2 PASSED', 'success');
+            } else {
+                log('✗ Test 2 FAILED', 'fail');
+            }
+
+            // Test 3: Acquire after refill
+            const canAcquire = limiter.acquire();
+            log(`\nCan acquire token? ${canAcquire ? '✓ Yes' : '✗ No'}`, canAcquire ? 'success' : 'fail');
+
+            // Test 4: Time until available
+            log('\n=== Test 3: Time Until Available ===', 'info');
+            const timeUntil = limiter.getTimeUntilTokensAvailable(5);
+            log(`Time until 5 tokens available: ${timeUntil}ms`, 'info');
+            log(`This should be > 0 since we just used some tokens`, 'info');
+
+            if (timeUntil > 0) {
+                log('✓ Test 3 PASSED', 'success');
+            } else {
+                log('✗ Test 3 FAILED', 'fail');
+            }
+
+            // Test 5: Helper function
+            log('\n=== Test 4: Helper Function ===', 'info');
+            const simpleLimiter = createRateLimiter(60);
+            const tokens = simpleLimiter.getAvailableTokens();
+            log(`Created limiter with 60 req/min`, 'info');
+            log(`Available tokens: ${tokens}`, 'info');
+            log('Expected: 60 tokens', 'info');
+
+            if (tokens === 60) {
+                log('✓ Test 4 PASSED', 'success');
+            } else {
+                log('✗ Test 4 FAILED', 'fail');
+            }
+
+            log('\n=== All Tests Completed ===', 'info');
+        };
+
+        // Auto-run on load
+        runTests();
+    </script>
+</body>
+</html>

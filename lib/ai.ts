@@ -53,7 +53,7 @@ function sanitizeError(error: unknown): string {
  */
 function logSanitizedError(message: string, error: unknown): void {
   const sanitized = sanitizeError(error);
-  console.error(`${message}`, sanitized);
+  console.log(`[ERROR] ${message}`, sanitized);
 }
 
 /**

@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { formatToMarkdown, formatToJSON, downloadAsFile } from "@/lib/export";
 import type { VoiceItem } from "@/types/voice-item";
 import { invoke } from "@tauri-apps/api/core";
+import { logError } from "@/lib/error-sanitizer";
 
 interface ExportDialogProps {
   open: boolean;
@@ -94,7 +95,7 @@ export function ExportDialog({ open, onOpenChange, items }: ExportDialogProps) {
     } catch (error) {
       // Only log error if it's not a user cancellation
       if (error !== "User cancelled save dialog") {
-        console.error("Export failed:", error);
+        logError("Export failed", error);
       }
     }
   };

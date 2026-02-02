@@ -12,6 +12,7 @@ import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { processVoiceRecording, RateLimitError } from "@/lib/ai";
 import { searchVoiceItems } from "@/lib/search";
 import { MOCK_HISTORY } from "@/lib/mock-data";
+import { logError } from "@/lib/error-sanitizer";
 import type { VoiceItem, IntentType } from "@/types/voice-item";
 import type { DateRange } from "@/components/SearchBar";
 
@@ -105,7 +106,7 @@ export default function Home() {
           setActiveItemId(parsed[0].id);
         }
       } catch (err) {
-        console.error("Failed to parse stored items:", err instanceof Error ? err.message : "Unknown error");
+        logError("Failed to parse stored items", err);
         // Fallback to mock data
         setItems(MOCK_HISTORY);
         history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
@@ -168,7 +169,7 @@ export default function Home() {
       setItems((prev) => [newItem, ...prev]);
       setActiveItemId(newItem.id);
     } catch (err) {
-      console.error("Processing error:", err instanceof Error ? err.message : "Unknown error");
+      logError("Processing error", err);
 
       // Handle rate limit errors with user-friendly message
       if (err instanceof RateLimitError) {

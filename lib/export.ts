@@ -1,4 +1,5 @@
 import type { VoiceItem } from '@/types/voice-item';
+import { logError } from '@/lib/error-sanitizer';
 
 /**
  * Formats a VoiceItem to Markdown with all metadata and content
@@ -147,7 +148,7 @@ export function downloadAsFile(content: string, filename: string, mimeType: stri
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Download error:', error);
+    logError('Download error', error);
     throw error;
   }
 }

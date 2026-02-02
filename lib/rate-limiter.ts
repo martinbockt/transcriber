@@ -1,3 +1,5 @@
+import { logError } from './error-sanitizer';
+
 /**
  * Configuration for the RateLimiter
  */
@@ -48,7 +50,7 @@ export class RateLimiter {
       this.tokens = Math.min(this.maxTokens, this.tokens + tokensToAdd);
       this.lastRefillTime = now;
     } catch (err) {
-      console.error('Failed to refill tokens:', err);
+      logError('Failed to refill tokens', err);
     }
   }
 
@@ -78,7 +80,7 @@ export class RateLimiter {
 
       return false;
     } catch (err) {
-      console.error('Failed to acquire token:', err);
+      logError('Failed to acquire token', err);
       return false;
     }
   }
@@ -92,7 +94,7 @@ export class RateLimiter {
       this.refill();
       return Math.floor(this.tokens);
     } catch (err) {
-      console.error('Failed to get available tokens:', err);
+      logError('Failed to get available tokens', err);
       return 0;
     }
   }
@@ -117,7 +119,7 @@ export class RateLimiter {
 
       return Math.ceil(timeNeeded);
     } catch (err) {
-      console.error('Failed to calculate time until tokens available:', err);
+      logError('Failed to calculate time until tokens available', err);
       return 0;
     }
   }
@@ -131,7 +133,7 @@ export class RateLimiter {
       this.tokens = tokens ?? this.maxTokens;
       this.lastRefillTime = Date.now();
     } catch (err) {
-      console.error('Failed to reset rate limiter:', err);
+      logError('Failed to reset rate limiter', err);
     }
   }
 }
