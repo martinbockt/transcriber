@@ -1,25 +1,25 @@
 {
   "active": true,
-  "spec": "004-settings-page",
+  "spec": "012-add-item-pinning-favorites",
   "state": "building",
   "subtasks": {
-    "completed": 17,
-    "total": 18,
+    "completed": 3,
+    "total": 7,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Integration & Polish",
+    "current": "UI Implementation",
     "id": null,
-    "total": 2
+    "total": 3
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 19,
-    "started_at": "2026-02-02T16:22:00.438775"
+    "number": 5,
+    "started_at": "2026-02-02T23:00:16.919362"
   },
-  "last_update": "2026-02-02T16:53:06.237920"
+  "last_update": "2026-02-02T23:09:25.947443"
 }
