@@ -105,7 +105,7 @@ export default function Home() {
           setActiveItemId(parsed[0].id);
         }
       } catch (err) {
-        console.error("Failed to parse stored items:", err);
+        console.error("Failed to parse stored items:", err instanceof Error ? err.message : "Unknown error");
         // Fallback to mock data
         setItems(MOCK_HISTORY);
         history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
@@ -168,7 +168,7 @@ export default function Home() {
       setItems((prev) => [newItem, ...prev]);
       setActiveItemId(newItem.id);
     } catch (err) {
-      console.error("Processing error:", err);
+      console.error("Processing error:", err instanceof Error ? err.message : "Unknown error");
 
       // Handle rate limit errors with user-friendly message
       if (err instanceof RateLimitError) {
