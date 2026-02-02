@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Settings, getSettings, saveSettings } from '@/lib/storage';
+import { logError } from '@/lib/error-sanitizer';
 
 export function useSettings() {
   const [settings, setSettings] = useState<Settings>(() => {
@@ -27,7 +28,7 @@ export function useSettings() {
       const updatedSettings = await getSettings();
       setSettings(updatedSettings);
     } catch (error) {
-      console.error('Failed to update settings:', error);
+      logError('Failed to update settings', error);
       throw error;
     }
   };

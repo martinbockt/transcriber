@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { useTheme } from "@/components/theme-provider";
 import { getStorageUsage } from "@/lib/storage";
 import { X, Shield } from "lucide-react";
+import { logError } from "@/lib/error-sanitizer";
 
 interface SettingsDialogProps {
   open: boolean;
@@ -80,7 +81,7 @@ export function SettingsDialog({
           setApiKey(savedKey);
         }
       } catch (error) {
-        console.error("Failed to load API key:", error);
+        logError("Failed to load API key", error);
       }
     };
     loadApiKey();
@@ -166,7 +167,7 @@ export function SettingsDialog({
     try {
       await invoke("delete_secure_value", { key: STORAGE_KEY });
     } catch (error) {
-      console.error("Failed to delete API key from secure storage:", error);
+      logError("Failed to delete API key from secure storage", error);
     }
 
     // Clear all localStorage data

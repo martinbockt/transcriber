@@ -1,4 +1,5 @@
 import { encryptData, decryptData } from '@/lib/crypto';
+import { logError } from './error-sanitizer';
 
 export type Theme = 'light' | 'dark' | 'system';
 
@@ -41,7 +42,7 @@ export async function getSettings(): Promise<Settings> {
       }
     }
   } catch (err) {
-    console.error('Failed to retrieve settings:', err);
+    logError('Failed to retrieve settings:'', err);
   }
   return DEFAULT_SETTINGS;
 }
@@ -59,7 +60,7 @@ export async function saveSettings(settings: Partial<Settings>): Promise<void> {
     const encrypted = await encryptData(jsonString);
     localStorage.setItem(SETTINGS_STORAGE_KEY, encrypted);
   } catch (err) {
-    console.error('Failed to save settings:', err);
+    logError('Failed to save settings', err);
     throw err;
   }
 }
@@ -72,7 +73,7 @@ export function clearSettings(): void {
   try {
     localStorage.removeItem(SETTINGS_STORAGE_KEY);
   } catch (err) {
-    console.error('Failed to clear settings:', err);
+    logError('Failed to clear settings', err);
     throw err;
   }
 }
@@ -176,7 +177,7 @@ export function calculateStorageSize(str: string): number {
     // Use Blob to accurately calculate byte size (handles multi-byte characters)
     return new Blob([str]).size;
   } catch (err) {
-    console.error('Failed to calculate storage size:', err);
+    logError('Failed to calculate storage size', err);
     // Fallback: estimate 2 bytes per character for UTF-16
     return str.length * 2;
   }
@@ -217,7 +218,7 @@ export function getStorageUsage(): StorageUsage {
       itemCount,
     };
   } catch (err) {
-    console.error('Failed to get storage usage:', err);
+    logError('Failed to get storage usage', err);
     return {
       used: 0,
       total: 5 * 1024 * 1024,

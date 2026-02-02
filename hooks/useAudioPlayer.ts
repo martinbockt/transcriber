@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { logError } from '@/lib/error-sanitizer';
 
 export interface UseAudioPlayerReturn {
   isPlaying: boolean;
@@ -10,6 +11,8 @@ export interface UseAudioPlayerReturn {
   pause: () => void;
   stop: () => void;
   seek: (time: number) => void;
+  skipForward: (seconds?: number) => void;
+  skipBackward: (seconds?: number) => void;
   error: string | null;
 }
 
@@ -69,7 +72,7 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to play audio');
-      console.error('Audio playback error:', err);
+      logError('Audio playback error', err);
     }
   }, [updateTime]);
 
@@ -103,6 +106,20 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     }
   }, []);
 
+  const skipForward = useCallback((seconds: number = 10) => {
+    if (audioRef.current) {
+      const newTime = Math.min(audioRef.current.currentTime + seconds, audioRef.current.duration);
+      seek(newTime);
+    }
+  }, [seek]);
+
+  const skipBackward = useCallback((seconds: number = 10) => {
+    if (audioRef.current) {
+      const newTime = Math.max(audioRef.current.currentTime - seconds, 0);
+      seek(newTime);
+    }
+  }, [seek]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -124,6 +141,8 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     pause,
     stop,
     seek,
+    skipForward,
+    skipBackward,
     error,
   };
 }
