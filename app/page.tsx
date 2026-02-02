@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { DetailView } from '@/components/DetailView';
 import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
@@ -27,6 +27,7 @@ export default function Home() {
   const [dateRange, setDateRange] = useState<DateRange>('all');
 
   const { isRecording, audioBlob, start, stop, error: recorderError } = useAudioRecorder();
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Load items from localStorage on mount
   useEffect(() => {
@@ -130,6 +131,14 @@ export default function Home() {
 
   const activeItem = items.find((item) => item.id === activeItemId);
 
+  // Clear search function
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSelectedIntents([]);
+    setDateRange('all');
+    searchInputRef.current?.blur();
+  };
+
   // Keyboard shortcuts
   useKeyboardShortcuts({
     onNew: () => {
@@ -145,16 +154,22 @@ export default function Home() {
     onEscape: () => {
       if (isRecording) {
         stop();
+      } else if (searchQuery || selectedIntents.length > 0 || dateRange !== 'all') {
+        clearSearch();
       }
     },
     onHelp: () => {
       setShowHelp(true);
+    },
+    onSearch: () => {
+      searchInputRef.current?.focus();
     },
   });
 
   return (
     <div className="flex h-screen bg-background">
       <Sidebar
+        ref={searchInputRef}
         items={filteredItems}
         activeItemId={activeItemId}
         onSelectItem={setActiveItemId}

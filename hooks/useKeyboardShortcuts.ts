@@ -8,18 +8,34 @@ export interface KeyboardShortcuts {
   onNew?: () => void;
   onEscape?: () => void;
   onHelp?: () => void;
+  onSearch?: () => void;
 }
 
 export function useKeyboardShortcuts(shortcuts: KeyboardShortcuts) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Don't trigger shortcuts when typing in inputs or textareas
       const target = event.target as HTMLElement;
-      if (
+      const isInInput =
         target.tagName === 'INPUT' ||
         target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
+        target.isContentEditable;
+
+      // Cmd+K / Ctrl+K - Focus search (works globally)
+      if (event.code === 'KeyK' && (event.metaKey || event.ctrlKey) && shortcuts.onSearch) {
+        event.preventDefault();
+        shortcuts.onSearch();
+        return;
+      }
+
+      // Escape - Works in inputs (for clearing search) and globally (for stopping recording)
+      if (event.code === 'Escape' && shortcuts.onEscape) {
+        event.preventDefault();
+        shortcuts.onEscape();
+        return;
+      }
+
+      // Don't trigger other shortcuts when typing in inputs or textareas
+      if (isInInput) {
         return;
       }
 
@@ -39,12 +55,6 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcuts) {
       if (event.code === 'KeyN' && !event.metaKey && !event.ctrlKey && shortcuts.onNew) {
         event.preventDefault();
         shortcuts.onNew();
-      }
-
-      // Escape - Stop recording or close dialogs
-      if (event.code === 'Escape' && shortcuts.onEscape) {
-        event.preventDefault();
-        shortcuts.onEscape();
       }
 
       // ? - Show help

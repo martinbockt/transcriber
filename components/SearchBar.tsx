@@ -1,5 +1,6 @@
 "use client";
 
+import { forwardRef } from 'react';
 import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -34,14 +35,14 @@ const dateRangeLabels: Record<DateRange, string> = {
   month: 'This Month',
 };
 
-export function SearchBar({
+export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function SearchBar({
   searchQuery,
   onSearchChange,
   selectedIntents,
   onIntentsChange,
   dateRange,
   onDateRangeChange,
-}: SearchBarProps) {
+}, ref) {
   const toggleIntent = (intent: IntentType) => {
     if (selectedIntents.includes(intent)) {
       onIntentsChange(selectedIntents.filter((i) => i !== intent));
@@ -64,6 +65,7 @@ export function SearchBar({
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
+          ref={ref}
           type="text"
           placeholder="Search voice items..."
           value={searchQuery}
@@ -136,4 +138,4 @@ export function SearchBar({
       )}
     </div>
   );
-}
+});

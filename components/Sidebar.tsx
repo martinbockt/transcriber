@@ -1,5 +1,6 @@
 "use client";
 
+import { forwardRef } from 'react';
 import { Mic, ListTodo, FileQuestion, FileEdit, StickyNote } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -58,7 +59,7 @@ function highlightText(text: string, query: string): React.ReactNode {
   });
 }
 
-export function Sidebar({
+export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sidebar({
   items,
   activeItemId,
   onSelectItem,
@@ -70,7 +71,7 @@ export function Sidebar({
   onIntentsChange,
   dateRange,
   onDateRangeChange,
-}: SidebarProps) {
+}, ref) {
   // Determine if we're in a search/filter context
   const hasActiveFilters = searchQuery.trim() !== '' || selectedIntents.length > 0 ||
     dateRange.from !== undefined || dateRange.to !== undefined;
@@ -98,6 +99,7 @@ export function Sidebar({
 
       <div className="p-4">
         <SearchBar
+          ref={ref}
           searchQuery={searchQuery}
           onSearchChange={onSearchChange}
           selectedIntents={selectedIntents}
@@ -182,4 +184,4 @@ export function Sidebar({
       </ScrollArea>
     </div>
   );
-}
+});
