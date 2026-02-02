@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "001-full-text-search",
+  "state": "building",
+  "subtasks": {
+    "completed": 8,
+    "total": 9,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "Polish & Keyboard Shortcuts",
+    "id": null,
+    "total": 2
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 10,
+    "started_at": "2026-02-02T15:45:56.312746"
+  },
+  "last_update": "2026-02-02T16:08:00.823232"
+}
