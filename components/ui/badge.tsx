@@ -16,7 +16,7 @@ const badgeVariants = cva(
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground border-border hover:bg-accent",
         tag:
-          "border-transparent bg-accent/10 text-accent-foreground hover:bg-accent/20 hover:scale-105",
+          "border-transparent bg-accent/30 text-foreground hover:bg-accent/40 hover:scale-105",
         todo:
           "border-transparent bg-[hsl(var(--intent-todo))] text-white hover:bg-[hsl(var(--intent-todo))]/90 shadow-sm",
         research:

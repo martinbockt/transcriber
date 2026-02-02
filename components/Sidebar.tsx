@@ -81,6 +81,7 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
   onIntentsChange,
   dateRange,
   onDateRangeChange,
+  onOpenSettings,
 }, ref) {
   // Determine if we're in a search/filter context
   const hasActiveFilters = searchQuery.trim() !== '' || selectedIntents.length > 0 || dateRange !== 'all';
@@ -88,14 +89,11 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
   // Calculate total items (would need to be passed from parent in real scenario)
   // For now, we show count when filters are active
   const showResultCount = hasActiveFilters && items.length > 0;
-
-  onOpenSettings,
-}: SidebarProps) {
   return (
     <div className="w-80 border-r bg-muted/10 flex flex-col h-screen">
-      <div className="p-4 space-y-2"">
+      <div className="p-4 space-y-2">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold mb-4">Voice Assistant</h1>
+          <h1 className="text-2xl font-bold">Voice Assistant</h1>
           {onOpenSettings && (
             <Button
               variant="ghost"
@@ -197,12 +195,26 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
                       {item.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {item.tags.slice(0, 2).map((tag) => (
-                            <Badge key={`${item.id}-sidebar-${tag}`} variant="tag" className="text-[10px] px-2 py-0">
+                            <Badge
+                              key={`${item.id}-sidebar-${tag}`}
+                              variant="tag"
+                              className={cn(
+                                "text-[10px] px-2 py-0",
+                                isActive && "bg-white/20 text-white hover:bg-white/30"
+                              )}
+                            >
                               {tag}
                             </Badge>
                           ))}
                           {item.tags.length > 2 && (
-                            <Badge key={`${item.id}-sidebar-more`} variant="tag" className="text-[10px] px-2 py-0">
+                            <Badge
+                              key={`${item.id}-sidebar-more`}
+                              variant="tag"
+                              className={cn(
+                                "text-[10px] px-2 py-0",
+                                isActive && "bg-white/20 text-white hover:bg-white/30"
+                              )}
+                            >
                               +{item.tags.length - 2}
                             </Badge>
                           )}
