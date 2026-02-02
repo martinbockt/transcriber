@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { DetailView } from '@/components/DetailView';
 import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
@@ -9,8 +9,10 @@ import { SettingsDialog } from '@/components/SettingsDialog';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { processVoiceRecording } from '@/lib/ai';
+import { searchVoiceItems } from '@/lib/search';
 import { MOCK_HISTORY } from '@/lib/mock-data';
-import type { VoiceItem } from '@/types/voice-item';
+import type { VoiceItem, IntentType } from '@/types/voice-item';
+import type { DateRange } from '@/components/SearchBar';
 
 const STORAGE_KEY = 'voice-assistant-history';
 
@@ -28,7 +30,13 @@ export default function Home() {
   const historyIndex = useRef<number>(-1);
   const isUndoRedoAction = useRef<boolean>(false);
 
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedIntents, setSelectedIntents] = useState<IntentType[]>([]);
+  const [dateRange, setDateRange] = useState<DateRange>('all');
+
   const { isRecording, audioBlob, start, stop, error: recorderError } = useAudioRecorder();
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Push current state to history (for undo/redo)
   const pushToHistory = (newItems: VoiceItem[]) => {
@@ -197,6 +205,11 @@ export default function Home() {
     }
   };
 
+  // Filter items based on search criteria
+  const filteredItems = useMemo(() => {
+    return searchVoiceItems(items, searchQuery, selectedIntents, dateRange);
+  }, [items, searchQuery, selectedIntents, dateRange]);
+  
   const handleExportAll = () => {
     setShowExportDialog(true);
   };
@@ -265,6 +278,14 @@ export default function Home() {
 
   const activeItem = items.find((item) => item.id === activeItemId);
 
+  // Clear search function
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSelectedIntents([]);
+    setDateRange('all');
+    searchInputRef.current?.blur();
+  };
+
   // Keyboard shortcuts
   useKeyboardShortcuts({
     onNew: () => {
@@ -280,10 +301,15 @@ export default function Home() {
     onEscape: () => {
       if (isRecording) {
         stop();
+      } else if (searchQuery || selectedIntents.length > 0 || dateRange !== 'all') {
+        clearSearch();
       }
     },
     onHelp: () => {
       setShowHelp(true);
+    },
+    onSearch: () => {
+      searchInputRef.current?.focus();
     },
     onSettings: () => {
       setShowSettings(true);
@@ -295,12 +321,19 @@ export default function Home() {
   return (
     <div className="flex h-screen bg-background">
       <Sidebar
-        items={items}
+        ref={searchInputRef}
+        items={filteredItems}
         activeItemId={activeItemId}
         onSelectItem={setActiveItemId}
         onNewRecording={handleNewRecording}
         onExportAll={handleExportAll}
         isRecording={isRecording}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        selectedIntents={selectedIntents}
+        onIntentsChange={setSelectedIntents}
+        dateRange={dateRange}
+        onDateRangeChange={setDateRange}
         onOpenSettings={() => setShowSettings(true)}
       />
 
