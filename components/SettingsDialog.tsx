@@ -22,10 +22,35 @@ interface SettingsDialogProps {
 
 const STORAGE_KEY = 'openai_api_key';
 
+// Utility function to calculate localStorage usage
+const calculateStorageUsage = (): number => {
+  let total = 0;
+  for (let key in localStorage) {
+    if (localStorage.hasOwnProperty(key)) {
+      const value = localStorage.getItem(key) || '';
+      // Calculate size in bytes (UTF-16, 2 bytes per character)
+      total += (key.length + value.length) * 2;
+    }
+  }
+  return total;
+};
+
+// Utility function to format bytes to KB/MB
+const formatStorageSize = (bytes: number): string => {
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  } else if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(2)} KB`;
+  } else {
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  }
+};
+
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const [apiKey, setApiKey] = useState('');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'validating' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [storageUsage, setStorageUsage] = useState<{ bytes: number; formatted: string }>({ bytes: 0, formatted: '0 KB' });
   const { theme, setTheme } = useTheme();
 
   // Load API key from localStorage on mount
@@ -35,6 +60,17 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       setApiKey(savedKey);
     }
   }, []);
+
+  // Calculate storage usage when dialog opens or when save status changes
+  useEffect(() => {
+    if (open) {
+      const bytes = calculateStorageUsage();
+      setStorageUsage({
+        bytes,
+        formatted: formatStorageSize(bytes),
+      });
+    }
+  }, [open, saveStatus]);
 
   const validateApiKey = async (key: string): Promise<boolean> => {
     try {
@@ -184,11 +220,20 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
             <Separator />
 
-            {/* Data Management Section - to be implemented in phase 4 */}
+            {/* Data Management Section */}
             <section>
               <h3 className="text-sm font-medium mb-3">Data Management</h3>
-              <div className="text-sm text-muted-foreground">
-                Storage usage and data management options will be added here
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Storage Usage</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Local storage used by this application
+                  </p>
+                  <div className="flex items-center justify-between p-3 border rounded-md">
+                    <span className="text-sm">Total Usage</span>
+                    <span className="text-sm font-medium">{storageUsage.formatted}</span>
+                  </div>
+                </div>
               </div>
             </section>
 
