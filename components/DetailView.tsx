@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Trash2, X, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -48,6 +48,20 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
   const [showTranscript, setShowTranscript] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState(item.title);
+  const [tags, setTags] = useState<string[]>(item.tags);
+  const [newTag, setNewTag] = useState('');
+
+  const handleAddTag = () => {
+    const trimmedTag = newTag.trim();
+    if (trimmedTag && !tags.includes(trimmedTag)) {
+      setTags([...tags, trimmedTag]);
+      setNewTag('');
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -145,22 +159,53 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
         </Card>
 
         {/* Tags */}
-        {item.tags.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Tags</CardTitle>
-            </CardHeader>
-            <CardContent>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Tags</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                {item.tags.map((tag, index) => (
-                  <Badge key={index} variant="secondary">
-                    {tag}
+                {tags.map((tag, index) => (
+                  <Badge key={index} variant="secondary" className="group pr-1">
+                    <span className="mr-1">{tag}</span>
+                    <button
+                      onClick={() => handleRemoveTag(tag)}
+                      className="inline-flex items-center justify-center rounded-full hover:bg-secondary-foreground/20 transition-colors"
+                      aria-label={`Remove ${tag} tag`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
                   </Badge>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
+              <div className="flex gap-2">
+                <Input
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddTag();
+                    }
+                  }}
+                  placeholder="Add a tag..."
+                  className="text-sm"
+                />
+                <Button
+                  onClick={handleAddTag}
+                  size="sm"
+                  variant="secondary"
+                  className="shrink-0"
+                  disabled={!newTag.trim()}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Key Facts */}
         {item.keyFacts.length > 0 && (
