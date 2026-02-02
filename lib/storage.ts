@@ -8,6 +8,7 @@ export interface Settings {
 }
 
 const SETTINGS_STORAGE_KEY = 'voice-assistant-settings';
+const VOICE_HISTORY_STORAGE_KEY = 'voice-assistant-history';
 
 const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
@@ -73,6 +74,85 @@ export function clearSettings(): void {
   } catch (err) {
     console.error('Failed to clear settings:', err);
     throw err;
+  }
+}
+
+/**
+ * Migration result information
+ */
+export interface MigrationResult {
+  success: boolean;
+  migrated: boolean; // true if data was migrated from plain text to encrypted
+  alreadyEncrypted: boolean; // true if data was already encrypted
+  noData: boolean; // true if no data exists
+  error?: string;
+}
+
+/**
+ * Migrates voice history data from plain text to encrypted format
+ * This function is idempotent - safe to call multiple times
+ * @returns Migration result indicating what happened
+ */
+export async function migrateVoiceHistoryData(): Promise<MigrationResult> {
+  try {
+    const stored = localStorage.getItem(VOICE_HISTORY_STORAGE_KEY);
+
+    // No data to migrate
+    if (!stored) {
+      return {
+        success: true,
+        migrated: false,
+        alreadyEncrypted: false,
+        noData: true,
+      };
+    }
+
+    try {
+      // Try to decrypt - if successful, data is already encrypted
+      await decryptData(stored);
+      return {
+        success: true,
+        migrated: false,
+        alreadyEncrypted: true,
+        noData: false,
+      };
+    } catch (decryptErr) {
+      // Decryption failed - try to parse as plain JSON
+      try {
+        const parsed = JSON.parse(stored);
+
+        // Valid JSON - encrypt and re-save
+        const jsonString = JSON.stringify(parsed);
+        const encrypted = await encryptData(jsonString);
+        localStorage.setItem(VOICE_HISTORY_STORAGE_KEY, encrypted);
+
+        return {
+          success: true,
+          migrated: true,
+          alreadyEncrypted: false,
+          noData: false,
+        };
+      } catch (parseErr) {
+        // Not valid JSON either - data is corrupted
+        return {
+          success: false,
+          migrated: false,
+          alreadyEncrypted: false,
+          noData: false,
+          error: 'Data is neither encrypted nor valid JSON',
+        };
+      }
+    }
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    console.error('Failed to migrate voice history data:', err);
+    return {
+      success: false,
+      migrated: false,
+      alreadyEncrypted: false,
+      noData: false,
+      error: errorMessage,
+    };
   }
 }
 
