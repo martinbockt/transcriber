@@ -2,7 +2,9 @@
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeSanitize from 'rehype-sanitize';
 import { cn } from '@/lib/utils';
+import { isValidLinkProtocol } from '@/lib/sanitize';
 
 interface MarkdownRendererProps {
   content: string;
@@ -35,10 +37,17 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeSanitize]}
         components={{
-          a: ({ node, ...props }) => (
-            <a {...props} target="_blank" rel="noopener noreferrer" />
-          ),
+          a: ({ node, ...props }) => {
+            // Validate link protocol to prevent XSS via javascript: or data: URLs
+            const href = props.href;
+            if (!isValidLinkProtocol(href)) {
+              // Render as plain text if protocol is unsafe
+              return <span className="text-muted-foreground">{props.children}</span>;
+            }
+            return <a {...props} target="_blank" rel="noopener noreferrer" />;
+          },
           code: ({ node, inline, ...props }) => {
             if (inline) {
               return <code {...props} />;
