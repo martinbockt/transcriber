@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Trash2, X, Plus } from 'lucide-react';
+import { ChevronDown, ChevronUp, Trash2, X, Plus, Edit2, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -51,6 +51,8 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
   const [editedTitle, setEditedTitle] = useState(item.title);
   const [isEditingSummary, setIsEditingSummary] = useState(false);
   const [editedSummary, setEditedSummary] = useState(item.summary);
+  const [isEditingTranscript, setIsEditingTranscript] = useState(false);
+  const [editedTranscript, setEditedTranscript] = useState(item.originalTranscript);
   const [tags, setTags] = useState<string[]>(item.tags);
   const [newTag, setNewTag] = useState('');
 
@@ -64,6 +66,15 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
 
   const handleRemoveTag = (tagToRemove: string) => {
     setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
+
+  const handleSaveTranscript = () => {
+    setIsEditingTranscript(false);
+  };
+
+  const handleCancelTranscript = () => {
+    setEditedTranscript(item.originalTranscript);
+    setIsEditingTranscript(false);
   };
 
   return (
@@ -265,24 +276,70 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
         {/* Original Transcript */}
         <Card>
           <CardHeader>
-            <Button
-              variant="ghost"
-              className="w-full justify-between p-0 h-auto hover:bg-transparent"
-              onClick={() => setShowTranscript(!showTranscript)}
-            >
-              <CardTitle className="text-lg">Original Transcript</CardTitle>
-              {showTranscript ? (
-                <ChevronUp className="h-5 w-5" />
-              ) : (
-                <ChevronDown className="h-5 w-5" />
+            <div className="flex items-center justify-between w-full">
+              <Button
+                variant="ghost"
+                className="flex-1 justify-between p-0 h-auto hover:bg-transparent"
+                onClick={() => setShowTranscript(!showTranscript)}
+              >
+                <CardTitle className="text-lg">Original Transcript</CardTitle>
+                {showTranscript ? (
+                  <ChevronUp className="h-5 w-5" />
+                ) : (
+                  <ChevronDown className="h-5 w-5" />
+                )}
+              </Button>
+              {showTranscript && !isEditingTranscript && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsEditingTranscript(true)}
+                  className="ml-2"
+                >
+                  <Edit2 className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
               )}
-            </Button>
+            </div>
           </CardHeader>
           {showTranscript && (
             <CardContent>
-              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                {item.originalTranscript}
-              </p>
+              {isEditingTranscript ? (
+                <div className="space-y-3">
+                  <Textarea
+                    value={editedTranscript}
+                    onChange={(e) => setEditedTranscript(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Escape') {
+                        handleCancelTranscript();
+                      }
+                    }}
+                    autoFocus
+                    className="text-sm leading-relaxed min-h-[200px] font-mono"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleSaveTranscript}
+                      size="sm"
+                      variant="default"
+                    >
+                      <Check className="h-4 w-4 mr-1" />
+                      Save
+                    </Button>
+                    <Button
+                      onClick={handleCancelTranscript}
+                      size="sm"
+                      variant="outline"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {editedTranscript}
+                </p>
+              )}
             </CardContent>
           )}
         </Card>
