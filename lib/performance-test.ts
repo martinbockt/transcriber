@@ -63,15 +63,19 @@ function generateMockVoiceItem(index: number, includeAudio: boolean): VoiceItem 
       `Key fact 3 with number: ${Math.floor(Math.random() * 1000)}`,
     ],
     intent,
-    data: {},
+    data: {
+      todos: null,
+      researchAnswer: null,
+      draftContent: null,
+    },
   };
 
   // Add intent-specific data
   switch (intent) {
     case 'TODO':
       baseItem.data.todos = [
-        { task: `Task 1 for item ${index}`, done: false },
-        { task: `Task 2 for item ${index}`, done: Math.random() > 0.5 },
+        { task: `Task 1 for item ${index}`, done: false, due: null },
+        { task: `Task 2 for item ${index}`, done: Math.random() > 0.5, due: null },
         { task: `Task 3 for item ${index}`, done: false, due: new Date(Date.now() + 86400000).toISOString() },
       ];
       break;

@@ -17,8 +17,12 @@ const mockItem1: VoiceItem = {
   tags: ['test', 'export'],
   summary: 'This is a test summary for item 1.',
   keyFacts: ['Fact 1', 'Fact 2', 'Fact 3'],
-  intent: 'note',
-  data: {},
+  intent: 'NOTE',
+  data: {
+    todos: null,
+    researchAnswer: null,
+    draftContent: null,
+  },
   audioData: 'data:audio/webm;base64,SGVsbG8gV29ybGQ=', // Mock base64 audio data
 };
 
@@ -30,12 +34,14 @@ const mockItem2: VoiceItem = {
   tags: ['test', 'todo'],
   summary: 'This is a test summary for item 2 with todos.',
   keyFacts: ['Task fact 1', 'Task fact 2'],
-  intent: 'todo',
+  intent: 'TODO',
   data: {
     todos: [
-      { task: 'Complete export feature', done: true },
+      { task: 'Complete export feature', done: true, due: null },
       { task: 'Test all formats', done: false, due: '2026-02-03' },
     ],
+    researchAnswer: null,
+    draftContent: null,
   },
   audioData: 'data:audio/webm;base64,VGVzdEF1ZGlvRGF0YQ==',
 };
@@ -48,9 +54,11 @@ const mockItem3: VoiceItem = {
   tags: ['test', 'research'],
   summary: 'Research about different export formats.',
   keyFacts: ['Export formats include Markdown and JSON'],
-  intent: 'research',
+  intent: 'RESEARCH',
   data: {
+    todos: null,
     researchAnswer: 'Markdown is great for human readability, JSON is better for machine processing.',
+    draftContent: null,
   },
   audioData: 'data:audio/webm;base64,UmVzZWFyY2hBdWRpbw==',
 };

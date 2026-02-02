@@ -17,9 +17,11 @@ export const MOCK_HISTORY: VoiceItem[] = [
     data: {
       todos: [
         { task: 'Call John about the quarterly report', done: false, due: '2024-01-19' },
-        { task: 'Review the budget spreadsheet', done: false },
-        { task: 'Schedule meeting with marketing team for new campaign', done: false },
+        { task: 'Review the budget spreadsheet', done: false, due: null },
+        { task: 'Schedule meeting with marketing team for new campaign', done: false, due: null },
       ],
+      researchAnswer: null,
+      draftContent: null,
     },
   },
   {
@@ -36,6 +38,7 @@ export const MOCK_HISTORY: VoiceItem[] = [
     originalAIKeyFacts: ['Framework: Next.js', 'Auth method: OAuth 2.0'],
     intent: 'RESEARCH',
     data: {
+      todos: null,
       researchAnswer: `OAuth 2.0 implementation in Next.js best practices:
 
 1. **Use NextAuth.js**: The most popular and secure solution for Next.js authentication. It provides built-in OAuth providers and handles token management automatically.
@@ -63,6 +66,7 @@ export const MOCK_HISTORY: VoiceItem[] = [
    - Implement token rotation
    - Set appropriate expiration times
    - Use middleware for route protection`,
+      draftContent: null,
     },
   },
   {
@@ -79,6 +83,8 @@ export const MOCK_HISTORY: VoiceItem[] = [
     originalAIKeyFacts: ['Recipient: Sarah', 'Delay: 2 weeks', 'Reason: API integration challenges'],
     intent: 'DRAFT',
     data: {
+      todos: null,
+      researchAnswer: null,
       draftContent: `Subject: Project Delivery Timeline Update
 
 Dear Sarah,
@@ -115,6 +121,10 @@ Best regards,
     keyFacts: ['Descaling: Every 3 months', 'Filter replacement: Quarterly', 'Manual location: Top drawer'],
     originalAIKeyFacts: ['Descaling: Every 3 months', 'Filter replacement: Quarterly', 'Manual location: Top drawer'],
     intent: 'NOTE',
-    data: {},
+    data: {
+      todos: null,
+      researchAnswer: null,
+      draftContent: null,
+    },
   },
 ];

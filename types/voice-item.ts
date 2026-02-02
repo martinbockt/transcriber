@@ -22,12 +22,12 @@ export interface VoiceItem {
   // --- Dynamic Modules (Intent based) ---
   intent: IntentType;
   data: {
-    todos?: Array<{ task: string; done: boolean; due?: string }>;
-    researchAnswer?: string; // AI generated answer
-    draftContent?: string;   // Polished text
+    todos: Array<{ task: string; done: boolean; due: string | null }> | null;
+    researchAnswer: string | null; // AI generated answer
+    draftContent: string | null;   // Polished text
 
     // Original AI-generated dynamic content
-    originalAITodos?: Array<{ task: string; done: boolean; due?: string }>;
+    originalAITodos?: Array<{ task: string; done: boolean; due: string | null }>;
     originalAIResearchAnswer?: string;
     originalAIDraftContent?: string;
   };
