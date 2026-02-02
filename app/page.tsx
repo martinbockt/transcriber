@@ -282,14 +282,6 @@ export default function Home() {
     );
   };
 
-  const handleUpdateTags = (itemId: string, newTags: string[]) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === itemId ? { ...item, tags: newTags } : item,
-      ),
-    );
-  };
-
   const activeItem = items.find((item) => item.id === activeItemId);
 
   // Clear search function
@@ -390,7 +382,6 @@ export default function Home() {
             onUpdateTitle={handleUpdateTitle}
             onUpdateSummary={handleUpdateSummary}
             onUpdateTranscript={handleUpdateTranscript}
-            onUpdateTags={handleUpdateTags}
           />
         ) : (
           <EmptyState onNewRecording={handleNewRecording} />

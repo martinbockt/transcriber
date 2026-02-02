@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { ChevronDown, ChevronUp, Trash2, Download, X, Plus, Edit2, Check } from 'lucide-react';
+import { ChevronDown, ChevronUp, Trash2, Download, Edit2, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,7 +33,6 @@ interface DetailViewProps {
   onUpdateTitle?: (itemId: string, newTitle: string) => void;
   onUpdateSummary?: (itemId: string, newSummary: string) => void;
   onUpdateTranscript?: (itemId: string, newTranscript: string) => void;
-  onUpdateTags?: (itemId: string, newTags: string[]) => void;
 }
 
 const intentLabels = {
@@ -64,8 +62,7 @@ export function DetailView({
   onDelete,
   onUpdateTitle,
   onUpdateSummary,
-  onUpdateTranscript,
-  onUpdateTags
+  onUpdateTranscript
 }: DetailViewProps) {
   const [showTranscript, setShowTranscript] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -75,8 +72,6 @@ export function DetailView({
   const [editedSummary, setEditedSummary] = useState(item.summary);
   const [isEditingTranscript, setIsEditingTranscript] = useState(false);
   const [editedTranscript, setEditedTranscript] = useState(item.originalTranscript);
-  const [tags, setTags] = useState<string[]>(item.tags);
-  const [newTag, setNewTag] = useState('');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Track unsaved changes in transcript
@@ -87,22 +82,6 @@ export function DetailView({
       setHasUnsavedChanges(false);
     }
   }, [isEditingTranscript, editedTranscript, item.originalTranscript]);
-
-  const handleAddTag = () => {
-    const trimmedTag = newTag.trim();
-    if (trimmedTag && !tags.includes(trimmedTag)) {
-      const newTags = [...tags, trimmedTag];
-      setTags(newTags);
-      onUpdateTags?.(item.id, newTags);
-      setNewTag('');
-    }
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    const newTags = tags.filter((tag) => tag !== tagToRemove);
-    setTags(newTags);
-    onUpdateTags?.(item.id, newTags);
-  };
 
   const handleSaveTranscript = () => {
     onUpdateTranscript?.(item.id, editedTranscript);
@@ -226,113 +205,60 @@ export function DetailView({
 
         <Separator />
 
-        {/* Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Summary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isEditingSummary ? (
-              <Textarea
-                value={editedSummary}
-                onChange={(e) => setEditedSummary(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape') {
-                    setEditedSummary(item.summary);
-                    setIsEditingSummary(false);
-                  }
-                }}
-                onBlur={() => {
-                  onUpdateSummary?.(item.id, editedSummary);
-                  setIsEditingSummary(false);
-                }}
-                autoFocus
-                className="text-sm leading-relaxed min-h-[100px]"
-              />
-            ) : (
-              <p
-                className="text-sm leading-relaxed cursor-pointer hover:text-primary/80 transition-colors"
-                onClick={() => setIsEditingSummary(true)}
-              >
-                {editedSummary}
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Tags */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Tags</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag, index) => (
-                  <Badge key={index} variant="secondary" className="group pr-1">
-                    <span className="mr-1">{tag}</span>
-                    <button
-                      onClick={() => handleRemoveTag(tag)}
-                      className="inline-flex items-center justify-center rounded-full hover:bg-secondary-foreground/20 transition-colors"
-                      aria-label={`Remove ${tag} tag`}
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <Input
-                  value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
+        {/* Summary & Key Facts */}
+        <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-4">
+          {/* Summary */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isEditingSummary ? (
+                <Textarea
+                  value={editedSummary}
+                  onChange={(e) => setEditedSummary(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddTag();
+                    if (e.key === 'Escape') {
+                      setEditedSummary(item.summary);
+                      setIsEditingSummary(false);
                     }
                   }}
-                  placeholder="Add a tag..."
-                  className="text-sm"
+                  onBlur={() => {
+                    onUpdateSummary?.(item.id, editedSummary);
+                    setIsEditingSummary(false);
+                  }}
+                  autoFocus
+                  className="text-sm leading-relaxed min-h-[100px]"
                 />
-                <Button
-                  onClick={handleAddTag}
-                  size="sm"
-                  variant="secondary"
-                  className="shrink-0"
-                  disabled={!newTag.trim()}
+              ) : (
+                <p
+                  className="text-sm leading-relaxed cursor-pointer hover:text-primary/80 transition-colors"
+                  onClick={() => setIsEditingSummary(true)}
                 >
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Key Facts */}
-        {item.keyFacts.length > 0 && (
-          <Card className={`border-l-4 ${intentBorderColors[item.intent]}`}>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-semibold tracking-tight">Key Facts</CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <Table>
-                <TableBody>
-                  {item.keyFacts.map((fact, index) => (
-                    <TableRow key={`${item.id}-fact-${index}`}>
-                      <TableCell className="font-semibold text-primary/70 w-16 text-center">
-                        <div className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-xs">
-                          {index + 1}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm leading-relaxed">{fact}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  {editedSummary}
+                </p>
+              )}
             </CardContent>
           </Card>
-        )}
+
+          {/* Key Facts */}
+          {item.keyFacts.length > 0 && (
+            <Card className={`border-l-4 ${intentBorderColors[item.intent]}`}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg font-semibold tracking-tight">Key Facts</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-2">
+                  {item.keyFacts.map((fact, index) => (
+                    <p key={`${item.id}-fact-${index}`} className="text-sm leading-relaxed">
+                      {fact}
+                    </p>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
 
         {/* Intent-Specific Content */}
         {item.intent === 'TODO' && (
