@@ -195,25 +195,49 @@ export default function Home() {
 
   const handleUpdateTitle = (itemId: string, newTitle: string) => {
     setItems((prev) =>
-      prev.map((item) =>
-        item.id === itemId ? { ...item, title: newTitle } : item
-      )
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
+
+        // Preserve original AI content on first edit
+        const updates: Partial<VoiceItem> = { title: newTitle };
+        if (!item.originalAITitle && item.title !== newTitle) {
+          updates.originalAITitle = item.title;
+        }
+
+        return { ...item, ...updates };
+      })
     );
   };
 
   const handleUpdateSummary = (itemId: string, newSummary: string) => {
     setItems((prev) =>
-      prev.map((item) =>
-        item.id === itemId ? { ...item, summary: newSummary } : item
-      )
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
+
+        // Preserve original AI content on first edit
+        const updates: Partial<VoiceItem> = { summary: newSummary };
+        if (!item.originalAISummary && item.summary !== newSummary) {
+          updates.originalAISummary = item.summary;
+        }
+
+        return { ...item, ...updates };
+      })
     );
   };
 
   const handleUpdateTranscript = (itemId: string, newTranscript: string) => {
     setItems((prev) =>
-      prev.map((item) =>
-        item.id === itemId ? { ...item, originalTranscript: newTranscript } : item
-      )
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
+
+        // Preserve original AI transcript on first edit
+        const updates: any = { originalTranscript: newTranscript };
+        if (!item.originalAITranscript && item.originalTranscript !== newTranscript) {
+          updates.originalAITranscript = item.originalTranscript;
+        }
+
+        return { ...item, ...updates };
+      })
     );
   };
 

@@ -16,6 +16,7 @@ export interface VoiceItem {
   originalAITitle?: string;       // Original AI-generated title before edits
   originalAISummary?: string;     // Original AI-generated summary before edits
   originalAIKeyFacts?: string[];  // Original AI-generated key facts before edits
+  originalAITranscript?: string;  // Original AI-generated transcript before edits
 
   // --- Dynamic Modules (Intent based) ---
   intent: IntentType;
