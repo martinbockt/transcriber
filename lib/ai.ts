@@ -138,6 +138,19 @@ async function blobToBase64(blob: Blob): Promise<string> {
 }
 
 export async function processVoiceRecording(audioBlob: Blob): Promise<VoiceItem> {
+  // Validate audio blob before making API calls
+  if (!audioBlob) {
+    throw new Error('Invalid audio: No audio blob provided');
+  }
+
+  if (audioBlob.size === 0) {
+    throw new Error('Invalid audio: Audio blob is empty');
+  }
+
+  if (!audioBlob.type.startsWith('audio/')) {
+    throw new Error('Invalid audio: Blob must be an audio file');
+  }
+
   const transcript = await transcribeAudio(audioBlob);
   const processed = await processContent(transcript);
 
