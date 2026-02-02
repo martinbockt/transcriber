@@ -28,6 +28,16 @@ const STORAGE_KEY = 'openai_api_key';
 const APP_VERSION = '0.1.0';
 const APP_NAME = 'Voice Assistant';
 
+// Keyboard shortcuts reference
+const shortcuts = [
+  { key: 'N', description: 'Start new recording' },
+  { key: 'Delete', description: 'Delete current recording' },
+  { key: 'Backspace', description: 'Delete current recording (alt)' },
+  { key: 'Escape', description: 'Stop recording' },
+  { key: '?', description: 'Show keyboard shortcuts' },
+  { key: 'Cmd+,', description: 'Open settings' },
+];
+
 // Utility function to calculate localStorage usage
 const calculateStorageUsage = (): number => {
   let total = 0;
@@ -277,11 +287,18 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
 
             <Separator />
 
-            {/* Keyboard Shortcuts Section - to be implemented in phase 5 */}
+            {/* Keyboard Shortcuts Section */}
             <section>
               <h3 className="text-sm font-medium mb-3">Keyboard Shortcuts</h3>
-              <div className="text-sm text-muted-foreground">
-                Keyboard shortcuts reference will be added here
+              <div className="space-y-3">
+                {shortcuts.map((shortcut) => (
+                  <div key={shortcut.key} className="flex items-center justify-between">
+                    <span className="text-sm text-foreground">{shortcut.description}</span>
+                    <kbd className="px-2 py-1 text-xs font-semibold text-foreground bg-muted border border-border rounded">
+                      {shortcut.key}
+                    </kbd>
+                  </div>
+                ))}
               </div>
             </section>
 
