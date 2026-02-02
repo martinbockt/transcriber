@@ -27,6 +27,8 @@ interface SidebarProps {
   onNewRecording: () => void;
   onExportAll: () => void;
   isRecording: boolean;
+  countdown: number | null;
+  elapsedTime: number;
   searchQuery: string;
   onSearchChange: (query: string) => void;
   selectedIntents: IntentType[];
@@ -91,6 +93,8 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(
       onNewRecording,
       onExportAll,
       isRecording,
+      countdown,
+      elapsedTime,
       searchQuery,
       onSearchChange,
       selectedIntents,
@@ -142,9 +146,13 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(
             variant={isRecording ? "destructive" : "default"}
           >
             <Mic
-              className={cn("mr-2 h-5 w-5", isRecording && "animate-pulse")}
+              className={cn("mr-2 h-5 w-5", (isRecording || countdown !== null) && "animate-pulse")}
             />
-            {isRecording ? "Recording..." : "New Recording"}
+            {countdown !== null
+              ? `Starting in ${countdown}...`
+              : isRecording
+                ? `Recording: ${Math.floor(elapsedTime / 60)}:${(elapsedTime % 60).toString().padStart(2, '0')}`
+                : "New Recording"}
           </Button>
           <Button
             onClick={onExportAll}
