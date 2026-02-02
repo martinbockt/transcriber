@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "@/components/theme-provider";
 import { getStorageUsage } from "@/lib/storage";
-import { X } from "lucide-react";
+import { X, Shield } from "lucide-react";
 
 interface SettingsDialogProps {
   open: boolean;
@@ -208,12 +208,20 @@ export function SettingsDialog({
           <div className="space-y-6 py-4">
             {/* API Key Section */}
             <section>
-              <h3 className="text-sm font-medium mb-3">OpenAI API Key</h3>
+              <div className="flex items-center gap-2 mb-3">
+                <h3 className="text-sm font-medium">OpenAI API Key</h3>
+                <div className="flex items-center gap-1 px-2 py-0.5 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-md">
+                  <Shield className="h-3 w-3 text-green-600 dark:text-green-400" />
+                  <span className="text-xs text-green-700 dark:text-green-300 font-medium">
+                    Encrypted
+                  </span>
+                </div>
+              </div>
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">
                   Enter your OpenAI API key to enable voice transcription and AI
                   processing. Your key is stored securely using OS-level
-                  encryption.
+                  encryption (keychain/keyring).
                 </p>
                 <div className="flex gap-2">
                   <Input
@@ -291,12 +299,21 @@ export function SettingsDialog({
 
             {/* Data Management Section */}
             <section>
-              <h3 className="text-sm font-medium mb-3">Data Management</h3>
+              <div className="flex items-center gap-2 mb-3">
+                <h3 className="text-sm font-medium">Data Management</h3>
+                <div className="flex items-center gap-1 px-2 py-0.5 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-md">
+                  <Shield className="h-3 w-3 text-green-600 dark:text-green-400" />
+                  <span className="text-xs text-green-700 dark:text-green-300 font-medium">
+                    Encrypted at Rest
+                  </span>
+                </div>
+              </div>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Storage Usage</Label>
                   <p className="text-sm text-muted-foreground">
-                    Local storage used by this application
+                    All recordings and transcripts are encrypted at rest using
+                    AES-256-GCM encryption
                   </p>
                   <div className="flex items-center justify-between p-3 border rounded-md">
                     <span className="text-sm">Total Usage</span>
@@ -309,8 +326,8 @@ export function SettingsDialog({
                 <div className="space-y-2">
                   <Label>Clear Data</Label>
                   <p className="text-sm text-muted-foreground">
-                    Remove all recordings, settings, and stored data from your
-                    browser
+                    Remove all recordings, settings, and encrypted data from local
+                    storage and secure keychain
                   </p>
                   <Button
                     variant="destructive"
@@ -405,7 +422,8 @@ export function SettingsDialog({
             <AlertDialogTitle>Clear All Data?</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently delete all your recordings, settings, and
-              stored data. This action cannot be undone.
+              encrypted data from both local storage and secure keychain. This
+              action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
