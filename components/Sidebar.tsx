@@ -213,13 +213,20 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(
                       "p-3 cursor-pointer transition-all duration-200 hover:bg-accent border-l-2 relative",
                       intentBorderColors[item.intent],
                       isActive && "bg-accent shadow-xs",
+                      item.pinned &&
+                        "ring-1 ring-amber-400/30 bg-amber-50/30 dark:bg-amber-950/20",
                     )}
                     onClick={() => onSelectItem(item.id)}
                   >
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute top-2 right-2 h-6 w-6 opacity-60 hover:opacity-100 transition-opacity"
+                      className={cn(
+                        "absolute top-2 right-2 h-6 w-6 transition-all duration-200",
+                        item.pinned
+                          ? "opacity-100 text-amber-500 hover:text-amber-600"
+                          : "opacity-60 hover:opacity-100",
+                      )}
                       onClick={(e) => {
                         e.stopPropagation();
                         onTogglePin(item.id);
