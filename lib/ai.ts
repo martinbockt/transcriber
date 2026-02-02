@@ -3,8 +3,29 @@ import { generateObject } from 'ai';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import type { VoiceItem, IntentType } from '@/types/voice-item';
+import { createRateLimiter } from '@/lib/rate-limiter';
 
 const STORAGE_KEY = 'openai_api_key';
+
+/**
+ * Custom error class for rate limiting errors
+ */
+export class RateLimitError extends Error {
+  constructor(
+    message: string,
+    public retryAfterMs: number,
+    public endpoint: string
+  ) {
+    super(message);
+    this.name = 'RateLimitError';
+  }
+}
+
+/**
+ * Rate limiter for Whisper API (transcription)
+ * Configured for 3 requests per minute with burst capacity of 5
+ */
+const whisperRateLimiter = createRateLimiter(3, 5);
 
 async function getApiKey(): Promise<string> {
   // Check Tauri secure storage first (user-provided key)
@@ -56,6 +77,17 @@ const VoiceItemSchema = z.object({
 });
 
 export async function transcribeAudio(audioBlob: Blob): Promise<string> {
+  // Check rate limit before making API call
+  if (!whisperRateLimiter.acquire()) {
+    const retryAfterMs = whisperRateLimiter.getTimeUntilTokensAvailable(1);
+    const retryAfterSeconds = Math.ceil(retryAfterMs / 1000);
+    throw new RateLimitError(
+      `Rate limit exceeded for transcription. Please wait ${retryAfterSeconds} second${retryAfterSeconds !== 1 ? 's' : ''} and try again.`,
+      retryAfterMs,
+      'whisper'
+    );
+  }
+
   const apiKey = await getApiKey();
 
   try {
