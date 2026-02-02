@@ -1,6 +1,7 @@
 "use client";
 
-import { Play, Pause, Download } from "lucide-react";
+import { forwardRef, useImperativeHandle } from "react";
+import { Play, Pause, SkipBack, SkipForward, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
@@ -10,15 +11,54 @@ interface AudioPlayerProps {
   className?: string;
 }
 
+export interface AudioPlayerRef {
+  play: () => void;
+  pause: () => void;
+  togglePlayPause: () => void;
+  skipForward: (seconds?: number) => void;
+  skipBackward: (seconds?: number) => void;
+  isPlaying: boolean;
+}
+
 function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-export function AudioPlayer({ audioData, className }: AudioPlayerProps) {
-  const { isPlaying, currentTime, duration, play, pause, seek, error } =
-    useAudioPlayer();
+export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
+  function AudioPlayer({ audioData, className }, ref) {
+    const {
+      isPlaying,
+      currentTime,
+      duration,
+      play,
+      pause,
+      seek,
+      skipForward,
+      skipBackward,
+      error,
+    } = useAudioPlayer();
+
+    // Expose methods to parent via ref
+    useImperativeHandle(
+      ref,
+      () => ({
+        play: () => play(audioData),
+        pause,
+        togglePlayPause: () => {
+          if (isPlaying) {
+            pause();
+          } else {
+            play(audioData);
+          }
+        },
+        skipForward,
+        skipBackward,
+        isPlaying,
+      }),
+      [isPlaying, play, pause, skipForward, skipBackward, audioData]
+    );
 
   const handlePlayPause = () => {
     if (isPlaying) {
@@ -32,6 +72,14 @@ export function AudioPlayer({ audioData, className }: AudioPlayerProps) {
     seek(value[0]);
   };
 
+  const handleSkipBack = () => {
+    skipBackward(10);
+  };
+
+  const handleSkipForward = () => {
+    skipForward(10);
+  };
+    
   const handleDownload = () => {
     try {
       // Extract MIME type and extension from data URL
@@ -77,6 +125,16 @@ export function AudioPlayer({ audioData, className }: AudioPlayerProps) {
           <Button
             variant="ghost"
             size="sm"
+            onClick={handleSkipBack}
+            className="h-9 w-9 p-0 rounded-full hover:bg-primary/10 transition-colors"
+            disabled={!duration}
+          >
+            <SkipBack className="h-4 w-4 fill-current" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handlePlayPause}
             className="h-9 w-9 p-0 rounded-full hover:bg-primary/10 transition-colors"
           >
@@ -90,6 +148,14 @@ export function AudioPlayer({ audioData, className }: AudioPlayerProps) {
           <Button
             variant="ghost"
             size="sm"
+            onClick={handleSkipForward}
+            className="h-9 w-9 p-0 rounded-full hover:bg-primary/10 transition-colors"
+            disabled={!duration}
+          >
+            <SkipForward className="h-4 w-4 fill-current" />
+          </Button>
+          
+          <Button
             onClick={handleDownload}
             className="h-9 w-9 p-0 rounded-full hover:bg-primary/10 transition-colors"
           >
@@ -118,4 +184,4 @@ export function AudioPlayer({ audioData, className }: AudioPlayerProps) {
       </div>
     </div>
   );
-}
+});

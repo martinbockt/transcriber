@@ -14,6 +14,7 @@ import { searchVoiceItems } from "@/lib/search";
 import { MOCK_HISTORY } from "@/lib/mock-data";
 import type { VoiceItem, IntentType } from "@/types/voice-item";
 import type { DateRange } from "@/components/SearchBar";
+import type { AudioPlayerRef } from "@/components/AudioPlayer";
 
 const STORAGE_KEY = "voice-assistant-history";
 
@@ -44,6 +45,7 @@ export default function Home() {
     error: recorderError,
   } = useAudioRecorder();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const audioPlayerRef = useRef<AudioPlayerRef>(null);
 
   // Push current state to history (for undo/redo)
   const pushToHistory = (newItems: VoiceItem[]) => {
@@ -326,6 +328,15 @@ export default function Home() {
     },
     onUndo: handleUndo,
     onRedo: handleRedo,
+    onSpace: () => {
+      audioPlayerRef.current?.togglePlayPause();
+    },
+    onArrowLeft: () => {
+      audioPlayerRef.current?.skipBackward(10);
+    },
+    onArrowRight: () => {
+      audioPlayerRef.current?.skipForward(10);
+    },
   });
 
   return (
@@ -376,6 +387,7 @@ export default function Home() {
         {/* Main Content */}
         {activeItem ? (
           <DetailView
+            ref={audioPlayerRef}
             item={activeItem}
             onToggleTodo={handleToggleTodo}
             onDelete={handleDelete}
