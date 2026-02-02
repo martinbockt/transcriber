@@ -16,10 +16,11 @@ interface KeyboardShortcutsDialogProps {
 }
 
 const shortcuts = [
+  { key: 'Cmd/Ctrl+K', description: 'Focus search input' },
+  { key: 'Escape', description: 'Clear search / Stop recording' },
   { key: 'N', description: 'Start new recording' },
   { key: 'Delete', description: 'Delete current recording' },
   { key: 'Backspace', description: 'Delete current recording (alt)' },
-  { key: 'Escape', description: 'Stop recording' },
   { key: '?', description: 'Show this help dialog' },
 ];
 

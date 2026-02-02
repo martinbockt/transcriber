@@ -1,15 +1,19 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { DetailView } from '@/components/DetailView';
 import { EmptyState } from '@/components/EmptyState';
 import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
+import { ExportDialog } from '@/components/ExportDialog';
+import { SettingsDialog } from '@/components/SettingsDialog';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { processVoiceRecording } from '@/lib/ai';
+import { searchVoiceItems } from '@/lib/search';
 import { MOCK_HISTORY } from '@/lib/mock-data';
-import type { VoiceItem } from '@/types/voice-item';
+import type { VoiceItem, IntentType } from '@/types/voice-item';
+import type { DateRange } from '@/components/SearchBar';
 
 const STORAGE_KEY = 'voice-assistant-history';
 
@@ -19,8 +23,63 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Undo/redo history management
+  const history = useRef<VoiceItem[][]>([]);
+  const historyIndex = useRef<number>(-1);
+  const isUndoRedoAction = useRef<boolean>(false);
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedIntents, setSelectedIntents] = useState<IntentType[]>([]);
+  const [dateRange, setDateRange] = useState<DateRange>('all');
 
   const { isRecording, audioBlob, start, stop, error: recorderError } = useAudioRecorder();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Push current state to history (for undo/redo)
+  const pushToHistory = (newItems: VoiceItem[]) => {
+    if (isUndoRedoAction.current) {
+      // Don't add to history if this is an undo/redo action
+      isUndoRedoAction.current = false;
+      return;
+    }
+
+    // Remove any forward history if we're not at the end
+    if (historyIndex.current < history.current.length - 1) {
+      history.current = history.current.slice(0, historyIndex.current + 1);
+    }
+
+    // Add new state to history
+    history.current.push(JSON.parse(JSON.stringify(newItems)));
+    historyIndex.current = history.current.length - 1;
+
+    // Limit history to 50 states
+    if (history.current.length > 50) {
+      history.current.shift();
+      historyIndex.current--;
+    }
+  };
+
+  // Undo last change
+  const handleUndo = () => {
+    if (historyIndex.current > 0) {
+      historyIndex.current--;
+      isUndoRedoAction.current = true;
+      setItems(JSON.parse(JSON.stringify(history.current[historyIndex.current])));
+    }
+  };
+
+  // Redo last undone change
+  const handleRedo = () => {
+    if (historyIndex.current < history.current.length - 1) {
+      historyIndex.current++;
+      isUndoRedoAction.current = true;
+      setItems(JSON.parse(JSON.stringify(history.current[historyIndex.current])));
+    }
+  };
 
   // Load items from localStorage on mount
   useEffect(() => {
@@ -29,6 +88,9 @@ export default function Home() {
       try {
         const parsed = JSON.parse(stored);
         setItems(parsed);
+        // Initialize history with loaded state
+        history.current = [JSON.parse(JSON.stringify(parsed))];
+        historyIndex.current = 0;
         if (parsed.length > 0) {
           setActiveItemId(parsed[0].id);
         }
@@ -36,19 +98,46 @@ export default function Home() {
         console.error('Failed to parse stored items:', err);
         // Fallback to mock data
         setItems(MOCK_HISTORY);
+        history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
+        historyIndex.current = 0;
         setActiveItemId(MOCK_HISTORY[0]?.id || null);
       }
     } else {
       // Use mock data on first load
       setItems(MOCK_HISTORY);
+      history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
+      historyIndex.current = 0;
       setActiveItemId(MOCK_HISTORY[0]?.id || null);
     }
   }, []);
 
-  // Save items to localStorage whenever they change
+  // Save items to localStorage with 500ms debounce
   useEffect(() => {
     if (items.length > 0) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      const timeoutId = setTimeout(() => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      }, 500);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [items]);
+
+  // Track items changes for undo/redo history
+  useEffect(() => {
+    // Skip if items is empty (initial state) or if this is the initial load
+    if (items.length === 0 || history.current.length === 0) {
+      return;
+    }
+
+    // Skip if this was an undo/redo action
+    if (isUndoRedoAction.current) {
+      return;
+    }
+
+    // Check if items actually changed (deep comparison of current vs last history state)
+    const lastHistoryState = history.current[historyIndex.current];
+    if (JSON.stringify(items) !== JSON.stringify(lastHistoryState)) {
+      pushToHistory(items);
     }
   }, [items]);
 
@@ -117,7 +206,86 @@ export default function Home() {
     }
   };
 
+  // Filter items based on search criteria
+  const filteredItems = useMemo(() => {
+    return searchVoiceItems(items, searchQuery, selectedIntents, dateRange);
+  }, [items, searchQuery, selectedIntents, dateRange]);
+  
+  const handleExportAll = () => {
+    setShowExportDialog(true);
+  };
+  
+  const handleClearAllData = () => {
+    // Clear all items and reset active item
+    setItems([]);
+    setActiveItemId(null);
+  };
+    // Note: localStorage is already cleared by SettingsDialog
+  const handleUpdateTitle = (itemId: string, newTitle: string) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
+
+        // Preserve original AI content on first edit
+        const updates: Partial<VoiceItem> = { title: newTitle };
+        if (!item.originalAITitle && item.title !== newTitle) {
+          updates.originalAITitle = item.title;
+        }
+
+        return { ...item, ...updates };
+      })
+    );
+  };
+
+  const handleUpdateSummary = (itemId: string, newSummary: string) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
+
+        // Preserve original AI content on first edit
+        const updates: Partial<VoiceItem> = { summary: newSummary };
+        if (!item.originalAISummary && item.summary !== newSummary) {
+          updates.originalAISummary = item.summary;
+        }
+
+        return { ...item, ...updates };
+      })
+    );
+  };
+
+  const handleUpdateTranscript = (itemId: string, newTranscript: string) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
+
+        // Preserve original AI transcript on first edit
+        const updates: any = { originalTranscript: newTranscript };
+        if (!item.originalAITranscript && item.originalTranscript !== newTranscript) {
+          updates.originalAITranscript = item.originalTranscript;
+        }
+
+        return { ...item, ...updates };
+      })
+    );
+  };
+
+  const handleUpdateTags = (itemId: string, newTags: string[]) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId ? { ...item, tags: newTags } : item
+      )
+    );
+  };
+
   const activeItem = items.find((item) => item.id === activeItemId);
+
+  // Clear search function
+  const clearSearch = () => {
+    setSearchQuery('');
+    setSelectedIntents([]);
+    setDateRange('all');
+    searchInputRef.current?.blur();
+  };
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
@@ -134,21 +302,40 @@ export default function Home() {
     onEscape: () => {
       if (isRecording) {
         stop();
+      } else if (searchQuery || selectedIntents.length > 0 || dateRange !== 'all') {
+        clearSearch();
       }
     },
     onHelp: () => {
       setShowHelp(true);
     },
+    onSearch: () => {
+      searchInputRef.current?.focus();
+    },
+    onSettings: () => {
+      setShowSettings(true);
+    },
+    onUndo: handleUndo,
+    onRedo: handleRedo,
   });
 
   return (
     <div className="flex h-screen bg-background">
       <Sidebar
-        items={items}
+        ref={searchInputRef}
+        items={filteredItems}
         activeItemId={activeItemId}
         onSelectItem={setActiveItemId}
         onNewRecording={handleNewRecording}
+        onExportAll={handleExportAll}
         isRecording={isRecording}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        selectedIntents={selectedIntents}
+        onIntentsChange={setSelectedIntents}
+        dateRange={dateRange}
+        onDateRangeChange={setDateRange}
+        onOpenSettings={() => setShowSettings(true)}
       />
 
       <div className="flex-1 flex flex-col">
@@ -181,6 +368,10 @@ export default function Home() {
             item={activeItem}
             onToggleTodo={handleToggleTodo}
             onDelete={handleDelete}
+            onUpdateTitle={handleUpdateTitle}
+            onUpdateSummary={handleUpdateSummary}
+            onUpdateTranscript={handleUpdateTranscript}
+            onUpdateTags={handleUpdateTags}
           />
         ) : (
           <EmptyState onNewRecording={handleNewRecording} />
@@ -189,6 +380,18 @@ export default function Home() {
 
       {/* Keyboard Shortcuts Help Dialog */}
       <KeyboardShortcutsDialog open={showHelp} onOpenChange={setShowHelp} />
+
+      {/* Export Dialog */}
+      <ExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        items={items}
+      {/* Settings Dialog */}
+      <SettingsDialog
+        open={showSettings}
+        onOpenChange={setShowSettings}
+        onDataCleared={handleClearAllData}
+      />
     </div>
   );
 }
