@@ -9,6 +9,8 @@ export interface KeyboardShortcuts {
   onEscape?: () => void;
   onHelp?: () => void;
   onSettings?: () => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
 }
 
 export function useKeyboardShortcuts(shortcuts: KeyboardShortcuts) {
@@ -58,6 +60,15 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcuts) {
       if (event.code === 'Comma' && (event.metaKey || event.ctrlKey) && shortcuts.onSettings) {
         event.preventDefault();
         shortcuts.onSettings();
+      // Cmd+Shift+Z - Redo
+      if (event.code === 'KeyZ' && event.metaKey && event.shiftKey && shortcuts.onRedo) {
+        event.preventDefault();
+        shortcuts.onRedo();
+      }
+      // Cmd+Z - Undo (check this after redo to avoid conflicts)
+      else if (event.code === 'KeyZ' && event.metaKey && !event.shiftKey && shortcuts.onUndo) {
+        event.preventDefault();
+        shortcuts.onUndo();
       }
     };
 
