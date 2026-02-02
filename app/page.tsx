@@ -39,6 +39,8 @@ export default function Home() {
   const {
     isRecording,
     audioBlob,
+    countdown,
+    elapsedTime,
     start,
     stop,
     error: recorderError,
@@ -338,6 +340,8 @@ export default function Home() {
         onNewRecording={handleNewRecording}
         onExportAll={handleExportAll}
         isRecording={isRecording}
+        countdown={countdown}
+        elapsedTime={elapsedTime}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         selectedIntents={selectedIntents}
@@ -349,13 +353,21 @@ export default function Home() {
 
       <div className="flex-1 flex flex-col">
         {/* Status Bar */}
-        {(isProcessing || isRecording || error || recorderError) && (
+        {(isProcessing || isRecording || countdown !== null || error || recorderError) && (
           <div className="border-b px-8 py-3 bg-muted/50">
-            {isRecording && (
+            {countdown !== null && (
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
+                <span className="text-sm font-medium">
+                  Starting in {countdown}...
+                </span>
+              </div>
+            )}
+            {isRecording && countdown === null && (
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                 <span className="text-sm font-medium">
-                  Recording in progress...
+                  Recording: {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
                 </span>
               </div>
             )}
