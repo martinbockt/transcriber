@@ -9,11 +9,13 @@ import { ExportDialog } from "@/components/ExportDialog";
 import { SettingsDialog } from "@/components/SettingsDialog";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { processVoiceRecording } from "@/lib/ai";
+import { processVoiceRecording, RateLimitError } from "@/lib/ai";
 import { searchVoiceItems } from "@/lib/search";
 import { MOCK_HISTORY } from "@/lib/mock-data";
+import { logError } from "@/lib/error-sanitizer";
 import type { VoiceItem, IntentType } from "@/types/voice-item";
 import type { DateRange } from "@/components/SearchBar";
+import type { AudioPlayerRef } from "@/components/AudioPlayer";
 
 const STORAGE_KEY = "voice-assistant-history";
 
@@ -39,11 +41,14 @@ export default function Home() {
   const {
     isRecording,
     audioBlob,
+    countdown,
+    elapsedTime,
     start,
     stop,
     error: recorderError,
   } = useAudioRecorder();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const audioPlayerRef = useRef<AudioPlayerRef>(null);
 
   // Push current state to history (for undo/redo)
   const pushToHistory = (newItems: VoiceItem[]) => {
@@ -105,7 +110,7 @@ export default function Home() {
           setActiveItemId(parsed[0].id);
         }
       } catch (err) {
-        console.error("Failed to parse stored items:", err);
+        logError("Failed to parse stored items", err);
         // Fallback to mock data
         setItems(MOCK_HISTORY);
         history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
@@ -168,15 +173,24 @@ export default function Home() {
       setItems((prev) => [newItem, ...prev]);
       setActiveItemId(newItem.id);
     } catch (err) {
-      console.error("Processing error:", err);
-      setError(err instanceof Error ? err.message : "Failed to process audio");
+      logError("Processing error", err);
+
+      // Handle rate limit errors with user-friendly message
+      if (err instanceof RateLimitError) {
+        const retrySeconds = Math.ceil(err.retryAfterMs / 1000);
+        setError(
+          `${err.message} Try recording again in ${retrySeconds} second${retrySeconds !== 1 ? 's' : ''}.`
+        );
+      } else {
+        setError(err instanceof Error ? err.message : "Failed to process audio");
+      }
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleNewRecording = async () => {
-    if (isRecording) {
+    if (isRecording || countdown !== null) {
       stop();
     } else {
       setError(null);
@@ -206,6 +220,18 @@ export default function Home() {
     );
   };
 
+  const handleTogglePin = (itemId: string) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
+        return {
+          ...item,
+          pinned: !item.pinned,
+        };
+      }),
+    );
+  };
+
   const handleDelete = (itemId: string) => {
     setItems((prev) => prev.filter((item) => item.id !== itemId));
 
@@ -216,9 +242,14 @@ export default function Home() {
     }
   };
 
-  // Filter items based on search criteria
+  // Filter and sort items (pinned items first)
   const filteredItems = useMemo(() => {
-    return searchVoiceItems(items, searchQuery, selectedIntents, dateRange);
+    const filtered = searchVoiceItems(items, searchQuery, selectedIntents, dateRange);
+    // Sort so pinned items appear at top, maintaining chronological order within each group
+    return filtered.sort((a, b) => {
+      if (a.pinned === b.pinned) return 0; // Maintain existing order within group
+      return a.pinned ? -1 : 1; // Pinned items come first
+    });
   }, [items, searchQuery, selectedIntents, dateRange]);
 
   const handleExportAll = () => {
@@ -326,6 +357,15 @@ export default function Home() {
     },
     onUndo: handleUndo,
     onRedo: handleRedo,
+    onSpace: () => {
+      audioPlayerRef.current?.togglePlayPause();
+    },
+    onArrowLeft: () => {
+      audioPlayerRef.current?.skipBackward(10);
+    },
+    onArrowRight: () => {
+      audioPlayerRef.current?.skipForward(10);
+    },
   });
 
   return (
@@ -335,9 +375,12 @@ export default function Home() {
         items={filteredItems}
         activeItemId={activeItemId}
         onSelectItem={setActiveItemId}
+        onTogglePin={handleTogglePin}
         onNewRecording={handleNewRecording}
         onExportAll={handleExportAll}
         isRecording={isRecording}
+        countdown={countdown}
+        elapsedTime={elapsedTime}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         selectedIntents={selectedIntents}
@@ -349,13 +392,21 @@ export default function Home() {
 
       <div className="flex-1 flex flex-col">
         {/* Status Bar */}
-        {(isProcessing || isRecording || error || recorderError) && (
+        {(isProcessing || isRecording || countdown !== null || error || recorderError) && (
           <div className="border-b px-8 py-3 bg-muted/50">
-            {isRecording && (
+            {countdown !== null && (
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
+                <span className="text-sm font-medium">
+                  Starting in {countdown}...
+                </span>
+              </div>
+            )}
+            {isRecording && countdown === null && (
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                 <span className="text-sm font-medium">
-                  Recording in progress...
+                  Recording: {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
                 </span>
               </div>
             )}
@@ -376,6 +427,7 @@ export default function Home() {
         {/* Main Content */}
         {activeItem ? (
           <DetailView
+            ref={audioPlayerRef}
             item={activeItem}
             onToggleTodo={handleToggleTodo}
             onDelete={handleDelete}
