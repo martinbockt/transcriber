@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { useTheme } from "@/components/theme-provider";
 import { getStorageUsage } from "@/lib/storage";
+import { X } from "lucide-react";
 
 interface SettingsDialogProps {
   open: boolean;
@@ -192,9 +193,18 @@ export function SettingsDialog({
               Manage your preferences and application settings
             </div>
           </AlertDialogDescription>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            onClick={() => onOpenChange(false)}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </Button>
         </AlertDialogHeader>
 
-        <ScrollArea className="flex-1 pr-4">
+        <ScrollArea className="h-[60vh] pr-4">
           <div className="space-y-6 py-4">
             {/* API Key Section */}
             <section>
@@ -319,16 +329,16 @@ export function SettingsDialog({
             {/* Keyboard Shortcuts Section */}
             <section>
               <h3 className="text-sm font-medium mb-3">Keyboard Shortcuts</h3>
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {shortcuts.map((shortcut) => (
                   <div
                     key={shortcut.key}
-                    className="flex items-center justify-between"
+                    className="group flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                   >
-                    <span className="text-sm text-foreground">
+                    <span className="text-sm text-foreground font-medium">
                       {shortcut.description}
                     </span>
-                    <kbd className="px-2 py-1 text-xs font-semibold text-foreground bg-muted border border-border rounded">
+                    <kbd className="ml-3 px-3 py-1.5 text-xs font-bold text-foreground bg-muted/80 border-2 border-border rounded-md shadow-sm group-hover:border-primary/50 transition-colors">
                       {shortcut.key}
                     </kbd>
                   </div>
