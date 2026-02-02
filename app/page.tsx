@@ -18,6 +18,7 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const { isRecording, audioBlob, start, stop, error: recorderError } = useAudioRecorder();
 
@@ -137,6 +138,9 @@ export default function Home() {
     },
     onHelp: () => {
       setShowHelp(true);
+    },
+    onSettings: () => {
+      setShowSettings(true);
     },
   });
 

@@ -8,6 +8,7 @@ export interface KeyboardShortcuts {
   onNew?: () => void;
   onEscape?: () => void;
   onHelp?: () => void;
+  onSettings?: () => void;
 }
 
 export function useKeyboardShortcuts(shortcuts: KeyboardShortcuts) {
@@ -51,6 +52,12 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcuts) {
       if (event.code === 'Slash' && event.shiftKey && shortcuts.onHelp) {
         event.preventDefault();
         shortcuts.onHelp();
+      }
+
+      // Cmd+, or Ctrl+, - Open settings
+      if (event.code === 'Comma' && (event.metaKey || event.ctrlKey) && shortcuts.onSettings) {
+        event.preventDefault();
+        shortcuts.onSettings();
       }
     };
 
