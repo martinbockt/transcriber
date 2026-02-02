@@ -1,25 +1,25 @@
 {
   "active": true,
-  "spec": "012-add-item-pinning-favorites",
+  "spec": "009-audio-player-keyboard-shortcuts",
   "state": "building",
   "subtasks": {
-    "completed": 6,
-    "total": 7,
+    "completed": 3,
+    "total": 4,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "End-to-End Verification",
+    "current": "Audio Player Keyboard Shortcuts Implementation",
     "id": null,
-    "total": 1
+    "total": 4
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 8,
-    "started_at": "2026-02-02T23:00:16.919362"
+    "number": 5,
+    "started_at": "2026-02-02T23:00:19.288439"
   },
-  "last_update": "2026-02-02T23:14:23.711157"
+  "last_update": "2026-02-02T23:07:24.645180"
 }

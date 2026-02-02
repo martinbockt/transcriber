@@ -14,6 +14,7 @@ import { searchVoiceItems } from "@/lib/search";
 import { MOCK_HISTORY } from "@/lib/mock-data";
 import type { VoiceItem, IntentType } from "@/types/voice-item";
 import type { DateRange } from "@/components/SearchBar";
+import type { AudioPlayerRef } from "@/components/AudioPlayer";
 
 const STORAGE_KEY = "voice-assistant-history";
 
@@ -39,11 +40,14 @@ export default function Home() {
   const {
     isRecording,
     audioBlob,
+    countdown,
+    elapsedTime,
     start,
     stop,
     error: recorderError,
   } = useAudioRecorder();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const audioPlayerRef = useRef<AudioPlayerRef>(null);
 
   // Push current state to history (for undo/redo)
   const pushToHistory = (newItems: VoiceItem[]) => {
@@ -176,7 +180,7 @@ export default function Home() {
   };
 
   const handleNewRecording = async () => {
-    if (isRecording) {
+    if (isRecording || countdown !== null) {
       stop();
     } else {
       setError(null);
@@ -343,6 +347,15 @@ export default function Home() {
     },
     onUndo: handleUndo,
     onRedo: handleRedo,
+    onSpace: () => {
+      audioPlayerRef.current?.togglePlayPause();
+    },
+    onArrowLeft: () => {
+      audioPlayerRef.current?.skipBackward(10);
+    },
+    onArrowRight: () => {
+      audioPlayerRef.current?.skipForward(10);
+    },
   });
 
   return (
@@ -356,6 +369,8 @@ export default function Home() {
         onNewRecording={handleNewRecording}
         onExportAll={handleExportAll}
         isRecording={isRecording}
+        countdown={countdown}
+        elapsedTime={elapsedTime}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         selectedIntents={selectedIntents}
@@ -367,13 +382,21 @@ export default function Home() {
 
       <div className="flex-1 flex flex-col">
         {/* Status Bar */}
-        {(isProcessing || isRecording || error || recorderError) && (
+        {(isProcessing || isRecording || countdown !== null || error || recorderError) && (
           <div className="border-b px-8 py-3 bg-muted/50">
-            {isRecording && (
+            {countdown !== null && (
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
+                <span className="text-sm font-medium">
+                  Starting in {countdown}...
+                </span>
+              </div>
+            )}
+            {isRecording && countdown === null && (
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                 <span className="text-sm font-medium">
-                  Recording in progress...
+                  Recording: {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
                 </span>
               </div>
             )}
@@ -394,6 +417,7 @@ export default function Home() {
         {/* Main Content */}
         {activeItem ? (
           <DetailView
+            ref={audioPlayerRef}
             item={activeItem}
             onToggleTodo={handleToggleTodo}
             onDelete={handleDelete}

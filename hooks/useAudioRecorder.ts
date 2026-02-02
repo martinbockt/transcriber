@@ -6,6 +6,8 @@ export interface UseAudioRecorderReturn {
   isRecording: boolean;
   audioLevel: number;
   audioBlob: Blob | null;
+  countdown: number | null;
+  elapsedTime: number;
   start: () => Promise<void>;
   stop: () => void;
   error: string | null;
@@ -16,12 +18,16 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
   const [audioLevel, setAudioLevel] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const countdownIntervalRef = useRef<number | null>(null);
+  const elapsedTimeIntervalRef = useRef<number | null>(null);
 
   const updateAudioLevel = useCallback(() => {
     if (!analyserRef.current) return;
@@ -35,12 +41,8 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
     animationFrameRef.current = requestAnimationFrame(updateAudioLevel);
   }, []);
 
-  const start = useCallback(async () => {
+  const startActualRecording = useCallback(async () => {
     try {
-      setError(null);
-      setAudioBlob(null);
-      chunksRef.current = [];
-
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
       // Set up audio context for visualization
@@ -72,13 +74,65 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
       mediaRecorder.start();
       setIsRecording(true);
       updateAudioLevel();
+
+      // Start elapsed time counter
+      setElapsedTime(0);
+      elapsedTimeIntervalRef.current = window.setInterval(() => {
+        setElapsedTime(prev => prev + 1);
+      }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start recording');
-      console.error('Error starting recording:', err);
+      throw err;
     }
   }, [updateAudioLevel]);
 
+  const start = useCallback(async () => {
+    try {
+      setError(null);
+      setAudioBlob(null);
+      setElapsedTime(0);
+      chunksRef.current = [];
+
+      // Start countdown
+      setCountdown(3);
+      let currentCount = 3;
+
+      countdownIntervalRef.current = window.setInterval(() => {
+        currentCount -= 1;
+        if (currentCount === 0) {
+          // Countdown finished
+          if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+          }
+          setCountdown(null);
+          // Start actual recording
+          startActualRecording().catch((err) => {
+            setError(err instanceof Error ? err.message : 'Failed to start recording');
+          });
+        } else {
+          setCountdown(currentCount);
+        }
+      }, 1000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start recording');
+    }
+  }, [startActualRecording]);
+
   const stop = useCallback(() => {
+    // Clean up countdown timer if still running
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+      setCountdown(null);
+    }
+
+    // Clean up elapsed time timer if running
+    if (elapsedTimeIntervalRef.current) {
+      clearInterval(elapsedTimeIntervalRef.current);
+      elapsedTimeIntervalRef.current = null;
+    }
+
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
@@ -99,6 +153,8 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
     isRecording,
     audioLevel,
     audioBlob,
+    countdown,
+    elapsedTime,
     start,
     stop,
     error,
