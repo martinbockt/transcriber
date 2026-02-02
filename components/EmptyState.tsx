@@ -1,7 +1,7 @@
 "use client";
 
-import { Mic, Sparkles } from 'lucide-react';
-import { Button } from './ui/button';
+import { Mic, Sparkles } from "lucide-react";
+import { Button } from "./ui/button";
 
 interface EmptyStateProps {
   onNewRecording?: () => void;
@@ -13,7 +13,7 @@ export function EmptyState({ onNewRecording }: EmptyStateProps) {
       <div className="max-w-md text-center space-y-6 animate-fadeIn">
         <div className="relative inline-flex">
           <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse" />
-          <div className="relative bg-gradient-to-br from-primary/10 to-accent/10 p-6 rounded-full">
+          <div className="relative bg-linear-to-br from-primary/10 to-accent/10 p-6 rounded-full">
             <Mic className="h-12 w-12 text-primary" />
           </div>
         </div>
@@ -24,7 +24,8 @@ export function EmptyState({ onNewRecording }: EmptyStateProps) {
             <Sparkles className="h-5 w-5 text-accent" />
           </h2>
           <p className="text-muted-foreground leading-relaxed">
-            Select a recording from the sidebar to view details, or create a new one to get started with AI-powered transcription and analysis.
+            Select a recording from the sidebar to view details, or create a new
+            one to get started with AI-powered transcription and analysis.
           </p>
         </div>
 
@@ -38,7 +39,9 @@ export function EmptyState({ onNewRecording }: EmptyStateProps) {
         )}
 
         <div className="pt-4 space-y-2">
-          <p className="text-xs text-muted-foreground font-medium">Quick Tips</p>
+          <p className="text-xs text-muted-foreground font-medium">
+            Quick Tips
+          </p>
           <div className="grid grid-cols-2 gap-3 text-left">
             <div className="bg-muted/30 rounded-lg p-3 space-y-1">
               <p className="text-xs font-semibold">⌘ + N</p>

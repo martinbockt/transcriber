@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/core';
+import { useState, useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,14 +11,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { useTheme } from '@/components/theme-provider';
-import { getStorageUsage } from '@/lib/storage';
+} from "@/components/ui/alert-dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { useTheme } from "@/components/theme-provider";
+import { getStorageUsage } from "@/lib/storage";
 
 interface SettingsDialogProps {
   open: boolean;
@@ -26,18 +26,18 @@ interface SettingsDialogProps {
   onDataCleared?: () => void;
 }
 
-const STORAGE_KEY = 'openai_api_key';
-const APP_VERSION = '0.1.0';
-const APP_NAME = 'Voice Assistant';
+const STORAGE_KEY = "openai_api_key";
+const APP_VERSION = "0.1.0";
+const APP_NAME = "Voice Assistant";
 
 // Keyboard shortcuts reference
 const shortcuts = [
-  { key: 'N', description: 'Start new recording' },
-  { key: 'Delete', description: 'Delete current recording' },
-  { key: 'Backspace', description: 'Delete current recording (alt)' },
-  { key: 'Escape', description: 'Stop recording' },
-  { key: '?', description: 'Show keyboard shortcuts' },
-  { key: 'Cmd+,', description: 'Open settings' },
+  { key: "N", description: "Start new recording" },
+  { key: "Delete", description: "Delete current recording" },
+  { key: "Backspace", description: "Delete current recording (alt)" },
+  { key: "Escape", description: "Stop recording" },
+  { key: "?", description: "Show keyboard shortcuts" },
+  { key: "Cmd+,", description: "Open settings" },
 ];
 
 // Utility function to format bytes to KB/MB
@@ -51,11 +51,20 @@ const formatStorageSize = (bytes: number): string => {
   }
 };
 
-export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDialogProps) {
-  const [apiKey, setApiKey] = useState('');
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'validating' | 'success' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [storageUsage, setStorageUsage] = useState<{ bytes: number; formatted: string }>({ bytes: 0, formatted: '0 KB' });
+export function SettingsDialog({
+  open,
+  onOpenChange,
+  onDataCleared,
+}: SettingsDialogProps) {
+  const [apiKey, setApiKey] = useState("");
+  const [saveStatus, setSaveStatus] = useState<
+    "idle" | "validating" | "success" | "error"
+  >("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [storageUsage, setStorageUsage] = useState<{
+    bytes: number;
+    formatted: string;
+  }>({ bytes: 0, formatted: "0 KB" });
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const { theme, setTheme } = useTheme();
 
@@ -63,12 +72,14 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
   useEffect(() => {
     const loadApiKey = async () => {
       try {
-        const savedKey = await invoke<string>('get_secure_value', { key: STORAGE_KEY });
+        const savedKey = await invoke<string>("get_secure_value", {
+          key: STORAGE_KEY,
+        });
         if (savedKey) {
           setApiKey(savedKey);
         }
       } catch (error) {
-        console.error('Failed to load API key:', error);
+        console.error("Failed to load API key:", error);
       }
     };
     loadApiKey();
@@ -87,16 +98,16 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
 
   const validateApiKey = async (key: string): Promise<boolean> => {
     try {
-      const response = await fetch('https://api.openai.com/v1/models', {
-        method: 'GET',
+      const response = await fetch("https://api.openai.com/v1/models", {
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${key}`,
+          Authorization: `Bearer ${key}`,
         },
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error?.message || 'Invalid API key');
+        throw new Error(error.error?.message || "Invalid API key");
       }
 
       return true;
@@ -104,61 +115,64 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
       if (error instanceof Error) {
         throw new Error(error.message);
       }
-      throw new Error('Failed to validate API key');
+      throw new Error("Failed to validate API key");
     }
   };
 
   const handleSaveApiKey = async () => {
     // Basic validation
     if (!apiKey.trim()) {
-      setErrorMessage('API key cannot be empty');
-      setSaveStatus('error');
-      setTimeout(() => setSaveStatus('idle'), 3000);
+      setErrorMessage("API key cannot be empty");
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 3000);
       return;
     }
 
     // Validate OpenAI API key format (should start with sk-)
-    if (!apiKey.startsWith('sk-')) {
-      setErrorMessage('Invalid API key format. OpenAI keys should start with "sk-"');
-      setSaveStatus('error');
-      setTimeout(() => setSaveStatus('idle'), 3000);
+    if (!apiKey.startsWith("sk-")) {
+      setErrorMessage(
+        'Invalid API key format. OpenAI keys should start with "sk-"',
+      );
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 3000);
       return;
     }
 
     // Validate API key with OpenAI
-    setSaveStatus('validating');
+    setSaveStatus("validating");
     try {
       await validateApiKey(apiKey);
 
       // Save to Tauri secure storage instead of localStorage
-      await invoke('set_secure_value', {
+      await invoke("set_secure_value", {
         key: STORAGE_KEY,
         value: apiKey,
       });
 
-      setSaveStatus('success');
-      setTimeout(() => setSaveStatus('idle'), 3000);
+      setSaveStatus("success");
+      setTimeout(() => setSaveStatus("idle"), 3000);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to validate API key';
+      const message =
+        error instanceof Error ? error.message : "Failed to validate API key";
       setErrorMessage(message);
-      setSaveStatus('error');
-      setTimeout(() => setSaveStatus('idle'), 3000);
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 3000);
     }
   };
 
   const handleClearAllData = async () => {
     // Clear API key from secure storage
     try {
-      await invoke('delete_secure_value', { key: STORAGE_KEY });
+      await invoke("delete_secure_value", { key: STORAGE_KEY });
     } catch (error) {
-      console.error('Failed to delete API key from secure storage:', error);
+      console.error("Failed to delete API key from secure storage:", error);
     }
 
     // Clear all localStorage data
     localStorage.clear();
 
     // Reset API key input
-    setApiKey('');
+    setApiKey("");
 
     // Close confirmation dialog
     setShowClearConfirm(false);
@@ -187,8 +201,9 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
               <h3 className="text-sm font-medium mb-3">OpenAI API Key</h3>
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  Enter your OpenAI API key to enable voice transcription and AI processing.
-                  Your key is stored securely using OS-level encryption.
+                  Enter your OpenAI API key to enable voice transcription and AI
+                  processing. Your key is stored securely using OS-level
+                  encryption.
                 </p>
                 <div className="flex gap-2">
                   <Input
@@ -200,16 +215,20 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                   />
                   <Button
                     onClick={handleSaveApiKey}
-                    variant={saveStatus === 'success' ? 'default' : 'outline'}
-                    disabled={saveStatus === 'validating'}
+                    variant={saveStatus === "success" ? "default" : "outline"}
+                    disabled={saveStatus === "validating"}
                   >
-                    {saveStatus === 'validating' ? 'Validating...' : saveStatus === 'success' ? 'Saved!' : 'Save'}
+                    {saveStatus === "validating"
+                      ? "Validating..."
+                      : saveStatus === "success"
+                        ? "Saved!"
+                        : "Save"}
                   </Button>
                 </div>
-                {saveStatus === 'error' && (
+                {saveStatus === "error" && (
                   <p className="text-sm text-destructive">{errorMessage}</p>
                 )}
-                {saveStatus === 'success' && (
+                {saveStatus === "success" && (
                   <p className="text-sm text-green-600 dark:text-green-400">
                     API key saved successfully
                   </p>
@@ -230,25 +249,25 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                   </p>
                   <div className="flex gap-2">
                     <Button
-                      variant={theme === 'light' ? 'default' : 'outline'}
+                      variant={theme === "light" ? "default" : "outline"}
                       size="sm"
-                      onClick={() => setTheme('light')}
+                      onClick={() => setTheme("light")}
                       className="flex-1"
                     >
                       Light
                     </Button>
                     <Button
-                      variant={theme === 'dark' ? 'default' : 'outline'}
+                      variant={theme === "dark" ? "default" : "outline"}
                       size="sm"
-                      onClick={() => setTheme('dark')}
+                      onClick={() => setTheme("dark")}
                       className="flex-1"
                     >
                       Dark
                     </Button>
                     <Button
-                      variant={theme === 'system' ? 'default' : 'outline'}
+                      variant={theme === "system" ? "default" : "outline"}
                       size="sm"
-                      onClick={() => setTheme('system')}
+                      onClick={() => setTheme("system")}
                       className="flex-1"
                     >
                       System
@@ -271,14 +290,17 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                   </p>
                   <div className="flex items-center justify-between p-3 border rounded-md">
                     <span className="text-sm">Total Usage</span>
-                    <span className="text-sm font-medium">{storageUsage.formatted}</span>
+                    <span className="text-sm font-medium">
+                      {storageUsage.formatted}
+                    </span>
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label>Clear Data</Label>
                   <p className="text-sm text-muted-foreground">
-                    Remove all recordings, settings, and stored data from your browser
+                    Remove all recordings, settings, and stored data from your
+                    browser
                   </p>
                   <Button
                     variant="destructive"
@@ -299,8 +321,13 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
               <h3 className="text-sm font-medium mb-3">Keyboard Shortcuts</h3>
               <div className="space-y-3">
                 {shortcuts.map((shortcut) => (
-                  <div key={shortcut.key} className="flex items-center justify-between">
-                    <span className="text-sm text-foreground">{shortcut.description}</span>
+                  <div
+                    key={shortcut.key}
+                    className="flex items-center justify-between"
+                  >
+                    <span className="text-sm text-foreground">
+                      {shortcut.description}
+                    </span>
                     <kbd className="px-2 py-1 text-xs font-semibold text-foreground bg-muted border border-border rounded">
                       {shortcut.key}
                     </kbd>
@@ -318,11 +345,14 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                 <div className="space-y-2">
                   <div className="flex items-center justify-between p-3 border rounded-md">
                     <span className="text-sm font-medium">{APP_NAME}</span>
-                    <span className="text-sm text-muted-foreground">v{APP_VERSION}</span>
+                    <span className="text-sm text-muted-foreground">
+                      v{APP_VERSION}
+                    </span>
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  A voice-powered assistant that transcribes and processes your audio recordings using OpenAI's advanced AI technology.
+                  A voice-powered assistant that transcribes and processes your
+                  audio recordings using OpenAI's advanced AI technology.
                 </p>
                 <div className="flex gap-2">
                   <Button
@@ -331,7 +361,9 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                     className="flex-1"
                     onClick={() => {
                       // TODO: Replace with actual documentation URL
-                      alert('Documentation link not configured. Please add your documentation URL.');
+                      alert(
+                        "Documentation link not configured. Please add your documentation URL.",
+                      );
                     }}
                   >
                     Documentation
@@ -342,7 +374,9 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                     className="flex-1"
                     onClick={() => {
                       // TODO: Replace with actual GitHub repository URL
-                      alert('GitHub repository link not configured. Please add your repository URL.');
+                      alert(
+                        "GitHub repository link not configured. Please add your repository URL.",
+                      );
                     }}
                   >
                     GitHub Repository
@@ -360,8 +394,8 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
           <AlertDialogHeader>
             <AlertDialogTitle>Clear All Data?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete all your recordings, settings, and stored data.
-              This action cannot be undone.
+              This will permanently delete all your recordings, settings, and
+              stored data. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

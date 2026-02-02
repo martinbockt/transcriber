@@ -1,9 +1,9 @@
 "use client";
 
-import { Play, Pause } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { Play, Pause } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 interface AudioPlayerProps {
   audioData: string;
@@ -13,11 +13,12 @@ interface AudioPlayerProps {
 function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
 export function AudioPlayer({ audioData, className }: AudioPlayerProps) {
-  const { isPlaying, currentTime, duration, play, pause, seek, error } = useAudioPlayer();
+  const { isPlaying, currentTime, duration, play, pause, seek, error } =
+    useAudioPlayer();
 
   const handlePlayPause = () => {
     if (isPlaying) {
@@ -35,7 +36,7 @@ export function AudioPlayer({ audioData, className }: AudioPlayerProps) {
 
   return (
     <div className={className}>
-      <div className="bg-muted/30 border border-border rounded-lg p-3 backdrop-blur-sm">
+      <div className="bg-muted/30 border border-border rounded-lg p-3 backdrop-blur-xs">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
@@ -61,7 +62,7 @@ export function AudioPlayer({ audioData, className }: AudioPlayerProps) {
             />
             <div className="flex justify-between text-xs text-muted-foreground font-medium tabular-nums">
               <span>{formatTime(currentTime)}</span>
-              <span>{duration ? formatTime(duration) : '--:--'}</span>
+              <span>{duration ? formatTime(duration) : "--:--"}</span>
             </div>
           </div>
         </div>
