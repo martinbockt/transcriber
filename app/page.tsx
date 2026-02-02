@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { DetailView } from '@/components/DetailView';
 import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
+import { SettingsDialog } from '@/components/SettingsDialog';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { processVoiceRecording } from '@/lib/ai';
@@ -117,6 +118,13 @@ export default function Home() {
     }
   };
 
+  const handleClearAllData = () => {
+    // Clear all items and reset active item
+    setItems([]);
+    setActiveItemId(null);
+    // Note: localStorage is already cleared by SettingsDialog
+  };
+
   const activeItem = items.find((item) => item.id === activeItemId);
 
   // Keyboard shortcuts
@@ -197,6 +205,13 @@ export default function Home() {
 
       {/* Keyboard Shortcuts Help Dialog */}
       <KeyboardShortcutsDialog open={showHelp} onOpenChange={setShowHelp} />
+
+      {/* Settings Dialog */}
+      <SettingsDialog
+        open={showSettings}
+        onOpenChange={setShowSettings}
+        onDataCleared={handleClearAllData}
+      />
     </div>
   );
 }

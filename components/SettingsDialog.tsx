@@ -3,8 +3,11 @@
 import { useState, useEffect } from 'react';
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
+  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
@@ -18,6 +21,7 @@ import { useTheme } from '@/components/theme-provider';
 interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onDataCleared?: () => void;
 }
 
 const STORAGE_KEY = 'openai_api_key';
@@ -46,11 +50,12 @@ const formatStorageSize = (bytes: number): string => {
   }
 };
 
-export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
+export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDialogProps) {
   const [apiKey, setApiKey] = useState('');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'validating' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [storageUsage, setStorageUsage] = useState<{ bytes: number; formatted: string }>({ bytes: 0, formatted: '0 KB' });
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const { theme, setTheme } = useTheme();
 
   // Load API key from localStorage on mount
@@ -70,7 +75,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
         formatted: formatStorageSize(bytes),
       });
     }
-  }, [open, saveStatus]);
+  }, [open, saveStatus, showClearConfirm]);
 
   const validateApiKey = async (key: string): Promise<boolean> => {
     try {
@@ -126,6 +131,22 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       setErrorMessage(message);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
+    }
+  };
+
+  const handleClearAllData = () => {
+    // Clear all localStorage data
+    localStorage.clear();
+
+    // Reset API key input
+    setApiKey('');
+
+    // Close confirmation dialog
+    setShowClearConfirm(false);
+
+    // Notify parent component
+    if (onDataCleared) {
+      onDataCleared();
     }
   };
   return (
@@ -234,6 +255,21 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     <span className="text-sm font-medium">{storageUsage.formatted}</span>
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <Label>Clear Data</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Remove all recordings, settings, and stored data from your browser
+                  </p>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setShowClearConfirm(true)}
+                    className="w-full"
+                  >
+                    Clear All Data
+                  </Button>
+                </div>
               </div>
             </section>
 
@@ -259,6 +295,28 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
           </div>
         </ScrollArea>
       </AlertDialogContent>
+
+      {/* Clear All Data Confirmation Dialog */}
+      <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear All Data?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete all your recordings, settings, and stored data.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleClearAllData}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Clear All Data
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AlertDialog>
   );
 }
