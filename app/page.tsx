@@ -1,21 +1,21 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { Sidebar } from '@/components/Sidebar';
-import { DetailView } from '@/components/DetailView';
-import { EmptyState } from '@/components/EmptyState';
-import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
-import { ExportDialog } from '@/components/ExportDialog';
-import { SettingsDialog } from '@/components/SettingsDialog';
-import { useAudioRecorder } from '@/hooks/useAudioRecorder';
-import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { processVoiceRecording } from '@/lib/ai';
-import { searchVoiceItems } from '@/lib/search';
-import { MOCK_HISTORY } from '@/lib/mock-data';
-import type { VoiceItem, IntentType } from '@/types/voice-item';
-import type { DateRange } from '@/components/SearchBar';
+import { useState, useEffect, useMemo, useRef } from "react";
+import { Sidebar } from "@/components/Sidebar";
+import { DetailView } from "@/components/DetailView";
+import { EmptyState } from "@/components/EmptyState";
+import { KeyboardShortcutsDialog } from "@/components/KeyboardShortcutsDialog";
+import { ExportDialog } from "@/components/ExportDialog";
+import { SettingsDialog } from "@/components/SettingsDialog";
+import { useAudioRecorder } from "@/hooks/useAudioRecorder";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { processVoiceRecording } from "@/lib/ai";
+import { searchVoiceItems } from "@/lib/search";
+import { MOCK_HISTORY } from "@/lib/mock-data";
+import type { VoiceItem, IntentType } from "@/types/voice-item";
+import type { DateRange } from "@/components/SearchBar";
 
-const STORAGE_KEY = 'voice-assistant-history';
+const STORAGE_KEY = "voice-assistant-history";
 
 export default function Home() {
   const [items, setItems] = useState<VoiceItem[]>([]);
@@ -32,11 +32,17 @@ export default function Home() {
   const isUndoRedoAction = useRef<boolean>(false);
 
   // Search state
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedIntents, setSelectedIntents] = useState<IntentType[]>([]);
-  const [dateRange, setDateRange] = useState<DateRange>('all');
+  const [dateRange, setDateRange] = useState<DateRange>("all");
 
-  const { isRecording, audioBlob, start, stop, error: recorderError } = useAudioRecorder();
+  const {
+    isRecording,
+    audioBlob,
+    start,
+    stop,
+    error: recorderError,
+  } = useAudioRecorder();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Push current state to history (for undo/redo)
@@ -68,7 +74,9 @@ export default function Home() {
     if (historyIndex.current > 0) {
       historyIndex.current--;
       isUndoRedoAction.current = true;
-      setItems(JSON.parse(JSON.stringify(history.current[historyIndex.current])));
+      setItems(
+        JSON.parse(JSON.stringify(history.current[historyIndex.current])),
+      );
     }
   };
 
@@ -77,7 +85,9 @@ export default function Home() {
     if (historyIndex.current < history.current.length - 1) {
       historyIndex.current++;
       isUndoRedoAction.current = true;
-      setItems(JSON.parse(JSON.stringify(history.current[historyIndex.current])));
+      setItems(
+        JSON.parse(JSON.stringify(history.current[historyIndex.current])),
+      );
     }
   };
 
@@ -95,7 +105,7 @@ export default function Home() {
           setActiveItemId(parsed[0].id);
         }
       } catch (err) {
-        console.error('Failed to parse stored items:', err);
+        console.error("Failed to parse stored items:", err);
         // Fallback to mock data
         setItems(MOCK_HISTORY);
         history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
@@ -158,8 +168,8 @@ export default function Home() {
       setItems((prev) => [newItem, ...prev]);
       setActiveItemId(newItem.id);
     } catch (err) {
-      console.error('Processing error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to process audio');
+      console.error("Processing error:", err);
+      setError(err instanceof Error ? err.message : "Failed to process audio");
     } finally {
       setIsProcessing(false);
     }
@@ -192,7 +202,7 @@ export default function Home() {
             todos: newTodos,
           },
         };
-      })
+      }),
     );
   };
 
@@ -210,17 +220,17 @@ export default function Home() {
   const filteredItems = useMemo(() => {
     return searchVoiceItems(items, searchQuery, selectedIntents, dateRange);
   }, [items, searchQuery, selectedIntents, dateRange]);
-  
+
   const handleExportAll = () => {
     setShowExportDialog(true);
   };
-  
+
   const handleClearAllData = () => {
     // Clear all items and reset active item
     setItems([]);
     setActiveItemId(null);
   };
-    // Note: localStorage is already cleared by SettingsDialog
+  // Note: localStorage is already cleared by SettingsDialog
   const handleUpdateTitle = (itemId: string, newTitle: string) => {
     setItems((prev) =>
       prev.map((item) => {
@@ -233,7 +243,7 @@ export default function Home() {
         }
 
         return { ...item, ...updates };
-      })
+      }),
     );
   };
 
@@ -249,7 +259,7 @@ export default function Home() {
         }
 
         return { ...item, ...updates };
-      })
+      }),
     );
   };
 
@@ -260,20 +270,23 @@ export default function Home() {
 
         // Preserve original AI transcript on first edit
         const updates: any = { originalTranscript: newTranscript };
-        if (!item.originalAITranscript && item.originalTranscript !== newTranscript) {
+        if (
+          !item.originalAITranscript &&
+          item.originalTranscript !== newTranscript
+        ) {
           updates.originalAITranscript = item.originalTranscript;
         }
 
         return { ...item, ...updates };
-      })
+      }),
     );
   };
 
   const handleUpdateTags = (itemId: string, newTags: string[]) => {
     setItems((prev) =>
       prev.map((item) =>
-        item.id === itemId ? { ...item, tags: newTags } : item
-      )
+        item.id === itemId ? { ...item, tags: newTags } : item,
+      ),
     );
   };
 
@@ -281,9 +294,9 @@ export default function Home() {
 
   // Clear search function
   const clearSearch = () => {
-    setSearchQuery('');
+    setSearchQuery("");
     setSelectedIntents([]);
-    setDateRange('all');
+    setDateRange("all");
     searchInputRef.current?.blur();
   };
 
@@ -302,7 +315,11 @@ export default function Home() {
     onEscape: () => {
       if (isRecording) {
         stop();
-      } else if (searchQuery || selectedIntents.length > 0 || dateRange !== 'all') {
+      } else if (
+        searchQuery ||
+        selectedIntents.length > 0 ||
+        dateRange !== "all"
+      ) {
         clearSearch();
       }
     },
@@ -345,7 +362,9 @@ export default function Home() {
             {isRecording && (
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-                <span className="text-sm font-medium">Recording in progress...</span>
+                <span className="text-sm font-medium">
+                  Recording in progress...
+                </span>
               </div>
             )}
             {isProcessing && (
@@ -386,6 +405,7 @@ export default function Home() {
         open={showExportDialog}
         onOpenChange={setShowExportDialog}
         items={items}
+      />
       {/* Settings Dialog */}
       <SettingsDialog
         open={showSettings}
