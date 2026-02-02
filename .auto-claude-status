@@ -1,25 +1,25 @@
 {
   "active": true,
-  "spec": "004-settings-page",
+  "spec": "006-encrypt-sensitive-data-at-rest",
   "state": "building",
   "subtasks": {
-    "completed": 17,
-    "total": 18,
+    "completed": 5,
+    "total": 12,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Integration & Polish",
+    "current": "Frontend Encryption Integration",
     "id": null,
-    "total": 2
+    "total": 4
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 19,
-    "started_at": "2026-02-02T16:22:00.438775"
+    "number": 7,
+    "started_at": "2026-02-02T23:00:25.020856"
   },
-  "last_update": "2026-02-02T16:53:06.237920"
+  "last_update": "2026-02-02T23:19:49.178067"
 }
