@@ -1,5 +1,6 @@
 "use client";
 
+import { forwardRef, useImperativeHandle } from "react";
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -10,15 +11,54 @@ interface AudioPlayerProps {
   className?: string;
 }
 
+export interface AudioPlayerRef {
+  play: () => void;
+  pause: () => void;
+  togglePlayPause: () => void;
+  skipForward: (seconds?: number) => void;
+  skipBackward: (seconds?: number) => void;
+  isPlaying: boolean;
+}
+
 function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-export function AudioPlayer({ audioData, className }: AudioPlayerProps) {
-  const { isPlaying, currentTime, duration, play, pause, seek, error } =
-    useAudioPlayer();
+export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
+  function AudioPlayer({ audioData, className }, ref) {
+    const {
+      isPlaying,
+      currentTime,
+      duration,
+      play,
+      pause,
+      seek,
+      skipForward,
+      skipBackward,
+      error,
+    } = useAudioPlayer();
+
+    // Expose methods to parent via ref
+    useImperativeHandle(
+      ref,
+      () => ({
+        play: () => play(audioData),
+        pause,
+        togglePlayPause: () => {
+          if (isPlaying) {
+            pause();
+          } else {
+            play(audioData);
+          }
+        },
+        skipForward,
+        skipBackward,
+        isPlaying,
+      }),
+      [isPlaying, play, pause, skipForward, skipBackward, audioData]
+    );
 
   const handlePlayPause = () => {
     if (isPlaying) {
@@ -33,11 +73,11 @@ export function AudioPlayer({ audioData, className }: AudioPlayerProps) {
   };
 
   const handleSkipBack = () => {
-    seek(Math.max(0, currentTime - 10));
+    skipBackward(10);
   };
 
   const handleSkipForward = () => {
-    seek(Math.min(duration, currentTime + 10));
+    skipForward(10);
   };
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
@@ -101,4 +141,4 @@ export function AudioPlayer({ audioData, className }: AudioPlayerProps) {
       </div>
     </div>
   );
-}
+});
