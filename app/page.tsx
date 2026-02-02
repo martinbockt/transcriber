@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { DetailView } from '@/components/DetailView';
 import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { processVoiceRecording } from '@/lib/ai';
+import { searchVoiceItems } from '@/lib/search';
 import { MOCK_HISTORY } from '@/lib/mock-data';
-import type { VoiceItem } from '@/types/voice-item';
+import type { VoiceItem, IntentType } from '@/types/voice-item';
+import type { DateRange } from '@/components/SearchBar';
 
 const STORAGE_KEY = 'voice-assistant-history';
 
@@ -18,6 +20,11 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedIntents, setSelectedIntents] = useState<IntentType[]>([]);
+  const [dateRange, setDateRange] = useState<DateRange>('all');
 
   const { isRecording, audioBlob, start, stop, error: recorderError } = useAudioRecorder();
 
@@ -116,6 +123,11 @@ export default function Home() {
     }
   };
 
+  // Filter items based on search criteria
+  const filteredItems = useMemo(() => {
+    return searchVoiceItems(items, searchQuery, selectedIntents, dateRange);
+  }, [items, searchQuery, selectedIntents, dateRange]);
+
   const activeItem = items.find((item) => item.id === activeItemId);
 
   // Keyboard shortcuts
@@ -143,11 +155,17 @@ export default function Home() {
   return (
     <div className="flex h-screen bg-background">
       <Sidebar
-        items={items}
+        items={filteredItems}
         activeItemId={activeItemId}
         onSelectItem={setActiveItemId}
         onNewRecording={handleNewRecording}
         isRecording={isRecording}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        selectedIntents={selectedIntents}
+        onIntentsChange={setSelectedIntents}
+        dateRange={dateRange}
+        onDateRangeChange={setDateRange}
       />
 
       <div className="flex-1 flex flex-col">
