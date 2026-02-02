@@ -38,6 +38,26 @@ const intentColors: Record<IntentType, string> = {
   NOTE: 'text-gray-600',
 };
 
+// Helper function to highlight search terms in text
+function highlightText(text: string, query: string): React.ReactNode {
+  if (!query.trim()) {
+    return text;
+  }
+
+  const parts = text.split(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
+
+  return parts.map((part, index) => {
+    if (part.toLowerCase() === query.toLowerCase()) {
+      return (
+        <mark key={index} className="bg-yellow-200 dark:bg-yellow-800 rounded px-0.5">
+          {part}
+        </mark>
+      );
+    }
+    return part;
+  });
+}
+
 export function Sidebar({
   items,
   activeItemId,
@@ -51,6 +71,14 @@ export function Sidebar({
   dateRange,
   onDateRangeChange,
 }: SidebarProps) {
+  // Determine if we're in a search/filter context
+  const hasActiveFilters = searchQuery.trim() !== '' || selectedIntents.length > 0 ||
+    dateRange.from !== undefined || dateRange.to !== undefined;
+
+  // Calculate total items (would need to be passed from parent in real scenario)
+  // For now, we show count when filters are active
+  const showResultCount = hasActiveFilters && items.length > 0;
+
   return (
     <div className="w-80 border-r bg-muted/10 flex flex-col h-screen">
       <div className="p-4">
@@ -77,6 +105,11 @@ export function Sidebar({
           dateRange={dateRange}
           onDateRangeChange={onDateRangeChange}
         />
+        {showResultCount && (
+          <p className="text-xs text-muted-foreground mt-2">
+            {items.length} {items.length === 1 ? 'result' : 'results'} found
+          </p>
+        )}
       </div>
 
       <Separator />
@@ -85,8 +118,17 @@ export function Sidebar({
         <div className="p-4 space-y-3">
           {items.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
-              <p className="text-sm">No recordings yet</p>
-              <p className="text-xs mt-1">Click the button above to start</p>
+              {hasActiveFilters ? (
+                <>
+                  <p className="text-sm">No matching results</p>
+                  <p className="text-xs mt-1">Try adjusting your search or filters</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm">No recordings yet</p>
+                  <p className="text-xs mt-1">Click the button above to start</p>
+                </>
+              )}
             </div>
           ) : (
             items.map((item) => {
@@ -106,7 +148,7 @@ export function Sidebar({
                     <Icon className={cn("h-5 w-5 mt-0.5", intentColors[item.intent])} />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-sm line-clamp-2 mb-1">
-                        {item.title}
+                        {highlightText(item.title, searchQuery)}
                       </h3>
                       <p className="text-xs text-muted-foreground mb-2">
                         {new Date(item.createdAt).toLocaleDateString('en-US', {
