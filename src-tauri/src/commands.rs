@@ -1,6 +1,8 @@
 use std::fs;
 use std::path::PathBuf;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
+
+use crate::crypto;
 
 /// Get the path to the secure storage file in the app's data directory
 fn get_secure_storage_path(app: &AppHandle, key: &str) -> Result<PathBuf, String> {
@@ -32,7 +34,10 @@ pub async fn set_secure_value(
 ) -> Result<(), String> {
     let file_path = get_secure_storage_path(&app, &key)?;
 
-    fs::write(&file_path, value.as_bytes())
+    // Encrypt the value before storing
+    let encrypted_value = crypto::encrypt(value.as_bytes())?;
+
+    fs::write(&file_path, encrypted_value.as_bytes())
         .map_err(|e| format!("Failed to write secure value: {}", e))?;
 
     // Set file permissions to be readable only by the owner (Unix-like systems)
@@ -59,10 +64,41 @@ pub async fn get_secure_value(app: AppHandle, key: String) -> Result<String, Str
         return Ok(String::new());
     }
 
-    let value = fs::read_to_string(&file_path)
+    let encrypted_value = fs::read_to_string(&file_path)
         .map_err(|e| format!("Failed to read secure value: {}", e))?;
 
-    Ok(value)
+    // Try to decrypt the value
+    match crypto::decrypt(&encrypted_value) {
+        Ok(decrypted_bytes) => {
+            // Successfully decrypted - convert bytes to string
+            String::from_utf8(decrypted_bytes)
+                .map_err(|e| format!("Decrypted data is not valid UTF-8: {}", e))
+        }
+        Err(_) => {
+            // Decryption failed - assume it's old plain text data
+            // Migrate it to encrypted format for next time
+            let plain_text_value = encrypted_value.clone();
+
+            // Attempt to re-encrypt and save (best effort, don't fail if this doesn't work)
+            if let Ok(encrypted) = crypto::encrypt(plain_text_value.as_bytes()) {
+                let _ = fs::write(&file_path, encrypted.as_bytes());
+
+                // Set file permissions again after migration (Unix-like systems)
+                #[cfg(unix)]
+                {
+                    use std::os::unix::fs::PermissionsExt;
+                    if let Ok(metadata) = fs::metadata(&file_path) {
+                        let mut perms = metadata.permissions();
+                        perms.set_mode(0o600);
+                        let _ = fs::set_permissions(&file_path, perms);
+                    }
+                }
+            }
+
+            // Return the plain text value
+            Ok(plain_text_value)
+        }
+    }
 }
 
 /// Delete a secure value from storage

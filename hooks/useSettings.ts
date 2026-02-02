@@ -13,16 +13,19 @@ export function useSettings() {
 
   // Load settings from localStorage on mount
   useEffect(() => {
-    const loadedSettings = getSettings();
-    setSettings(loadedSettings);
-    setIsLoaded(true);
+    async function loadSettings() {
+      const loadedSettings = await getSettings();
+      setSettings(loadedSettings);
+      setIsLoaded(true);
+    }
+    loadSettings();
   }, []);
 
   // Update settings function
-  const updateSettings = (newSettings: Partial<Settings>) => {
+  const updateSettings = async (newSettings: Partial<Settings>) => {
     try {
-      saveSettings(newSettings);
-      const updatedSettings = getSettings();
+      await saveSettings(newSettings);
+      const updatedSettings = await getSettings();
       setSettings(updatedSettings);
     } catch (error) {
       logError('Failed to update settings', error);

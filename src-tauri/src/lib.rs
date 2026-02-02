@@ -54,6 +54,7 @@ async fn save_file(
 }
 
 mod commands;
+mod crypto;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {

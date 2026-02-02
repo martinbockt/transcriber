@@ -1,3 +1,4 @@
+import { encryptData, decryptData } from '@/lib/crypto';
 import { logError } from './error-sanitizer';
 
 export type Theme = 'light' | 'dark' | 'system';
@@ -8,6 +9,7 @@ export interface Settings {
 }
 
 const SETTINGS_STORAGE_KEY = 'voice-assistant-settings';
+const VOICE_HISTORY_STORAGE_KEY = 'voice-assistant-history';
 
 const DEFAULT_SETTINGS: Settings = {
   theme: 'system',
@@ -16,29 +18,47 @@ const DEFAULT_SETTINGS: Settings = {
 /**
  * Retrieves settings from localStorage
  * Returns default settings if none exist or if parsing fails
+ * Settings are decrypted using AES-256-GCM encryption
  */
-export function getSettings(): Settings {
+export async function getSettings(): Promise<Settings> {
   try {
     const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
     if (stored) {
-      const parsed = JSON.parse(stored);
-      return { ...DEFAULT_SETTINGS, ...parsed };
+      try {
+        // Try to decrypt (new encrypted format)
+        const decrypted = await decryptData(stored);
+        const parsed = JSON.parse(decrypted);
+        return { ...DEFAULT_SETTINGS, ...parsed };
+      } catch (decryptErr) {
+        // Fallback: try parsing as plain JSON (backwards compatibility)
+        try {
+          const parsed = JSON.parse(stored);
+          // If successful, re-save as encrypted
+          await saveSettings(parsed);
+          return { ...DEFAULT_SETTINGS, ...parsed };
+        } catch (parseErr) {
+          console.error('Failed to parse stored settings:', parseErr);
+        }
+      }
     }
   } catch (err) {
-    logError('Failed to parse stored settings', err);
+    logError('Failed to retrieve settings:'', err);
   }
   return DEFAULT_SETTINGS;
 }
 
 /**
  * Saves settings to localStorage
+ * Settings are encrypted using AES-256-GCM encryption before storage
  * @param settings - Partial settings object (only changed values need to be provided)
  */
-export function saveSettings(settings: Partial<Settings>): void {
+export async function saveSettings(settings: Partial<Settings>): Promise<void> {
   try {
-    const currentSettings = getSettings();
+    const currentSettings = await getSettings();
     const updatedSettings = { ...currentSettings, ...settings };
-    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(updatedSettings));
+    const jsonString = JSON.stringify(updatedSettings);
+    const encrypted = await encryptData(jsonString);
+    localStorage.setItem(SETTINGS_STORAGE_KEY, encrypted);
   } catch (err) {
     logError('Failed to save settings', err);
     throw err;
@@ -55,6 +75,85 @@ export function clearSettings(): void {
   } catch (err) {
     logError('Failed to clear settings', err);
     throw err;
+  }
+}
+
+/**
+ * Migration result information
+ */
+export interface MigrationResult {
+  success: boolean;
+  migrated: boolean; // true if data was migrated from plain text to encrypted
+  alreadyEncrypted: boolean; // true if data was already encrypted
+  noData: boolean; // true if no data exists
+  error?: string;
+}
+
+/**
+ * Migrates voice history data from plain text to encrypted format
+ * This function is idempotent - safe to call multiple times
+ * @returns Migration result indicating what happened
+ */
+export async function migrateVoiceHistoryData(): Promise<MigrationResult> {
+  try {
+    const stored = localStorage.getItem(VOICE_HISTORY_STORAGE_KEY);
+
+    // No data to migrate
+    if (!stored) {
+      return {
+        success: true,
+        migrated: false,
+        alreadyEncrypted: false,
+        noData: true,
+      };
+    }
+
+    try {
+      // Try to decrypt - if successful, data is already encrypted
+      await decryptData(stored);
+      return {
+        success: true,
+        migrated: false,
+        alreadyEncrypted: true,
+        noData: false,
+      };
+    } catch (decryptErr) {
+      // Decryption failed - try to parse as plain JSON
+      try {
+        const parsed = JSON.parse(stored);
+
+        // Valid JSON - encrypt and re-save
+        const jsonString = JSON.stringify(parsed);
+        const encrypted = await encryptData(jsonString);
+        localStorage.setItem(VOICE_HISTORY_STORAGE_KEY, encrypted);
+
+        return {
+          success: true,
+          migrated: true,
+          alreadyEncrypted: false,
+          noData: false,
+        };
+      } catch (parseErr) {
+        // Not valid JSON either - data is corrupted
+        return {
+          success: false,
+          migrated: false,
+          alreadyEncrypted: false,
+          noData: false,
+          error: 'Data is neither encrypted nor valid JSON',
+        };
+      }
+    }
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    console.error('Failed to migrate voice history data:', err);
+    return {
+      success: false,
+      migrated: false,
+      alreadyEncrypted: false,
+      noData: false,
+      error: errorMessage,
+    };
   }
 }
 
