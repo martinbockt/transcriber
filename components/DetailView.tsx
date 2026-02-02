@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import {
   AlertDialog,
@@ -48,6 +49,8 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
   const [showTranscript, setShowTranscript] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState(item.title);
+  const [isEditingSummary, setIsEditingSummary] = useState(false);
+  const [editedSummary, setEditedSummary] = useState(item.summary);
   const [tags, setTags] = useState<string[]>(item.tags);
   const [newTag, setNewTag] = useState('');
 
@@ -154,7 +157,30 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
             <CardTitle className="text-lg">Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm leading-relaxed">{item.summary}</p>
+            {isEditingSummary ? (
+              <Textarea
+                value={editedSummary}
+                onChange={(e) => setEditedSummary(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setEditedSummary(item.summary);
+                    setIsEditingSummary(false);
+                  }
+                }}
+                onBlur={() => {
+                  setIsEditingSummary(false);
+                }}
+                autoFocus
+                className="text-sm leading-relaxed min-h-[100px]"
+              />
+            ) : (
+              <p
+                className="text-sm leading-relaxed cursor-pointer hover:text-primary/80 transition-colors"
+                onClick={() => setIsEditingSummary(true)}
+              >
+                {editedSummary}
+              </p>
+            )}
           </CardContent>
         </Card>
 
