@@ -27,6 +27,12 @@ export class RateLimitError extends Error {
  */
 const whisperRateLimiter = createRateLimiter(3, 5);
 
+/**
+ * Rate limiter for GPT-4o API (content processing)
+ * Configured for 3 requests per minute with burst capacity of 5
+ */
+const gptRateLimiter = createRateLimiter(3, 5);
+
 async function getApiKey(): Promise<string> {
   // Check Tauri secure storage first (user-provided key)
   if (typeof window !== 'undefined' && '__TAURI__' in window) {
@@ -117,6 +123,17 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 }
 
 export async function processContent(transcript: string): Promise<Omit<VoiceItem, 'id' | 'createdAt' | 'originalTranscript'>> {
+  // Check rate limit before making API call
+  if (!gptRateLimiter.acquire()) {
+    const retryAfterMs = gptRateLimiter.getTimeUntilTokensAvailable(1);
+    const retryAfterSeconds = Math.ceil(retryAfterMs / 1000);
+    throw new RateLimitError(
+      `Rate limit exceeded for content processing. Please wait ${retryAfterSeconds} second${retryAfterSeconds !== 1 ? 's' : ''} and try again.`,
+      retryAfterMs,
+      'gpt-4o'
+    );
+  }
+
   const apiKey = await getApiKey();
 
   try {
