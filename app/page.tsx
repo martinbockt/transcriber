@@ -160,6 +160,7 @@ export default function Home() {
         onSelectItem={setActiveItemId}
         onNewRecording={handleNewRecording}
         isRecording={isRecording}
+        onOpenSettings={() => setShowSettings(true)}
       />
 
       <div className="flex-1 flex flex-col">
