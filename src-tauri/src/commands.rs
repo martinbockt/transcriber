@@ -1,6 +1,6 @@
 use std::fs;
 use std::path::PathBuf;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 /// Get the path to the secure storage file in the app's data directory
 fn get_secure_storage_path(app: &AppHandle, key: &str) -> Result<PathBuf, String> {
