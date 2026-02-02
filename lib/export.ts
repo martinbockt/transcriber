@@ -119,3 +119,35 @@ export function formatToJSON(item: VoiceItem, includeAudio: boolean = false): st
   // Return formatted JSON with 2-space indentation
   return JSON.stringify(exportData, null, 2);
 }
+
+/**
+ * Downloads a string as a file in the browser
+ * @param content The content to download
+ * @param filename The name of the file to download
+ * @param mimeType The MIME type of the file (default: text/plain)
+ */
+export function downloadAsFile(content: string, filename: string, mimeType: string = 'text/plain'): void {
+  try {
+    // Create a Blob from the content
+    const blob = new Blob([content], { type: mimeType });
+
+    // Create a temporary URL for the blob
+    const url = URL.createObjectURL(blob);
+
+    // Create a temporary anchor element
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+
+    // Trigger the download
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Download error:', error);
+    throw error;
+  }
+}
