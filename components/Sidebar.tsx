@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { SearchBar, type DateRange } from '@/components/SearchBar';
 import type { VoiceItem, IntentType } from '@/types/voice-item';
 import { cn } from '@/lib/utils';
 
@@ -15,6 +16,12 @@ interface SidebarProps {
   onSelectItem: (id: string) => void;
   onNewRecording: () => void;
   isRecording: boolean;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  selectedIntents: IntentType[];
+  onIntentsChange: (intents: IntentType[]) => void;
+  dateRange: DateRange;
+  onDateRangeChange: (range: DateRange) => void;
 }
 
 const intentIcons: Record<IntentType, typeof ListTodo> = {
@@ -37,6 +44,12 @@ export function Sidebar({
   onSelectItem,
   onNewRecording,
   isRecording,
+  searchQuery,
+  onSearchChange,
+  selectedIntents,
+  onIntentsChange,
+  dateRange,
+  onDateRangeChange,
 }: SidebarProps) {
   return (
     <div className="w-80 border-r bg-muted/10 flex flex-col h-screen">
@@ -51,6 +64,19 @@ export function Sidebar({
           <Mic className={cn("mr-2 h-5 w-5", isRecording && "animate-pulse")} />
           {isRecording ? 'Recording...' : 'New Recording'}
         </Button>
+      </div>
+
+      <Separator />
+
+      <div className="p-4">
+        <SearchBar
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
+          selectedIntents={selectedIntents}
+          onIntentsChange={onIntentsChange}
+          dateRange={dateRange}
+          onDateRangeChange={onDateRangeChange}
+        />
       </div>
 
       <Separator />
