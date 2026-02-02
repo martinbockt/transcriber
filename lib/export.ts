@@ -90,3 +90,32 @@ export function formatToMarkdown(item: VoiceItem, includeAudio: boolean = false)
 
   return lines.join('\n');
 }
+
+/**
+ * Formats a VoiceItem to JSON with optional audio data
+ * @param item The voice item to format
+ * @param includeAudio Whether to include audio as base64 data URL
+ * @returns Formatted JSON string
+ */
+export function formatToJSON(item: VoiceItem, includeAudio: boolean = false): string {
+  // Create a clean copy of the item
+  const exportData: Partial<VoiceItem> = {
+    id: item.id,
+    createdAt: item.createdAt,
+    originalTranscript: item.originalTranscript,
+    title: item.title,
+    tags: item.tags,
+    summary: item.summary,
+    keyFacts: item.keyFacts,
+    intent: item.intent,
+    data: item.data,
+  };
+
+  // Conditionally include audio data
+  if (includeAudio && item.audioData) {
+    exportData.audioData = item.audioData;
+  }
+
+  // Return formatted JSON with 2-space indentation
+  return JSON.stringify(exportData, null, 2);
+}
