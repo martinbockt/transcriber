@@ -73,8 +73,7 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
   onDateRangeChange,
 }, ref) {
   // Determine if we're in a search/filter context
-  const hasActiveFilters = searchQuery.trim() !== '' || selectedIntents.length > 0 ||
-    dateRange.from !== undefined || dateRange.to !== undefined;
+  const hasActiveFilters = searchQuery.trim() !== '' || selectedIntents.length > 0 || dateRange !== 'all';
 
   // Calculate total items (would need to be passed from parent in real scenario)
   // For now, we show count when filters are active
