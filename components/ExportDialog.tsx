@@ -14,6 +14,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatToMarkdown, formatToJSON, downloadAsFile } from '@/lib/export';
 import type { VoiceItem } from '@/types/voice-item';
+import { invoke } from '@tauri-apps/api/core';
 
 interface ExportDialogProps {
   open: boolean;
@@ -27,38 +28,63 @@ export function ExportDialog({ open, onOpenChange, items }: ExportDialogProps) {
   const [format, setFormat] = useState<ExportFormat>('markdown');
   const [includeAudio, setIncludeAudio] = useState(false);
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (items.length === 0) return;
 
     try {
+      // Prepare export content and metadata
+      let content: string;
+      let filename: string;
+      let extension: string;
+      let mimeType: string;
+
       if (items.length === 1) {
         // Single item export
         const item = items[0];
-        const content = format === 'markdown'
+        content = format === 'markdown'
           ? formatToMarkdown(item, includeAudio)
           : formatToJSON(item, includeAudio);
 
-        const extension = format === 'markdown' ? 'md' : 'json';
-        const mimeType = format === 'markdown' ? 'text/markdown' : 'application/json';
-        const filename = `${item.title.replace(/[^a-z0-9]/gi, '_')}.${extension}`;
-
-        downloadAsFile(content, filename, mimeType);
+        extension = format === 'markdown' ? 'md' : 'json';
+        mimeType = format === 'markdown' ? 'text/markdown' : 'application/json';
+        filename = `${item.title.replace(/[^a-z0-9]/gi, '_')}.${extension}`;
       } else {
         // Multiple items export - combine into single file
-        const content = format === 'markdown'
+        content = format === 'markdown'
           ? items.map(item => formatToMarkdown(item, includeAudio)).join('\n\n---\n\n')
           : JSON.stringify(items.map(item => JSON.parse(formatToJSON(item, includeAudio))), null, 2);
 
-        const extension = format === 'markdown' ? 'md' : 'json';
-        const mimeType = format === 'markdown' ? 'text/markdown' : 'application/json';
-        const filename = `voice_items_export_${new Date().toISOString().split('T')[0]}.${extension}`;
+        extension = format === 'markdown' ? 'md' : 'json';
+        mimeType = format === 'markdown' ? 'text/markdown' : 'application/json';
+        filename = `voice_items_export_${new Date().toISOString().split('T')[0]}.${extension}`;
+      }
 
+      // Detect if running in Tauri (desktop app) or browser
+      const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+
+      if (isTauri) {
+        // Use Tauri native file dialog
+        await invoke('save_file', {
+          content,
+          defaultFilename: filename,
+          filters: [
+            {
+              name: format === 'markdown' ? 'Markdown Files' : 'JSON Files',
+              extensions: [extension]
+            }
+          ]
+        });
+      } else {
+        // Fallback to browser download
         downloadAsFile(content, filename, mimeType);
       }
 
       onOpenChange(false);
     } catch (error) {
-      console.error('Export failed:', error);
+      // Only log error if it's not a user cancellation
+      if (error !== 'User cancelled save dialog') {
+        console.error('Export failed:', error);
+      }
     }
   };
 
