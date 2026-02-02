@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { DetailView } from '@/components/DetailView';
 import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
+import { ExportDialog } from '@/components/ExportDialog';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { processVoiceRecording } from '@/lib/ai';
@@ -18,6 +19,7 @@ export default function Home() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
 
   const { isRecording, audioBlob, start, stop, error: recorderError } = useAudioRecorder();
 
@@ -116,6 +118,10 @@ export default function Home() {
     }
   };
 
+  const handleExportAll = () => {
+    setShowExportDialog(true);
+  };
+
   const activeItem = items.find((item) => item.id === activeItemId);
 
   // Keyboard shortcuts
@@ -147,6 +153,7 @@ export default function Home() {
         activeItemId={activeItemId}
         onSelectItem={setActiveItemId}
         onNewRecording={handleNewRecording}
+        onExportAll={handleExportAll}
         isRecording={isRecording}
       />
 
@@ -193,6 +200,13 @@ export default function Home() {
 
       {/* Keyboard Shortcuts Help Dialog */}
       <KeyboardShortcutsDialog open={showHelp} onOpenChange={setShowHelp} />
+
+      {/* Export Dialog */}
+      <ExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        items={items}
+      />
     </div>
   );
 }

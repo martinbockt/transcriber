@@ -1,6 +1,6 @@
 "use client";
 
-import { Mic, ListTodo, FileQuestion, FileEdit, StickyNote } from 'lucide-react';
+import { Mic, ListTodo, FileQuestion, FileEdit, StickyNote, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,7 @@ interface SidebarProps {
   activeItemId: string | null;
   onSelectItem: (id: string) => void;
   onNewRecording: () => void;
+  onExportAll: () => void;
   isRecording: boolean;
 }
 
@@ -36,11 +37,12 @@ export function Sidebar({
   activeItemId,
   onSelectItem,
   onNewRecording,
+  onExportAll,
   isRecording,
 }: SidebarProps) {
   return (
     <div className="w-80 border-r bg-muted/10 flex flex-col h-screen">
-      <div className="p-4">
+      <div className="p-4 space-y-2">
         <h1 className="text-2xl font-bold mb-4">Voice Assistant</h1>
         <Button
           onClick={onNewRecording}
@@ -50,6 +52,16 @@ export function Sidebar({
         >
           <Mic className={cn("mr-2 h-5 w-5", isRecording && "animate-pulse")} />
           {isRecording ? 'Recording...' : 'New Recording'}
+        </Button>
+        <Button
+          onClick={onExportAll}
+          disabled={items.length === 0}
+          variant="outline"
+          size="lg"
+          className="w-full"
+        >
+          <Download className="mr-2 h-5 w-5" />
+          Export All
         </Button>
       </div>
 
