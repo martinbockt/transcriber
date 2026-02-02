@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Trash2, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import { TodoView } from './TodoView';
 import { ResearchView } from './ResearchView';
 import { DraftView } from './DraftView';
 import { AudioPlayer } from './AudioPlayer';
+import { ExportDialog } from './ExportDialog';
 import type { VoiceItem } from '@/types/voice-item';
 
 interface DetailViewProps {
@@ -45,6 +46,7 @@ const intentVariants = {
 
 export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
   const [showTranscript, setShowTranscript] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -57,6 +59,14 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
               <Badge variant={intentVariants[item.intent]}>
                 {intentLabels[item.intent]}
               </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => setShowExportDialog(true)}
+              >
+                <Download className="h-4 w-4" />
+              </Button>
               {onDelete && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
@@ -188,6 +198,13 @@ export function DetailView({ item, onToggleTodo, onDelete }: DetailViewProps) {
           )}
         </Card>
       </div>
+
+      {/* Export Dialog */}
+      <ExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        items={[item]}
+      />
     </div>
   );
 }
