@@ -210,6 +210,18 @@ export default function Home() {
     );
   };
 
+  const handleTogglePin = (itemId: string) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
+        return {
+          ...item,
+          pinned: !item.pinned,
+        };
+      }),
+    );
+  };
+
   const handleDelete = (itemId: string) => {
     setItems((prev) => prev.filter((item) => item.id !== itemId));
 
@@ -220,9 +232,14 @@ export default function Home() {
     }
   };
 
-  // Filter items based on search criteria
+  // Filter and sort items (pinned items first)
   const filteredItems = useMemo(() => {
-    return searchVoiceItems(items, searchQuery, selectedIntents, dateRange);
+    const filtered = searchVoiceItems(items, searchQuery, selectedIntents, dateRange);
+    // Sort so pinned items appear at top, maintaining chronological order within each group
+    return filtered.sort((a, b) => {
+      if (a.pinned === b.pinned) return 0; // Maintain existing order within group
+      return a.pinned ? -1 : 1; // Pinned items come first
+    });
   }, [items, searchQuery, selectedIntents, dateRange]);
 
   const handleExportAll = () => {
@@ -348,6 +365,7 @@ export default function Home() {
         items={filteredItems}
         activeItemId={activeItemId}
         onSelectItem={setActiveItemId}
+        onTogglePin={handleTogglePin}
         onNewRecording={handleNewRecording}
         onExportAll={handleExportAll}
         isRecording={isRecording}

@@ -10,6 +10,7 @@ import {
   StickyNote,
   Download,
   Settings,
+  Pin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -36,6 +37,7 @@ interface SidebarProps {
   dateRange: DateRange;
   onDateRangeChange: (range: DateRange) => void;
   onOpenSettings?: () => void;
+  onTogglePin: (itemId: string) => void;
 }
 
 const intentIcons: Record<IntentType, typeof ListTodo> = {
@@ -102,6 +104,7 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(
       dateRange,
       onDateRangeChange,
       onOpenSettings,
+      onTogglePin,
     },
     ref,
   ) {
@@ -216,12 +219,35 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(
                   <Card
                     key={item.id}
                     className={cn(
-                      "p-3 cursor-pointer transition-all duration-200 hover:bg-accent border-l-2",
+                      "p-3 cursor-pointer transition-all duration-200 hover:bg-accent border-l-2 relative",
                       intentBorderColors[item.intent],
                       isActive && "bg-accent shadow-xs",
+                      item.pinned &&
+                        "ring-1 ring-amber-400/30 bg-amber-50/30 dark:bg-amber-950/20",
                     )}
                     onClick={() => onSelectItem(item.id)}
                   >
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={cn(
+                        "absolute top-2 right-2 h-6 w-6 transition-all duration-200",
+                        item.pinned
+                          ? "opacity-100 text-amber-500 hover:text-amber-600"
+                          : "opacity-60 hover:opacity-100",
+                      )}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onTogglePin(item.id);
+                      }}
+                    >
+                      <Pin
+                        className={cn(
+                          "h-4 w-4",
+                          item.pinned && "fill-current",
+                        )}
+                      />
+                    </Button>
                     <div className="flex items-start gap-3">
                       <Icon
                         className={cn(
@@ -229,7 +255,7 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(
                           intentColors[item.intent],
                         )}
                       />
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 pr-6">
                         <h3 className="font-medium text-sm line-clamp-2 mb-1">
                           {highlightText(item.title, searchQuery)}
                         </h3>
