@@ -22,7 +22,7 @@ const STORAGE_KEY = 'openai_api_key';
 
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const [apiKey, setApiKey] = useState('');
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'validating' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
   // Load API key from localStorage on mount
@@ -33,7 +33,30 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     }
   }, []);
 
-  const handleSaveApiKey = () => {
+  const validateApiKey = async (key: string): Promise<boolean> => {
+    try {
+      const response = await fetch('https://api.openai.com/v1/models', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${key}`,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error?.message || 'Invalid API key');
+      }
+
+      return true;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+      throw new Error('Failed to validate API key');
+    }
+  };
+
+  const handleSaveApiKey = async () => {
     // Basic validation
     if (!apiKey.trim()) {
       setErrorMessage('API key cannot be empty');
@@ -50,13 +73,18 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       return;
     }
 
-    // Save to localStorage
+    // Validate API key with OpenAI
+    setSaveStatus('validating');
     try {
+      await validateApiKey(apiKey);
+
+      // Save to localStorage
       localStorage.setItem(STORAGE_KEY, apiKey);
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
-      setErrorMessage('Failed to save API key');
+      const message = error instanceof Error ? error.message : 'Failed to validate API key';
+      setErrorMessage(message);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
     }
@@ -94,8 +122,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                   <Button
                     onClick={handleSaveApiKey}
                     variant={saveStatus === 'success' ? 'default' : 'outline'}
+                    disabled={saveStatus === 'validating'}
                   >
-                    {saveStatus === 'success' ? 'Saved!' : 'Save'}
+                    {saveStatus === 'validating' ? 'Validating...' : saveStatus === 'success' ? 'Saved!' : 'Save'}
                   </Button>
                 </div>
                 {saveStatus === 'error' && (
