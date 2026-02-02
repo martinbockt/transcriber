@@ -25,6 +25,8 @@ interface SettingsDialogProps {
 }
 
 const STORAGE_KEY = 'openai_api_key';
+const APP_VERSION = '0.1.0';
+const APP_NAME = 'Voice Assistant';
 
 // Utility function to calculate localStorage usage
 const calculateStorageUsage = (): number => {
@@ -285,11 +287,19 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
 
             <Separator />
 
-            {/* About Section - to be implemented in phase 5 */}
+            {/* About Section */}
             <section>
               <h3 className="text-sm font-medium mb-3">About</h3>
-              <div className="text-sm text-muted-foreground">
-                Version info and links will be added here
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-3 border rounded-md">
+                    <span className="text-sm font-medium">{APP_NAME}</span>
+                    <span className="text-sm text-muted-foreground">v{APP_VERSION}</span>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  A voice-powered assistant that transcribes and processes your audio recordings using OpenAI's advanced AI technology.
+                </p>
               </div>
             </section>
           </div>
