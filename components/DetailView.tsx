@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, forwardRef } from 'react';
+import { useState, forwardRef } from 'react';
 import { ChevronDown, ChevronUp, Trash2, Download, Edit2, Check, Copy } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -68,28 +68,18 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
   const [editedSummary, setEditedSummary] = useState(item.summary);
   const [isEditingTranscript, setIsEditingTranscript] = useState(false);
   const [editedTranscript, setEditedTranscript] = useState(item.originalTranscript);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [hasCopied, setHasCopied] = useState(false);
 
-  // Track unsaved changes in transcript
-  useEffect(() => {
-    if (isEditingTranscript && editedTranscript !== item.originalTranscript) {
-      setHasUnsavedChanges(true);
-    } else if (!isEditingTranscript) {
-      setHasUnsavedChanges(false);
-    }
-  }, [isEditingTranscript, editedTranscript, item.originalTranscript]);
+  const hasUnsavedChanges = isEditingTranscript && editedTranscript !== item.originalTranscript;
 
   const handleSaveTranscript = () => {
     onUpdateTranscript?.(item.id, editedTranscript);
     setIsEditingTranscript(false);
-    setHasUnsavedChanges(false);
   };
 
   const handleCancelTranscript = () => {
     setEditedTranscript(item.originalTranscript);
     setIsEditingTranscript(false);
-    setHasUnsavedChanges(false);
   };
 
   const handleCopyTranscript = async () => {
@@ -246,7 +236,7 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
 
           {/* Key Facts */}
           {item.keyFacts.length > 0 && (
-            <Card className={`border-l-4 ${intentBorderColors[item.intent]}`}>
+            <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg font-semibold tracking-tight">Key Facts</CardTitle>
               </CardHeader>

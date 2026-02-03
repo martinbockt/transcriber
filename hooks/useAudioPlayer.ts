@@ -25,62 +25,70 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
-  const updateTime = useCallback(() => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-      animationFrameRef.current = requestAnimationFrame(updateTime);
+  useEffect(() => {
+    if (!isPlaying || !audioRef.current) return;
+
+    const updateTime = () => {
+      if (audioRef.current) {
+        setCurrentTime(audioRef.current.currentTime);
+        animationFrameRef.current = requestAnimationFrame(updateTime);
+      }
+    };
+
+    updateTime();
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [isPlaying]);
+
+  const play = useCallback((audioData: string) => {
+    try {
+      setError(null);
+
+      // Stop any currently playing audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+
+      // Create new audio element
+      const audio = new Audio(audioData);
+      audioRef.current = audio;
+
+      audio.onloadedmetadata = () => {
+        setDuration(audio.duration);
+      };
+
+      audio.onended = () => {
+        setIsPlaying(false);
+        setCurrentTime(0);
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+        }
+      };
+
+      audio.onerror = () => {
+        setError('Failed to load audio');
+        setIsPlaying(false);
+      };
+
+      audio
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch((err) => {
+          setError(`Playback failed: ${err.message}`);
+          setIsPlaying(false);
+        });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to play audio');
+      logError('Audio playback error', err);
     }
   }, []);
-
-  const play = useCallback(
-    (audioData: string) => {
-      try {
-        setError(null);
-
-        // Stop any currently playing audio
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current = null;
-        }
-
-        // Create new audio element
-        const audio = new Audio(audioData);
-        audioRef.current = audio;
-
-        audio.onloadedmetadata = () => {
-          setDuration(audio.duration);
-        };
-
-        audio.onended = () => {
-          setIsPlaying(false);
-          setCurrentTime(0);
-          if (animationFrameRef.current) {
-            cancelAnimationFrame(animationFrameRef.current);
-          }
-        };
-
-        audio.onerror = () => {
-          setError('Failed to load audio');
-          setIsPlaying(false);
-        };
-
-        audio
-          .play()
-          .then(() => {
-            setIsPlaying(true);
-            updateTime();
-          })
-          .catch((err) => {
-            setError(`Playback failed: ${err.message}`);
-            setIsPlaying(false);
-          });
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to play audio');
-        logError('Audio playback error', err);
-      }
-    },
-    [updateTime],
-  );
 
   const pause = useCallback(() => {
     if (audioRef.current) {

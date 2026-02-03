@@ -364,7 +364,7 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                 </div>
                 <p className="text-muted-foreground text-sm">
                   A voice-powered assistant that transcribes and processes your audio recordings
-                  using OpenAI's advanced AI technology.
+                  using OpenAI&apos;s advanced AI technology.
                 </p>
                 <div className="flex gap-2">
                   <Button

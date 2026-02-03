@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { validateAudioBlob } from '@/lib/validation';
 import { logError } from '@/lib/error-sanitizer';
 
@@ -31,17 +31,29 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
   const countdownIntervalRef = useRef<number | null>(null);
   const elapsedTimeIntervalRef = useRef<number | null>(null);
 
-  const updateAudioLevel = useCallback(() => {
-    if (!analyserRef.current) return;
+  useEffect(() => {
+    if (!isRecording || !analyserRef.current) return;
 
-    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-    analyserRef.current.getByteFrequencyData(dataArray);
+    const updateAudioLevel = () => {
+      if (!analyserRef.current) return;
 
-    const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-    setAudioLevel(average / 255);
+      const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+      analyserRef.current.getByteFrequencyData(dataArray);
 
-    animationFrameRef.current = requestAnimationFrame(updateAudioLevel);
-  }, []);
+      const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+      setAudioLevel(average / 255);
+
+      animationFrameRef.current = requestAnimationFrame(updateAudioLevel);
+    };
+
+    updateAudioLevel();
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [isRecording]);
 
   const startActualRecording = useCallback(async () => {
     try {
@@ -95,7 +107,6 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
 
       mediaRecorder.start();
       setIsRecording(true);
-      updateAudioLevel();
 
       // Start elapsed time counter
       setElapsedTime(0);
@@ -106,7 +117,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
       setError(err instanceof Error ? err.message : 'Failed to start recording');
       logError('Error starting recording', err);
     }
-  }, [updateAudioLevel]);
+  }, []);
 
   const start = useCallback(async () => {
     try {
