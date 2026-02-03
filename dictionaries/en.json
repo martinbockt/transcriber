@@ -78,8 +78,14 @@
     "apiKeyEmpty": "API key cannot be empty",
     "apiKeyInvalidFormat": "Invalid API key format. OpenAI keys should start with \"sk-\"",
     "apiKeyValidationFailed": "Failed to validate API key",
-    "audioProcessingFailed": "Failed to process audio",
-    "rateLimitExceeded": "Rate limit exceeded. Please try again later.",
+    "audioProcessingFailed": "Unable to process your recording. Please try again.",
+    "rateLimitExceeded": "Too many requests. Please wait a moment and try again.",
+    "networkError": "Connection issue detected. Please check your internet and try again.",
+    "transcriptionError": "Unable to transcribe audio. Please speak clearly and try again.",
+    "processingError": "Unable to analyze your recording. Please try again.",
+    "microphoneAccessDenied": "Microphone access denied. Please enable microphone permissions in your browser settings.",
+    "recordingFailed": "Recording failed. Please check your microphone and try again.",
+    "unknownError": "Something went wrong. Please try again.",
     "generic": "Error"
   }
 }

@@ -209,6 +209,56 @@ export default function Home() {
     });
   };
 
+  // Helper function to get user-friendly error message
+  const getErrorMessage = (err: unknown): string => {
+    if (err instanceof RateLimitError) {
+      return dictionary.errors.rateLimitExceeded;
+    }
+
+    if (err instanceof Error) {
+      const message = err.message.toLowerCase();
+
+      // Check for network errors
+      if (
+        message.includes('fetch') ||
+        message.includes('network') ||
+        message.includes('failed to fetch') ||
+        message.includes('networkerror') ||
+        message.includes('connection')
+      ) {
+        return dictionary.errors.networkError;
+      }
+
+      // Check for transcription errors
+      if (message.includes('transcription') || message.includes('whisper')) {
+        return dictionary.errors.transcriptionError;
+      }
+
+      // Check for processing errors
+      if (message.includes('processing') || message.includes('gpt') || message.includes('completion')) {
+        return dictionary.errors.processingError;
+      }
+
+      // Check for microphone errors
+      if (
+        message.includes('microphone') ||
+        message.includes('permission') ||
+        message.includes('notallowederror') ||
+        message.includes('permissiondeniederror')
+      ) {
+        return dictionary.errors.microphoneAccessDenied;
+      }
+
+      // Check for recording errors
+      if (message.includes('recording') || message.includes('mediarecorder')) {
+        return dictionary.errors.recordingFailed;
+      }
+    }
+
+    // Default to generic error message
+    return dictionary.errors.unknownError;
+  };
+
   const handleProcessAudio = async (blob: Blob, transcriptText: string) => {
     setIsProcessing(true);
     setError(null);
@@ -220,6 +270,9 @@ export default function Home() {
     } catch (err) {
       logError('Processing error', err);
 
+      // Get user-friendly error message
+      const userErrorMessage = getErrorMessage(err);
+
       // Save failed recording for recovery
       try {
         const audioData = await blobToBase64(blob);
@@ -227,19 +280,18 @@ export default function Home() {
 
         // Determine error type
         let errorType: 'transcription' | 'processing' | 'network' | 'unknown' = 'unknown';
-        let errorMessage = dictionary.errors.audioProcessingFailed;
+        let errorMessage = err instanceof Error ? err.message : 'Unknown error';
 
         if (err instanceof RateLimitError) {
           errorType = 'network';
-          errorMessage = dictionary.errors.rateLimitExceeded;
         } else if (err instanceof Error) {
-          errorMessage = err.message;
+          const message = err.message.toLowerCase();
           // Check if it's a network error
-          if (err.message.includes('fetch') || err.message.includes('network') || err.message.includes('Failed to fetch')) {
+          if (message.includes('fetch') || message.includes('network') || message.includes('failed to fetch')) {
             errorType = 'network';
-          } else if (err.message.includes('transcription') || err.message.includes('Whisper')) {
+          } else if (message.includes('transcription') || message.includes('whisper')) {
             errorType = 'transcription';
-          } else if (err.message.includes('processing') || err.message.includes('GPT')) {
+          } else if (message.includes('processing') || message.includes('gpt')) {
             errorType = 'processing';
           }
         }
@@ -258,13 +310,8 @@ export default function Home() {
         logError('Failed to save failed recording', saveErr);
       }
 
-      // Handle rate limit errors with user-friendly message
-      if (err instanceof RateLimitError) {
-        // const retrySeconds = Math.ceil(err.retryAfterMs / 1000);
-        setError(dictionary.errors.rateLimitExceeded);
-      } else {
-        setError(err instanceof Error ? err.message : dictionary.errors.audioProcessingFailed);
-      }
+      // Set user-friendly error message
+      setError(userErrorMessage);
     } finally {
       setIsProcessing(false);
     }
@@ -338,6 +385,23 @@ export default function Home() {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   }, [items, searchQuery, selectedIntents, dateRange]);
+
+  // Compute friendly error message for display
+  const displayError = useMemo(() => {
+    if (recorderError) {
+      // Map recorder errors to friendly messages
+      const lowerError = recorderError.toLowerCase();
+      if (
+        lowerError.includes('permission') ||
+        lowerError.includes('notallowed') ||
+        lowerError.includes('denied')
+      ) {
+        return dictionary.errors.microphoneAccessDenied;
+      }
+      return dictionary.errors.recordingFailed;
+    }
+    return error;
+  }, [error, recorderError, dictionary.errors]);
 
   const handleExportAll = () => {
     setShowExportDialog(true);
@@ -472,7 +536,7 @@ export default function Home() {
 
       <div className="flex flex-1 flex-col">
         {/* Status Bar */}
-        {(isProcessing || isRecording || countdown !== null || error || recorderError) && (
+        {(isProcessing || isRecording || countdown !== null || displayError) && (
           <div className="bg-muted/50 border-b px-8 py-3">
             {countdown !== null && (
               <div className="flex items-center gap-2">
@@ -504,9 +568,9 @@ export default function Home() {
                 <span className="text-sm font-medium">{dictionary.status.processing}</span>
               </div>
             )}
-            {(error || recorderError) && (
+            {displayError && (
               <div className="text-destructive text-sm font-medium">
-                {dictionary.status.error}: {error || recorderError}
+                {displayError}
               </div>
             )}
           </div>

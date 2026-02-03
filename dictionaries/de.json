@@ -78,8 +78,14 @@
     "apiKeyEmpty": "API-Schlüssel darf nicht leer sein",
     "apiKeyInvalidFormat": "Ungültiges API-Schlüsselformat. OpenAI-Schlüssel sollten mit \"sk-\" beginnen",
     "apiKeyValidationFailed": "Validierung des API-Schlüssels fehlgeschlagen",
-    "audioProcessingFailed": "Audioverarbeitung fehlgeschlagen",
-    "rateLimitExceeded": "Ratenlimit überschritten. Bitte versuchen Sie es später erneut.",
+    "audioProcessingFailed": "Aufnahme konnte nicht verarbeitet werden. Bitte versuchen Sie es erneut.",
+    "rateLimitExceeded": "Zu viele Anfragen. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+    "networkError": "Verbindungsproblem erkannt. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+    "transcriptionError": "Audio konnte nicht transkribiert werden. Bitte sprechen Sie deutlich und versuchen Sie es erneut.",
+    "processingError": "Aufnahme konnte nicht analysiert werden. Bitte versuchen Sie es erneut.",
+    "microphoneAccessDenied": "Mikrofonzugriff verweigert. Bitte aktivieren Sie die Mikrofonberechtigung in Ihren Browsereinstellungen.",
+    "recordingFailed": "Aufnahme fehlgeschlagen. Bitte überprüfen Sie Ihr Mikrofon und versuchen Sie es erneut.",
+    "unknownError": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "generic": "Fehler"
   }
 }
