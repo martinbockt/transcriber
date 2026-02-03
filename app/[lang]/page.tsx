@@ -15,9 +15,11 @@ import { searchVoiceItems } from '@/lib/search';
 import { MOCK_HISTORY } from '@/lib/mock-data';
 import { encryptData, decryptData } from '@/lib/crypto';
 import { logError } from '@/lib/error-sanitizer';
+import { saveFailedRecording } from '@/lib/failed-recordings';
 import type { VoiceItem, IntentType } from '@/types/voice-item';
 import type { DateRange } from '@/components/SearchBar';
 import type { AudioPlayerRef } from '@/components/AudioPlayer';
+import { v4 as uuidv4 } from 'uuid';
 
 const STORAGE_KEY = 'voice-assistant-history';
 
@@ -192,6 +194,21 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audioBlob, isRecording]);
 
+  // Helper function to convert Blob to base64
+  const blobToBase64 = (blob: Blob): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        // Remove data URL prefix (e.g., "data:audio/webm;base64,")
+        const base64 = result.split(',')[1] || result;
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+
   const handleProcessAudio = async (blob: Blob, transcriptText: string) => {
     setIsProcessing(true);
     setError(null);
@@ -202,6 +219,44 @@ export default function Home() {
       setActiveItemId(newItem.id);
     } catch (err) {
       logError('Processing error', err);
+
+      // Save failed recording for recovery
+      try {
+        const audioData = await blobToBase64(blob);
+        const now = new Date().toISOString();
+
+        // Determine error type
+        let errorType: 'transcription' | 'processing' | 'network' | 'unknown' = 'unknown';
+        let errorMessage = dictionary.errors.audioProcessingFailed;
+
+        if (err instanceof RateLimitError) {
+          errorType = 'network';
+          errorMessage = dictionary.errors.rateLimitExceeded;
+        } else if (err instanceof Error) {
+          errorMessage = err.message;
+          // Check if it's a network error
+          if (err.message.includes('fetch') || err.message.includes('network') || err.message.includes('Failed to fetch')) {
+            errorType = 'network';
+          } else if (err.message.includes('transcription') || err.message.includes('Whisper')) {
+            errorType = 'transcription';
+          } else if (err.message.includes('processing') || err.message.includes('GPT')) {
+            errorType = 'processing';
+          }
+        }
+
+        await saveFailedRecording({
+          id: uuidv4(),
+          createdAt: now,
+          failedAt: now,
+          audioData,
+          transcript: transcriptText || undefined,
+          errorMessage,
+          errorType,
+          retryCount: 0,
+        });
+      } catch (saveErr) {
+        logError('Failed to save failed recording', saveErr);
+      }
 
       // Handle rate limit errors with user-friendly message
       if (err instanceof RateLimitError) {
