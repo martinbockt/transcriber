@@ -11,6 +11,7 @@ import {
   Download,
   Settings,
   Pin,
+  WifiOff,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -21,6 +22,7 @@ import { SearchBar, type DateRange } from '@/components/SearchBar';
 import type { VoiceItem, IntentType } from '@/types/voice-item';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/components/language-provider';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 interface SidebarProps {
   items: VoiceItem[];
@@ -111,6 +113,8 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
   // For now, we show count when filters are active
   const showResultCount = hasActiveFilters && items.length > 0;
   const { dictionary, locale } = useTranslation();
+  const { isOnline } = useNetworkStatus();
+
   return (
     <div className="bg-muted/10 flex h-screen w-80 flex-col border-r">
       <div className="space-y-2 p-4">
@@ -156,6 +160,12 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
           <Download className="mr-2 h-5 w-5" />
           {dictionary.navigation.exportAll}
         </Button>
+        {!isOnline && (
+          <div className="mt-2 flex items-center gap-2 rounded-md bg-amber-100 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950/50 dark:text-amber-200">
+            <WifiOff className="h-4 w-4 flex-shrink-0" />
+            <span>Offline - Some features may be unavailable</span>
+          </div>
+        )}
       </div>
 
       <Separator />
