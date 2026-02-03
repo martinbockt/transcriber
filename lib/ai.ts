@@ -82,7 +82,7 @@ const whisperRateLimiter = createRateLimiter(3, 5);
  */
 const gptRateLimiter = createRateLimiter(3, 5);
 
-async function getApiKey(): Promise<string> {
+export async function getApiKey(): Promise<string> {
   // Check Tauri secure storage first (user-provided key)
   if (typeof window !== 'undefined' && '__TAURI__' in window) {
     try {
@@ -282,6 +282,24 @@ export async function processVoiceRecording(audioBlob: Blob): Promise<VoiceItem>
     originalTranscript: transcript,
     audioData,
     language,
+    ...processed,
+  };
+}
+
+export async function processRealtimeRecording(
+  audioBlob: Blob,
+  transcript: string,
+  language?: string,
+): Promise<VoiceItem> {
+  const processed = await processContent(transcript, language);
+  const audioData = await blobToBase64(audioBlob);
+
+  return {
+    id: uuidv4(),
+    createdAt: new Date().toISOString(),
+    originalTranscript: transcript,
+    audioData,
+    language: language || 'en',
     ...processed,
   };
 }

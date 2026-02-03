@@ -9,7 +9,7 @@ import { ExportDialog } from '@/components/ExportDialog';
 import { SettingsDialog } from '@/components/SettingsDialog';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { processVoiceRecording, RateLimitError } from '@/lib/ai';
+import { processRealtimeRecording, RateLimitError } from '@/lib/ai';
 import { useTranslation } from '@/components/language-provider';
 import { searchVoiceItems } from '@/lib/search';
 import { MOCK_HISTORY } from '@/lib/mock-data';
@@ -44,6 +44,7 @@ export default function Home() {
   const {
     isRecording,
     audioBlob,
+    transcript,
     countdown,
     elapsedTime,
     start,
@@ -186,17 +187,17 @@ export default function Home() {
   // Process audio when recording stops
   useEffect(() => {
     if (audioBlob && !isRecording && !isProcessing) {
-      handleProcessAudio(audioBlob);
+      handleProcessAudio(audioBlob, transcript);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audioBlob, isRecording]);
 
-  const handleProcessAudio = async (blob: Blob) => {
+  const handleProcessAudio = async (blob: Blob, transcriptText: string) => {
     setIsProcessing(true);
     setError(null);
 
     try {
-      const newItem = await processVoiceRecording(blob);
+      const newItem = await processRealtimeRecording(blob, transcriptText);
       setItems((prev) => [newItem, ...prev]);
       setActiveItemId(newItem.id);
     } catch (err) {
@@ -427,12 +428,19 @@ export default function Home() {
               </div>
             )}
             {isRecording && countdown === null && (
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
-                <span className="text-sm font-medium">
-                  {dictionary.status.recording}: {Math.floor(elapsedTime / 60)}:
-                  {(elapsedTime % 60).toString().padStart(2, '0')}
-                </span>
+              <div className="flex w-full flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
+                  <span className="text-sm font-medium">
+                    {dictionary.status.recording}: {Math.floor(elapsedTime / 60)}:
+                    {(elapsedTime % 60).toString().padStart(2, '0')}
+                  </span>
+                </div>
+                {transcript && (
+                  <div className="bg-background text-foreground/80 mt-2 max-h-[200px] min-h-[60px] overflow-y-auto rounded-md border p-3 font-mono text-sm whitespace-pre-wrap">
+                    {transcript}
+                  </div>
+                )}
               </div>
             )}
             {isProcessing && (
