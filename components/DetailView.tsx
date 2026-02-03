@@ -216,9 +216,9 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
         <Separator />
 
         {/* Summary & Key Facts */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[65%_35%]">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
           {/* Summary */}
-          <Card>
+          <Card className="min-w-0">
             <CardHeader>
               <CardTitle className="text-lg">{dictionary.detailView.summary}</CardTitle>
             </CardHeader>
@@ -242,7 +242,7 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
                 />
               ) : (
                 <p
-                  className="hover:bg-muted/50 -m-1 cursor-pointer rounded p-1 text-sm leading-relaxed transition-colors"
+                  className="hover:bg-muted/50 -m-1 cursor-pointer rounded p-1 text-sm leading-relaxed transition-colors break-words"
                   onClick={() => setIsEditingSummary(true)}
                 >
                   {editedSummary}
@@ -253,16 +253,16 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
 
           {/* Key Facts */}
           {item.keyFacts.length > 0 && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg font-semibold tracking-tight">
+            <Card className="min-w-0">
+              <CardHeader>
+                <CardTitle className="text-lg">
                   {dictionary.detailView.keyFacts}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-0">
+              <CardContent>
                 <div className="space-y-2">
                   {item.keyFacts.map((fact, index) => (
-                    <p key={`${item.id}-fact-${index}`} className="text-sm leading-relaxed">
+                    <p key={`${item.id}-fact-${index}`} className="text-sm leading-relaxed break-words">
                       {fact}
                     </p>
                   ))}

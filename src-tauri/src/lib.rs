@@ -52,6 +52,39 @@ async fn save_file(
     }
 }
 
+/// Save binary file command for audio files (no dialog, saves directly)
+#[tauri::command]
+async fn save_audio_file(
+    app: tauri::AppHandle,
+    base64_data: String,
+    file_path: String,
+) -> Result<String, String> {
+    use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
+    use base64::prelude::*;
+
+    // Decode base64 data
+    let binary_data = match BASE64_STANDARD.decode(&base64_data) {
+        Ok(data) => data,
+        Err(e) => {
+            return Err(format!("Failed to decode base64 data: {}", e));
+        }
+    };
+
+    // Write binary data to file
+    let path = std::path::Path::new(&file_path);
+    match std::fs::write(path, binary_data) {
+        Ok(_) => Ok(file_path),
+        Err(e) => {
+            // Show error dialog to user
+            app.dialog()
+                .message(format!("Failed to save audio file: {}", e))
+                .kind(MessageDialogKind::Error)
+                .blocking_show();
+            Err(format!("Failed to write audio file: {}", e))
+        }
+    }
+}
+
 /// Toggle window visibility
 #[tauri::command]
 async fn toggle_window_visibility(window: tauri::Window) -> Result<(), String> {
@@ -79,6 +112,7 @@ pub fn run() {
         .manage(audio::AudioRecorder::default())
         .invoke_handler(tauri::generate_handler![
             save_file,
+            save_audio_file,
             toggle_window_visibility,
             commands::get_secure_value,
             commands::set_secure_value,

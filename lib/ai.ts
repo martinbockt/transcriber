@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import type { VoiceItem, IntentType } from '@/types/voice-item';
 import { createRateLimiter } from '@/lib/rate-limiter';
+import { convertToWav } from '@/lib/audio-converter';
 
 const STORAGE_KEY = 'openai_api_key';
 
@@ -273,8 +274,17 @@ export async function processVoiceRecording(audioBlob: Blob): Promise<VoiceItem>
   const { text: transcript, language } = await transcribeAudio(audioBlob);
   const processed = await processContent(transcript, language);
 
+  // Convert WebM to WAV for better compatibility in Tauri's WebView
+  let finalBlob = audioBlob;
+  try {
+    finalBlob = await convertToWav(audioBlob);
+  } catch (error) {
+    console.warn('Failed to convert audio to WAV, using original format:', error);
+    // Fall back to original blob if conversion fails
+  }
+
   // Convert audio blob to base64 for storage
-  const audioData = await blobToBase64(audioBlob);
+  const audioData = await blobToBase64(finalBlob);
 
   return {
     id: uuidv4(),
@@ -292,7 +302,17 @@ export async function processRealtimeRecording(
   language?: string,
 ): Promise<VoiceItem> {
   const processed = await processContent(transcript, language);
-  const audioData = await blobToBase64(audioBlob);
+
+  // Convert WebM to WAV for better compatibility in Tauri's WebView
+  let finalBlob = audioBlob;
+  try {
+    finalBlob = await convertToWav(audioBlob);
+  } catch (error) {
+    console.warn('Failed to convert audio to WAV, using original format:', error);
+    // Fall back to original blob if conversion fails
+  }
+
+  const audioData = await blobToBase64(finalBlob);
 
   return {
     id: uuidv4(),

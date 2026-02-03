@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { formatToMarkdown, formatToJSON, downloadAsFile } from '@/lib/export';
+import { formatToMarkdown, formatToJSON, downloadAsFile, downloadAudioFile } from '@/lib/export';
 import type { VoiceItem } from '@/types/voice-item';
 import { invoke } from '@tauri-apps/api/core';
 import { logError } from '@/lib/error-sanitizer';
@@ -73,7 +73,7 @@ export function ExportDialog({ open, onOpenChange, items }: ExportDialogProps) {
 
       if (isTauri) {
         // Use Tauri native file dialog
-        await invoke('save_file', {
+        const savedFilePath = (await invoke('save_file', {
           content,
           defaultFilename: filename,
           filters: [
@@ -82,10 +82,62 @@ export function ExportDialog({ open, onOpenChange, items }: ExportDialogProps) {
               extensions: [extension],
             },
           ],
-        });
+        })) as string;
+
+        // Download audio files separately if includeAudio is checked
+        if (includeAudio && savedFilePath) {
+          // Get the directory and base filename from the saved file
+          // Handle both forward slashes (Unix) and backslashes (Windows)
+          const lastSlashIndex = Math.max(
+            savedFilePath.lastIndexOf('/'),
+            savedFilePath.lastIndexOf('\\'),
+          );
+          const directory =
+            lastSlashIndex !== -1 ? savedFilePath.substring(0, lastSlashIndex + 1) : '';
+
+          for (let index = 0; index < items.length; index++) {
+            const item = items[index];
+            if (item.audioData) {
+              // Extract base64 data from data URL
+              const base64Match = item.audioData.match(/^data:[^;]+;base64,(.+)$/);
+              if (base64Match) {
+                const base64Data = base64Match[1];
+
+                // Generate audio filename based on item title or index
+                const audioFilename =
+                  items.length === 1
+                    ? `${item.title.replace(/[^a-z0-9]/gi, '_')}_audio.webm`
+                    : `${item.title.replace(/[^a-z0-9]/gi, '_')}_${index + 1}_audio.webm`;
+
+                // Save audio file in the same directory as the main file
+                const audioFilePath = directory + audioFilename;
+
+                await invoke('save_audio_file', {
+                  base64Data,
+                  filePath: audioFilePath,
+                });
+              }
+            }
+          }
+        }
       } else {
         // Fallback to browser download
         downloadAsFile(content, filename, mimeType);
+
+        // Download audio files separately if includeAudio is checked
+        if (includeAudio) {
+          items.forEach((item, index) => {
+            if (item.audioData) {
+              // Generate audio filename based on item title or index
+              const audioFilename =
+                items.length === 1
+                  ? `${item.title.replace(/[^a-z0-9]/gi, '_')}_audio.webm`
+                  : `${item.title.replace(/[^a-z0-9]/gi, '_')}_${index + 1}_audio.webm`;
+
+              downloadAudioFile(item.audioData, audioFilename);
+            }
+          });
+        }
       }
 
       onOpenChange(false);

@@ -110,17 +110,22 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
         <div className="text-muted-foreground px-1 text-xs font-medium">
           {dictionary.searchBar.filterByDate}
         </div>
-        <div className="flex flex-wrap gap-2">
-          {(['all', 'today', 'week', 'month'] as DateRange[]).map((range) => (
-            <Button
+        <div className="inline-flex w-full overflow-hidden rounded-md border">
+          {(['all', 'today', 'week', 'month'] as DateRange[]).map((range, index) => (
+            <button
               key={range}
-              variant={dateRange === range ? 'default' : 'outline'}
-              size="sm"
               onClick={() => onDateRangeChange(range)}
-              className="text-xs"
+              className={cn(
+                'flex-1 px-3 py-1.5 text-xs font-medium transition-colors',
+                'hover:bg-accent/50',
+                index !== 0 && 'border-l',
+                dateRange === range
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'bg-background',
+              )}
             >
               {dictionary.searchBar.dateRanges[range]}
-            </Button>
+            </button>
           ))}
         </div>
       </div>

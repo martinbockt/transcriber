@@ -79,11 +79,7 @@ export function formatToMarkdown(item: VoiceItem, includeAudio: boolean = false)
   if (includeAudio && item.audioData) {
     lines.push('## Audio');
     lines.push('');
-    lines.push(`[Audio Recording](${item.audioData})`);
-    lines.push('');
-    lines.push(
-      '_Note: Audio is embedded as a base64 data URL. Some markdown viewers may not support audio playback._',
-    );
+    lines.push('_Note: Audio file has been downloaded separately._');
     lines.push('');
   }
 
@@ -155,6 +151,53 @@ export function downloadAsFile(
     URL.revokeObjectURL(url);
   } catch (error) {
     logError('Download error', error);
+    throw error;
+  }
+}
+
+/**
+ * Downloads audio data as a separate audio file
+ * @param audioData Base64-encoded audio data URL
+ * @param filename The name of the audio file to download
+ */
+export function downloadAudioFile(audioData: string, filename: string): void {
+  try {
+    // Extract the base64 data and MIME type from the data URL
+    const matches = audioData.match(/^data:([^;]+);base64,(.+)$/);
+    if (!matches) {
+      throw new Error('Invalid audio data format');
+    }
+
+    const mimeType = matches[1];
+    const base64Data = matches[2];
+
+    // Convert base64 to binary
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    // Create blob from binary data
+    const blob = new Blob([bytes], { type: mimeType });
+
+    // Create a temporary URL for the blob
+    const url = URL.createObjectURL(blob);
+
+    // Create a temporary anchor element
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+
+    // Trigger the download
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    logError('Audio download error', error);
     throw error;
   }
 }
