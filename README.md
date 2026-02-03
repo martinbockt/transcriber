@@ -24,7 +24,7 @@ The app automatically classifies your voice input into four categories:
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14+ (App Router, Static Export)
+- **Frontend**: Next.js 16+ (App Router, Static Export)
 - **UI Framework**: Tailwind CSS + Shadcn UI (Radix Primitives)
 - **Desktop**: Tauri 2.0 (Rust + Webview)
 - **AI**: OpenAI API (Whisper for STT, GPT-4o for processing)
@@ -43,22 +43,26 @@ The app automatically classifies your voice input into four categories:
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd voice-assistant
 ```
 
 2. Install dependencies:
+
 ```bash
 pnpm install
 ```
 
 3. Configure environment variables:
+
 ```bash
 cp .env.example .env
 ```
 
 Edit `.env` and add your OpenAI API key:
+
 ```
 NEXT_PUBLIC_OPENAI_API_KEY=your_actual_api_key_here
 ```
@@ -84,6 +88,7 @@ pnpm tauri:dev
 ```
 
 This will:
+
 1. Start the Next.js dev server automatically
 2. Launch the Tauri desktop window
 3. Enable hot-reload for both frontend and Rust code
@@ -106,12 +111,14 @@ pnpm tauri:build
 ```
 
 This will:
+
 1. Build the Next.js app for production
 2. Compile the Rust backend
 3. Create a native executable for your platform
 4. Output the installer in `src-tauri/target/release/bundle/`
 
 The bundle will include:
+
 - **macOS**: `.app` and `.dmg` files
 - **Windows**: `.exe` and `.msi` installers
 - **Linux**: `.deb`, `.AppImage`, or other formats

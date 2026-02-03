@@ -1,5 +1,5 @@
-import type { VoiceItem, IntentType } from '@/types/voice-item';
-import type { DateRange } from '@/components/SearchBar';
+import type { VoiceItem, IntentType } from "@/types/voice-item";
+import type { DateRange } from "@/components/SearchBar";
 
 interface SearchResult {
   item: VoiceItem;
@@ -28,10 +28,11 @@ export function searchVoiceItems(
   items: VoiceItem[],
   query: string,
   selectedIntents: IntentType[],
-  dateRange: DateRange
+  dateRange: DateRange,
 ): VoiceItem[] {
   // Apply filters first for performance (O(n) with early termination)
-  let filtered = items;
+  // Create a shallow copy to prevent in-place mutation of the input array
+  let filtered = [...items];
 
   // Filter by intent type
   if (selectedIntents.length > 0) {
@@ -39,21 +40,25 @@ export function searchVoiceItems(
   }
 
   // Filter by date range (compute threshold once, then O(n) filter)
-  if (dateRange !== 'all') {
+  if (dateRange !== "all") {
     const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfDay = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
 
     let dateThreshold: Date;
 
     switch (dateRange) {
-      case 'today':
+      case "today":
         dateThreshold = startOfDay;
         break;
-      case 'week':
+      case "week":
         dateThreshold = new Date(startOfDay);
         dateThreshold.setDate(dateThreshold.getDate() - 7);
         break;
-      case 'month':
+      case "month":
         dateThreshold = new Date(startOfDay);
         dateThreshold.setMonth(dateThreshold.getMonth() - 1);
         break;
@@ -69,8 +74,9 @@ export function searchVoiceItems(
 
   // If no search query, return filtered items sorted by date (newest first)
   if (!query.trim()) {
-    return filtered.sort((a, b) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    return filtered.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
   }
 
@@ -91,7 +97,10 @@ export function searchVoiceItems(
     if (b.score !== a.score) {
       return b.score - a.score;
     }
-    return new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime();
+    return (
+      new Date(b.item.createdAt).getTime() -
+      new Date(a.item.createdAt).getTime()
+    );
   });
 
   return searchResults.map((result) => result.item);
@@ -108,8 +117,8 @@ function preprocessQuery(query: string): ProcessedQuery {
 
   // Pre-compile regex patterns for exact word matching
   // Escape special characters once, not repeatedly
-  const exactMatchRegexes = terms.map(term =>
-    new RegExp(`\\b${escapeRegex(term)}\\b`, 'g')
+  const exactMatchRegexes = terms.map(
+    (term) => new RegExp(`\\b${escapeRegex(term)}\\b`, "g"),
   );
 
   return {
@@ -123,7 +132,10 @@ function preprocessQuery(query: string): ProcessedQuery {
  * Higher scores indicate better matches
  * PERFORMANCE: Uses pre-compiled regexes to avoid thousands of RegExp creations
  */
-function calculateRelevanceScore(item: VoiceItem, processedQuery: ProcessedQuery): number {
+function calculateRelevanceScore(
+  item: VoiceItem,
+  processedQuery: ProcessedQuery,
+): number {
   let score = 0;
 
   // Weight factors for different fields (higher = more important)
@@ -155,7 +167,8 @@ function calculateRelevanceScore(item: VoiceItem, processedQuery: ProcessedQuery
   });
 
   // Search in original transcript
-  score += countMatches(item.originalTranscript, processedQuery) * WEIGHTS.transcript;
+  score +=
+    countMatches(item.originalTranscript, processedQuery) * WEIGHTS.transcript;
 
   // Search in dynamic data fields
   if (item.data.todos) {
@@ -165,11 +178,15 @@ function calculateRelevanceScore(item: VoiceItem, processedQuery: ProcessedQuery
   }
 
   if (item.data.researchAnswer) {
-    score += countMatches(item.data.researchAnswer, processedQuery) * WEIGHTS.researchAnswer;
+    score +=
+      countMatches(item.data.researchAnswer, processedQuery) *
+      WEIGHTS.researchAnswer;
   }
 
   if (item.data.draftContent) {
-    score += countMatches(item.data.draftContent, processedQuery) * WEIGHTS.draftContent;
+    score +=
+      countMatches(item.data.draftContent, processedQuery) *
+      WEIGHTS.draftContent;
   }
 
   return score;
@@ -212,5 +229,5 @@ function countMatches(text: string, processedQuery: ProcessedQuery): number {
  * Escapes special regex characters in a string
  */
 function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

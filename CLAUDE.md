@@ -4,11 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A Tauri 2.0 + Next.js 14 hybrid desktop application for AI-powered voice recording, transcription, and intelligent content processing. The app uses OpenAI Whisper for speech-to-text and GPT-4o for intent classification and content extraction.
+A Tauri 2.0 + Next.js 16 hybrid desktop application for AI-powered voice recording, transcription, and intelligent content processing. The app uses OpenAI Whisper for speech-to-text and GPT-4o for intent classification and content extraction.
 
 ## Common Development Commands
 
 ### Frontend Development
+
 ```bash
 pnpm dev              # Start Next.js dev server at localhost:3000
 pnpm build            # Build Next.js for production (static export to out/)
@@ -16,6 +17,7 @@ pnpm lint             # Run ESLint
 ```
 
 ### Desktop Development
+
 ```bash
 pnpm tauri:dev        # Run Tauri + Next.js in desktop mode (auto-opens DevTools)
 pnpm tauri:build      # Build production desktop app (creates native installers)
@@ -23,6 +25,7 @@ pnpm tauri <command>  # Run any Tauri CLI command
 ```
 
 ### Dependency Management
+
 ```bash
 pnpm install          # Install all dependencies
 ```
@@ -105,11 +108,13 @@ Three custom hooks encapsulate complex stateful logic:
 ### Tauri Integration
 
 The Rust backend ([src-tauri/src/lib.rs](src-tauri/src/lib.rs)) is minimal:
+
 - Initializes Tauri with shell plugin
 - Auto-opens DevTools in debug mode
 - No custom commands or backend logic (all processing happens in frontend via API calls)
 
 Tauri configuration ([src-tauri/tauri.conf.json](src-tauri/tauri.conf.json)):
+
 - Points to Next.js dev server in dev mode (`devUrl: http://localhost:3000`)
 - Uses static export (`frontendDist: ../out`) for production builds
 - Window config: 1400x900 default, 1000x600 minimum
@@ -125,6 +130,7 @@ Tauri configuration ([src-tauri/tauri.conf.json](src-tauri/tauri.conf.json)):
 The app implements a Content Security Policy for enhanced security in desktop mode. CSP configuration is located in [src-tauri/tauri.conf.json](src-tauri/tauri.conf.json) under `app.security.csp`.
 
 **Current Policy:**
+
 - `default-src: 'self' tauri://localhost asset: http://tauri.localhost` - Fallback for all resource types, allows local app resources and Tauri protocol
 - `script-src: 'self' 'wasm-unsafe-eval'` - Allow WebAssembly compilation (required for Next.js)
 - `style-src: 'self' 'unsafe-inline'` - Allow inline styles (required for Tailwind CSS and Next.js dynamic styles)
@@ -160,6 +166,7 @@ If you see CSP violations in the console or DevTools:
 ## Environment Variables
 
 Required environment variable:
+
 - `NEXT_PUBLIC_OPENAI_API_KEY`: OpenAI API key for Whisper and GPT-4o
 
 Copy `.env.example` to `.env` and add your API key. The `NEXT_PUBLIC_` prefix makes it available in the browser (Next.js requirement for client-side API calls).

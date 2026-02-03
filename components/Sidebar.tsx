@@ -149,12 +149,15 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(
             variant={isRecording ? "destructive" : "default"}
           >
             <Mic
-              className={cn("mr-2 h-5 w-5", (isRecording || countdown !== null) && "animate-pulse")}
+              className={cn(
+                "mr-2 h-5 w-5",
+                (isRecording || countdown !== null) && "animate-pulse",
+              )}
             />
             {countdown !== null
               ? `Starting in ${countdown}...`
               : isRecording
-                ? `Recording: ${Math.floor(elapsedTime / 60)}:${(elapsedTime % 60).toString().padStart(2, '0')}`
+                ? `Recording: ${Math.floor(elapsedTime / 60)}:${(elapsedTime % 60).toString().padStart(2, "0")}`
                 : "New Recording"}
           </Button>
           <Button
@@ -221,7 +224,7 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(
                     className={cn(
                       "p-3 cursor-pointer transition-all duration-200 hover:bg-accent border-l-2 relative",
                       intentBorderColors[item.intent],
-                      isActive && "bg-accent shadow-xs",
+                      isActive && "bg-accent text-accent-foreground shadow-xs",
                       item.pinned &&
                         "ring-1 ring-amber-400/30 bg-amber-50/30 dark:bg-amber-950/20",
                     )}
@@ -235,6 +238,9 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(
                         item.pinned
                           ? "opacity-100 text-amber-500 hover:text-amber-600"
                           : "opacity-60 hover:opacity-100",
+                        isActive &&
+                          !item.pinned &&
+                          "text-accent-foreground/70 hover:text-accent-foreground",
                       )}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -242,24 +248,30 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(
                       }}
                     >
                       <Pin
-                        className={cn(
-                          "h-4 w-4",
-                          item.pinned && "fill-current",
-                        )}
+                        className={cn("h-4 w-4", item.pinned && "fill-current")}
                       />
                     </Button>
                     <div className="flex items-start gap-3">
                       <Icon
                         className={cn(
                           "h-5 w-5 mt-0.5",
-                          intentColors[item.intent],
+                          isActive
+                            ? "text-accent-foreground"
+                            : intentColors[item.intent],
                         )}
                       />
                       <div className="flex-1 min-w-0 pr-6">
                         <h3 className="font-medium text-sm line-clamp-2 mb-1">
                           {highlightText(item.title, searchQuery)}
                         </h3>
-                        <p className="text-xs text-muted-foreground mb-2">
+                        <p
+                          className={cn(
+                            "text-xs mb-2",
+                            isActive
+                              ? "text-accent-foreground/80"
+                              : "text-muted-foreground",
+                          )}
+                        >
                           {new Date(item.createdAt).toLocaleDateString(
                             "en-US",
                             {

@@ -1,17 +1,20 @@
 "use client";
 
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeSanitize from 'rehype-sanitize';
-import { cn } from '@/lib/utils';
-import { isValidLinkProtocol } from '@/lib/sanitize';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeSanitize from "rehype-sanitize";
+import { cn } from "@/lib/utils";
+import { isValidLinkProtocol } from "@/lib/sanitize";
 
 interface MarkdownRendererProps {
   content: string;
   className?: string;
 }
 
-export function MarkdownRenderer({ content, className }: MarkdownRendererProps) {
+export function MarkdownRenderer({
+  content,
+  className,
+}: MarkdownRendererProps) {
   return (
     <div
       className={cn(
@@ -32,7 +35,7 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
         "prose-img:rounded-lg prose-img:shadow-sm",
         "prose-ul:list-disc prose-ol:list-decimal",
         "prose-li:marker:text-primary/70",
-        className
+        className,
       )}
     >
       <ReactMarkdown
@@ -44,17 +47,18 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
             const href = props.href;
             if (!isValidLinkProtocol(href)) {
               // Render as plain text if protocol is unsafe
-              return <span className="text-muted-foreground">{props.children}</span>;
+              return (
+                <span className="text-muted-foreground">{props.children}</span>
+              );
             }
             return <a {...props} target="_blank" rel="noopener noreferrer" />;
           },
-          code: ({ node, inline, ...props }) => {
+          code: (props: any) => {
+            const { node, inline, ...rest } = props;
             if (inline) {
-              return <code {...props} />;
+              return <code {...rest} />;
             }
-            return (
-              <code className="block" {...props} />
-            );
+            return <code className="block" {...rest} />;
           },
         }}
       >

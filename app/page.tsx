@@ -208,10 +208,12 @@ export default function Home() {
       if (err instanceof RateLimitError) {
         const retrySeconds = Math.ceil(err.retryAfterMs / 1000);
         setError(
-          `${err.message} Try recording again in ${retrySeconds} second${retrySeconds !== 1 ? 's' : ''}.`
+          `${err.message} Try recording again in ${retrySeconds} second${retrySeconds !== 1 ? "s" : ""}.`,
         );
       } else {
-        setError(err instanceof Error ? err.message : "Failed to process audio");
+        setError(
+          err instanceof Error ? err.message : "Failed to process audio",
+        );
       }
     } finally {
       setIsProcessing(false);
@@ -273,11 +275,22 @@ export default function Home() {
 
   // Filter and sort items (pinned items first)
   const filteredItems = useMemo(() => {
-    const filtered = searchVoiceItems(items, searchQuery, selectedIntents, dateRange);
+    const filtered = searchVoiceItems(
+      items,
+      searchQuery,
+      selectedIntents,
+      dateRange,
+    );
     // Sort so pinned items appear at top, maintaining chronological order within each group
     return filtered.sort((a, b) => {
-      if (a.pinned === b.pinned) return 0; // Maintain existing order within group
-      return a.pinned ? -1 : 1; // Pinned items come first
+      const isPinnedA = !!a.pinned;
+      const isPinnedB = !!b.pinned;
+
+      if (isPinnedA !== isPinnedB) {
+        return isPinnedA ? -1 : 1;
+      }
+
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   }, [items, searchQuery, selectedIntents, dateRange]);
 
@@ -421,7 +434,11 @@ export default function Home() {
 
       <div className="flex-1 flex flex-col">
         {/* Status Bar */}
-        {(isProcessing || isRecording || countdown !== null || error || recorderError) && (
+        {(isProcessing ||
+          isRecording ||
+          countdown !== null ||
+          error ||
+          recorderError) && (
           <div className="border-b px-8 py-3 bg-muted/50">
             {countdown !== null && (
               <div className="flex items-center gap-2">
@@ -435,7 +452,8 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                 <span className="text-sm font-medium">
-                  Recording: {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
+                  Recording: {Math.floor(elapsedTime / 60)}:
+                  {(elapsedTime % 60).toString().padStart(2, "0")}
                 </span>
               </div>
             )}
@@ -456,6 +474,7 @@ export default function Home() {
         {/* Main Content */}
         {activeItem ? (
           <DetailView
+            key={activeItem.id}
             ref={audioPlayerRef}
             item={activeItem}
             onToggleTodo={handleToggleTodo}
