@@ -1,6 +1,7 @@
 import { i18n } from '@/i18n-config';
 import { getDictionary } from '@/lib/dictionary';
 import { LanguageProvider } from '@/components/language-provider';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }));
@@ -19,7 +20,9 @@ export default async function LangLayout({
 
   return (
     <LanguageProvider dictionary={dictionary} locale={lang as any}>
-      {children}
+      <ErrorBoundary>
+        {children}
+      </ErrorBoundary>
     </LanguageProvider>
   );
 }
