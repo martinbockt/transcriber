@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
 import { ExportDialog } from '@/components/ExportDialog';
 import { SettingsDialog } from '@/components/SettingsDialog';
+import { ErrorMessage } from '@/components/ErrorMessage';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { processRealtimeRecording, RateLimitError } from '@/lib/ai';
@@ -31,6 +32,10 @@ export default function Home() {
   const [showHelp, setShowHelp] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+
+  // Store failed audio for retry functionality
+  const [failedAudioBlob, setFailedAudioBlob] = useState<Blob | null>(null);
+  const [failedTranscript, setFailedTranscript] = useState<string>('');
 
   // Undo/redo history management
   const history = useRef<VoiceItem[][]>([]);
@@ -267,7 +272,13 @@ export default function Home() {
       const newItem = await processRealtimeRecording(blob, transcriptText);
       setItems((prev) => [newItem, ...prev]);
       setActiveItemId(newItem.id);
+      // Clear failed audio state on success
+      setFailedAudioBlob(null);
+      setFailedTranscript('');
     } catch (err) {
+      // Store failed audio and transcript for retry
+      setFailedAudioBlob(blob);
+      setFailedTranscript(transcriptText);
       logError('Processing error', err);
 
       // Get user-friendly error message
@@ -322,7 +333,16 @@ export default function Home() {
       stop();
     } else {
       setError(null);
+      // Clear failed audio state when starting new recording
+      setFailedAudioBlob(null);
+      setFailedTranscript('');
       await start();
+    }
+  };
+
+  const handleRetry = () => {
+    if (failedAudioBlob) {
+      handleProcessAudio(failedAudioBlob, failedTranscript);
     }
   };
 
@@ -569,9 +589,12 @@ export default function Home() {
               </div>
             )}
             {displayError && (
-              <div className="text-destructive text-sm font-medium">
-                {displayError}
-              </div>
+              <ErrorMessage
+                title="Error"
+                message={displayError}
+                onRetry={failedAudioBlob ? handleRetry : undefined}
+                variant="error"
+              />
             )}
           </div>
         )}
