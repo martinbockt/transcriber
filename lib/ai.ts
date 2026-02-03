@@ -71,6 +71,86 @@ export class RateLimitError extends Error {
 }
 
 /**
+ * Retry configuration for exponential backoff
+ */
+interface RetryConfig {
+  maxAttempts: number;
+  initialDelayMs: number;
+  maxDelayMs: number;
+  shouldRetry?: (error: unknown) => boolean;
+}
+
+/**
+ * Default function to determine if an error should trigger a retry
+ */
+function shouldRetryDefault(error: unknown): boolean {
+  // Don't retry rate limit errors (they have their own retry mechanism)
+  if (error instanceof RateLimitError) {
+    return false;
+  }
+
+  // Don't retry validation errors (won't succeed on retry)
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    if (
+      message.includes('invalid audio') ||
+      message.includes('validation') ||
+      message.includes('schema')
+    ) {
+      return false;
+    }
+  }
+
+  // Retry on network errors, timeouts, and temporary API failures
+  return true;
+}
+
+/**
+ * Executes a function with exponential backoff retry logic
+ * @param fn The async function to execute
+ * @param config Retry configuration
+ * @returns The result of the function
+ * @throws The last error if all attempts fail
+ */
+async function withRetry<T>(fn: () => Promise<T>, config: RetryConfig): Promise<T> {
+  const { maxAttempts, initialDelayMs, maxDelayMs, shouldRetry = shouldRetryDefault } = config;
+
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+
+      // Check if we should retry this error
+      if (!shouldRetry(error)) {
+        throw error;
+      }
+
+      // If this was the last attempt, throw the error
+      if (attempt === maxAttempts) {
+        throw error;
+      }
+
+      // Calculate delay with exponential backoff
+      const delayMs = Math.min(initialDelayMs * Math.pow(2, attempt - 1), maxDelayMs);
+
+      logSanitizedError(
+        `Attempt ${attempt}/${maxAttempts} failed, retrying in ${delayMs}ms:`,
+        error,
+      );
+
+      // Wait before retrying
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+
+  // This should never be reached, but TypeScript needs it
+  throw lastError;
+}
+
+/**
  * Rate limiter for Whisper API (transcription)
  * Configured for 3 requests per minute with burst capacity of 5
  */
@@ -158,31 +238,40 @@ export async function transcribeAudio(
 
   const apiKey = await getApiKey();
 
-  try {
-    const formData = new FormData();
-    formData.append('file', audioBlob, 'audio.webm');
-    formData.append('model', 'whisper-1');
-    formData.append('response_format', 'verbose_json');
+  return withRetry(
+    async () => {
+      try {
+        const formData = new FormData();
+        formData.append('file', audioBlob, 'audio.webm');
+        formData.append('model', 'whisper-1');
+        formData.append('response_format', 'verbose_json');
 
-    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: formData,
-    });
+        const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: formData,
+        });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Transcription failed: ${error.error?.message || response.statusText}`);
-    }
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(`Transcription failed: ${error.error?.message || response.statusText}`);
+        }
 
-    const data = await response.json();
-    return { text: data.text, language: data.language };
-  } catch (error) {
-    logSanitizedError('Transcription error:', error);
-    throw error;
-  }
+        const data = await response.json();
+        return { text: data.text, language: data.language };
+      } catch (error) {
+        logSanitizedError('Transcription error:', error);
+        throw error;
+      }
+    },
+    {
+      maxAttempts: 3,
+      initialDelayMs: 1000,
+      maxDelayMs: 8000,
+    },
+  );
 }
 
 export async function processContent(
@@ -202,12 +291,14 @@ export async function processContent(
 
   const apiKey = await getApiKey();
 
-  try {
-    const openai = createOpenAI({ apiKey });
-    const result = await generateObject({
-      model: openai('gpt-4o'),
-      schema: VoiceItemSchema,
-      prompt: `Analyze the following voice transcript and extract structured information.
+  return withRetry(
+    async () => {
+      try {
+        const openai = createOpenAI({ apiKey });
+        const result = await generateObject({
+          model: openai('gpt-4o'),
+          schema: VoiceItemSchema,
+          prompt: `Analyze the following voice transcript and extract structured information.
 
 Transcript: "${transcript}"
 ${language ? `Detected Language Code: "${language}"` : ''}
@@ -235,13 +326,20 @@ Instructions:
 
 IMPORTANT: Strictly output in the same language as the transcript. Do not translate.
 Be thorough and accurate. Ensure the output is immediately useful to the user.`,
-    });
+        });
 
-    return result.object;
-  } catch (error) {
-    logSanitizedError('Processing error:', error);
-    throw error;
-  }
+        return result.object;
+      } catch (error) {
+        logSanitizedError('Processing error:', error);
+        throw error;
+      }
+    },
+    {
+      maxAttempts: 3,
+      initialDelayMs: 1000,
+      maxDelayMs: 8000,
+    },
+  );
 }
 
 async function blobToBase64(blob: Blob): Promise<string> {
