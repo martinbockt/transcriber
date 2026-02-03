@@ -39,7 +39,9 @@
     "light": "Ċar",
     "dark": "Skur",
     "system": "Sistema",
-    "openaiApiKey": "OpenAI API Key"
+    "openaiApiKey": "OpenAI API Key",
+    "showApiKey": "Uri l-ċavetta API",
+    "hideApiKey": "Aħbi l-ċavetta API"
   },
   "detailView": {
     "edit": "Editja",

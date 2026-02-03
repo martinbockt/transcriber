@@ -39,7 +39,9 @@
     "light": "Světlý",
     "dark": "Tmavý",
     "system": "Systémový",
-    "openaiApiKey": "OpenAI API klíč"
+    "openaiApiKey": "OpenAI API klíč",
+    "showApiKey": "Zobrazit klíč API",
+    "hideApiKey": "Skrýt klíč API"
   },
   "detailView": {
     "edit": "Upravit",

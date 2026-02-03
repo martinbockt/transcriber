@@ -39,7 +39,9 @@
     "light": "Luminos",
     "dark": "Întunecat",
     "system": "Sistem",
-    "openaiApiKey": "Cheie API OpenAI"
+    "openaiApiKey": "Cheie API OpenAI",
+    "showApiKey": "Afișează cheia API",
+    "hideApiKey": "Ascunde cheia API"
   },
   "detailView": {
     "edit": "Editare",

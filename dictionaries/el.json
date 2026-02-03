@@ -39,7 +39,9 @@
     "light": "Φωτεινό",
     "dark": "Σκοτεινό",
     "system": "Συστήματος",
-    "openaiApiKey": "Κλειδί API OpenAI"
+    "openaiApiKey": "Κλειδί API OpenAI",
+    "showApiKey": "Εμφάνιση κλειδιού API",
+    "hideApiKey": "Απόκρυψη κλειδιού API"
   },
   "detailView": {
     "edit": "Επεξεργασία",

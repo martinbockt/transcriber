@@ -5,6 +5,8 @@ An AI-powered desktop application for voice recording, transcription, and intell
 ## Features
 
 - 🎤 **Voice Recording**: Record audio directly from your microphone with real-time audio level visualization
+- ⚡ **Global Hotkey**: Activate the app from anywhere with Cmd+Shift+Space (macOS) or Ctrl+Shift+Space (Windows/Linux)
+- 🔄 **System Tray Integration**: Run in background and access via system tray icon
 - 📝 **AI Transcription**: Automatic transcription using OpenAI Whisper API
 - 🤖 **Intelligent Processing**: AI-powered intent classification and content extraction using GPT-4o
 - 🏷️ **Smart Categorization**: Automatic tagging, summarization, and key fact extraction
@@ -157,23 +159,69 @@ The bundle will include:
 
 ## Usage
 
-1. **Record Audio**: Click the "New Recording" button in the sidebar
-2. **Stop Recording**: Click the button again to stop and process
+### Quick Start Workflow
+
+1. **Launch the app**: Start the desktop application
+2. **Use the global hotkey**: Press `Cmd+Shift+Space` (macOS) or `Ctrl+Shift+Space` (Windows/Linux) from anywhere to show/hide the app
+3. **Record**: Click "New Recording" or press `N`
+4. **Speak**: Record your voice input
+5. **Stop**: Click the button again or press `Escape`
+6. **Review**: View AI-processed results with title, summary, tags, and intent-specific content
+
+### Detailed Features
+
+1. **Record Audio**: Click the "New Recording" button in the sidebar or press `N`
+2. **Stop Recording**: Click the button again or press `Escape` to stop and process
 3. **View Results**: The AI will transcribe and process your audio, displaying:
    - Title and summary
    - Extracted tags and key facts
    - Intent-specific content (todos, research answers, or drafts)
    - Original transcript (collapsible)
+4. **Background Mode**: Minimize to system tray and activate with the global hotkey when needed
 
 ## Mock Data
 
 The app comes with sample data for testing the UI. Once you start recording, your actual recordings will be stored in localStorage and persist between sessions.
 
+## Design Decisions
+
+### Global Hotkey Activation
+
+The app implements a global hotkey (`Cmd+Shift+Space` on macOS, `Ctrl+Shift+Space` on Windows/Linux) that allows you to:
+
+- **Seamless Workflow Integration**: Activate the app from any application without switching contexts
+- **Quick Voice Capture**: Start recording immediately without navigating to the app
+- **Background Operation**: Keep the app running in the system tray and summon it on demand
+- **Toggle Visibility**: Press the hotkey again to hide the window and return to your previous task
+
+This design choice enables a true "second brain" experience where capturing thoughts is as frictionless as possible.
+
+### Two-Stage AI Pipeline
+
+The application separates transcription from content processing:
+
+1. **Stage 1 - Transcription**: OpenAI Whisper converts speech to text
+2. **Stage 2 - Enrichment**: GPT-4o analyzes intent, extracts tasks, generates summaries, and adds metadata
+
+This separation allows for:
+- **Flexibility**: Easy to swap AI providers for either stage
+- **Optimization**: Different models can be used for different tasks
+- **Reliability**: Failures in one stage don't affect the other
+- **Future Enhancement**: Real-time transcription in Stage 1 while Stage 2 runs in parallel
+
+### Local-First Architecture
+
+All data is stored locally using encrypted localStorage:
+- **Privacy**: Your voice data never leaves your machine except for AI processing
+- **Offline Access**: Review past recordings without internet connection
+- **Performance**: Instant load times and search
+- **Control**: Export, delete, or backup your data at any time
+
 ## Privacy & Security
 
 - All recordings are processed through OpenAI's API
-- API key is stored in environment variables (not in code)
-- Data is stored locally in your browser's localStorage
+- API key is stored securely in the system keychain (via `keyring` crate)
+- Data is stored locally with AES-GCM encryption in localStorage
 - No data is sent to any server except OpenAI for processing
 
 ## Future Enhancements

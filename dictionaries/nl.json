@@ -39,7 +39,9 @@
     "light": "Licht",
     "dark": "Donker",
     "system": "Systeem",
-    "openaiApiKey": "OpenAI API-sleutel"
+    "openaiApiKey": "OpenAI API-sleutel",
+    "showApiKey": "API-sleutel tonen",
+    "hideApiKey": "API-sleutel verbergen"
   },
   "detailView": {
     "edit": "Bewerken",

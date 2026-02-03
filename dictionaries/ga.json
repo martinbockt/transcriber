@@ -39,7 +39,9 @@
     "light": "Geal",
     "dark": "Dorcha",
     "system": "Córas",
-    "openaiApiKey": "Eochair API OpenAI"
+    "openaiApiKey": "Eochair API OpenAI",
+    "showApiKey": "Taispeáin eochair API",
+    "hideApiKey": "Folaigh eochair API"
   },
   "detailView": {
     "edit": "Cuir in Eagar",

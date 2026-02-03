@@ -140,6 +140,11 @@ export async function decryptData(encryptedData: string): Promise<string> {
   try {
     const masterKey = getOrCreateMasterKey();
 
+    // Validate base64 format before decoding
+    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(encryptedData)) {
+      throw new Error('Invalid base64 format');
+    }
+
     // Decode from base64
     const dataBytes = Uint8Array.from(atob(encryptedData), (c) => c.charCodeAt(0));
 

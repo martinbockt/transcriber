@@ -1,4 +1,3 @@
-use tauri::Manager;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -53,8 +52,22 @@ async fn save_file(
     }
 }
 
+/// Toggle window visibility
+#[tauri::command]
+async fn toggle_window_visibility(window: tauri::Window) -> Result<(), String> {
+    if window.is_visible().map_err(|e| e.to_string())? {
+        window.hide().map_err(|e| e.to_string())?;
+    } else {
+        window.show().map_err(|e| e.to_string())?;
+        window.set_focus().map_err(|e| e.to_string())?;
+        window.unminimize().map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
 mod commands;
 mod crypto;
+mod audio;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -62,18 +75,76 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .manage(audio::AudioRecorder::default())
         .invoke_handler(tauri::generate_handler![
             save_file,
+            toggle_window_visibility,
             commands::get_secure_value,
             commands::set_secure_value,
             commands::delete_secure_value,
+            audio::start_recording,
+            audio::stop_recording,
         ])
         .setup(|app| {
+            use tauri::Manager;
+            use tauri::tray::{TrayIconBuilder, TrayIconEvent, MouseButton};
+            use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
+
+            let window = app.get_webview_window("main").unwrap();
+
             #[cfg(debug_assertions)]
             {
-                let window = app.get_webview_window("main").unwrap();
                 window.open_devtools();
             }
+
+            // Setup system tray
+            let window_clone_tray = window.clone();
+            let _tray = TrayIconBuilder::new()
+                .tooltip("Voice Assistant")
+                .icon(app.default_window_icon().unwrap().clone())
+                .on_tray_icon_event(move |_tray, event| {
+                    if let TrayIconEvent::Click { button, .. } = event {
+                        if button == MouseButton::Left {
+                            let window = &window_clone_tray;
+                            if window.is_visible().unwrap_or(true) {
+                                let _ = window.hide();
+                            } else {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                                let _ = window.unminimize();
+                            }
+                        }
+                    }
+                })
+                .build(app)
+                .expect("Failed to create tray icon");
+
+            // Register global shortcut: Cmd+Shift+Space (macOS) / Ctrl+Shift+Space (Windows/Linux)
+            let shortcut = if cfg!(target_os = "macos") {
+                "CommandOrControl+Shift+Space"
+            } else {
+                "Control+Shift+Space"
+            };
+
+            // Clone window for the closure
+            let window_clone = window.clone();
+
+            app.global_shortcut().on_shortcut(shortcut, move |_app, _shortcut, event| {
+                if event.state == ShortcutState::Pressed {
+                    let window = &window_clone;
+
+                    // Toggle window visibility
+                    if window.is_visible().unwrap_or(true) {
+                        let _ = window.hide();
+                    } else {
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                        let _ = window.unminimize();
+                    }
+                }
+            }).expect("Failed to register global shortcut");
+
             Ok(())
         })
         .run(tauri::generate_context!())

@@ -39,7 +39,9 @@
     "light": "Ljus",
     "dark": "Mörk",
     "system": "System",
-    "openaiApiKey": "OpenAI API-nyckel"
+    "openaiApiKey": "OpenAI API-nyckel",
+    "showApiKey": "Visa API-nyckel",
+    "hideApiKey": "Dölj API-nyckel"
   },
   "detailView": {
     "edit": "Redigera",

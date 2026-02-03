@@ -107,17 +107,29 @@ Three custom hooks encapsulate complex stateful logic:
 
 ### Tauri Integration
 
-The Rust backend ([src-tauri/src/lib.rs](src-tauri/src/lib.rs)) is minimal:
+The Rust backend ([src-tauri/src/lib.rs](src-tauri/src/lib.rs)) provides:
 
-- Initializes Tauri with shell plugin
-- Auto-opens DevTools in debug mode
-- No custom commands or backend logic (all processing happens in frontend via API calls)
+- **Global Shortcut**: `Cmd+Shift+Space` (macOS) / `Ctrl+Shift+Space` (Windows/Linux) to toggle window visibility from anywhere in the OS
+- **System Tray**: Icon in system tray for quick access and background operation
+- **Window Management**: Commands to show/hide/focus the application window programmatically
+- **Secure Storage**: API keys stored in system keychain via `keyring` crate
+- **Audio Recording**: Native audio capture using `cpal` for better performance than web APIs
+- **File Operations**: Save dialog and file writing via `tauri-plugin-dialog` and `tauri-plugin-fs`
+- **Auto DevTools**: Opens DevTools automatically in debug mode
+
+**Key Plugins:**
+- `tauri-plugin-shell` - Execute shell commands
+- `tauri-plugin-dialog` - Native file/message dialogs
+- `tauri-plugin-fs` - File system access
+- `tauri-plugin-global-shortcut` - System-wide keyboard shortcuts
+- `tauri-plugin-tray` - System tray icon and menu
 
 Tauri configuration ([src-tauri/tauri.conf.json](src-tauri/tauri.conf.json)):
 
 - Points to Next.js dev server in dev mode (`devUrl: http://localhost:3000`)
 - Uses static export (`frontendDist: ../out`) for production builds
 - Window config: 1400x900 default, 1000x600 minimum
+- Bundling enabled for production installers
 
 ### TypeScript Configuration
 
@@ -173,17 +185,28 @@ Copy `.env.example` to `.env` and add your API key. The `NEXT_PUBLIC_` prefix ma
 
 ## Key Data Flows
 
+### Global Hotkey → Window Toggle Flow
+
+1. User presses `Cmd+Shift+Space` (macOS) or `Ctrl+Shift+Space` (Windows/Linux) from any application
+2. Tauri's global shortcut handler intercepts the keypress
+3. Handler checks current window visibility state
+4. If visible: window is hidden
+5. If hidden: window is shown, focused, and unminimized
+6. User can also click the system tray icon to toggle visibility
+
+This enables seamless workflow integration where the app can be summoned instantly from anywhere.
+
 ### Recording → Processing Flow
 
-1. User clicks "New Recording" button in Sidebar
+1. User clicks "New Recording" button in Sidebar (or presses `N` key, or activates via global hotkey)
 2. `useAudioRecorder.start()` requests microphone access and begins recording
-3. User clicks button again to stop
+3. User clicks button again to stop (or presses `Escape`)
 4. `useAudioRecorder.stop()` produces audio Blob
-5. [app/page.tsx:55](app/page.tsx#L55) `useEffect` detects blob and calls `handleProcessAudio`
-6. `processVoiceRecording` (lib/ai.ts) executes two-stage pipeline
+5. [app/[lang]/page.tsx:189](app/[lang]/page.tsx#L189) `useEffect` detects blob and calls `handleProcessAudio`
+6. `processRealtimeRecording` (lib/ai.ts) executes two-stage pipeline
 7. New `VoiceItem` added to state array (prepended to list)
 8. Item auto-selected and rendered in DetailView
-9. State change triggers localStorage save
+9. State change triggers encrypted localStorage save
 
 ### Todo Toggle Flow
 

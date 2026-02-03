@@ -39,7 +39,9 @@
     "light": "Chiaro",
     "dark": "Scuro",
     "system": "Sistema",
-    "openaiApiKey": "Chiave API OpenAI"
+    "openaiApiKey": "Chiave API OpenAI",
+    "showApiKey": "Mostra chiave API",
+    "hideApiKey": "Nascondi chiave API"
   },
   "detailView": {
     "edit": "Modifica",

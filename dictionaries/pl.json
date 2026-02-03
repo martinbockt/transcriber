@@ -39,7 +39,9 @@
     "light": "Jasny",
     "dark": "Ciemny",
     "system": "Systemowy",
-    "openaiApiKey": "Klucz API OpenAI"
+    "openaiApiKey": "Klucz API OpenAI",
+    "showApiKey": "Pokaż klucz API",
+    "hideApiKey": "Ukryj klucz API"
   },
   "detailView": {
     "edit": "Edytuj",

@@ -39,7 +39,9 @@
     "light": "Gaiša",
     "dark": "Tumša",
     "system": "Sistēmas",
-    "openaiApiKey": "OpenAI API atslēga"
+    "openaiApiKey": "OpenAI API atslēga",
+    "showApiKey": "Rādīt API atslēgu",
+    "hideApiKey": "Paslēpt API atslēgu"
   },
   "detailView": {
     "edit": "Rediģēt",

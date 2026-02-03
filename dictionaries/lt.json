@@ -39,7 +39,9 @@
     "light": "Šviesi",
     "dark": "Tamsi",
     "system": "Sisteminė",
-    "openaiApiKey": "OpenAI API raktas"
+    "openaiApiKey": "OpenAI API raktas",
+    "showApiKey": "Rodyti API raktą",
+    "hideApiKey": "Slėpti API raktą"
   },
   "detailView": {
     "edit": "Redaguoti",

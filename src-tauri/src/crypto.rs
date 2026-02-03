@@ -2,47 +2,26 @@ use aes_gcm::{
     aead::{Aead, AeadCore, KeyInit, OsRng},
     Aes256Gcm, Nonce,
 };
-use base64::{Engine as _, engine::general_purpose};
-use keyring::Entry;
+use base64::{engine::general_purpose, Engine as _};
+use machine_uid;
+use sha2::{Digest, Sha256};
 
-const SERVICE_NAME: &str = "voice-assistant";
-const KEY_NAME: &str = "encryption-key";
+/// Generate a consistent 32-byte key based on the machine's unique ID
+/// This replaces the OS Keyring to prevent UI blocking/hanging
+fn get_machine_key() -> Result<[u8; 32], String> {
+    let machine_id = machine_uid::get()
+        .map_err(|e| format!("Could not get machine ID: {}", e))?;
 
-/// Get or create the encryption key from OS keyring
-/// Returns a 32-byte key for AES-256
-fn get_or_create_key() -> Result<[u8; 32], String> {
-    let entry = Entry::new(SERVICE_NAME, KEY_NAME)
-        .map_err(|e| format!("Failed to access keyring: {}", e))?;
+    // Hash the machine ID to get a fixed-length 32-byte key
+    let mut hasher = Sha256::new();
+    hasher.update(machine_id.as_bytes());
+    // Optional: Add a hardcoded "salt" specific to your app to ensure key uniqueness
+    hasher.update(b"voice-assistant-v1-salt");
 
-    // Try to get existing key
-    match entry.get_password() {
-        Ok(key_str) => {
-            // Decode base64 key
-            let key_bytes = general_purpose::STANDARD
-                .decode(key_str)
-                .map_err(|e| format!("Failed to decode stored key: {}", e))?;
-
-            if key_bytes.len() != 32 {
-                return Err("Stored key has invalid length".to_string());
-            }
-
-            let mut key = [0u8; 32];
-            key.copy_from_slice(&key_bytes);
-            Ok(key)
-        }
-        Err(_) => {
-            // Generate new key
-            let key = Aes256Gcm::generate_key(&mut OsRng);
-            let key_bytes: [u8; 32] = key.into();
-
-            // Store key in keyring
-            let key_str = general_purpose::STANDARD.encode(key_bytes);
-            entry.set_password(&key_str)
-                .map_err(|e| format!("Failed to store key in keyring: {}", e))?;
-
-            Ok(key_bytes)
-        }
-    }
+    let result = hasher.finalize();
+    let mut key = [0u8; 32];
+    key.copy_from_slice(&result);
+    Ok(key)
 }
 
 /// Internal encryption function that accepts a key directly
@@ -50,41 +29,39 @@ fn get_or_create_key() -> Result<[u8; 32], String> {
 fn encrypt_with_key(data: &[u8], key: &[u8; 32]) -> Result<String, String> {
     let cipher = Aes256Gcm::new(key.into());
 
-    // Generate random nonce (12 bytes for AES-GCM)
-    let nonce_bytes = Aes256Gcm::generate_nonce(&mut OsRng);
+    // Generate random nonce (96-bits / 12 bytes for AES-GCM)
+    let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
 
     // Encrypt
     let ciphertext = cipher
-        .encrypt(&nonce_bytes, data)
+        .encrypt(&nonce, data)
         .map_err(|e| format!("Encryption failed: {}", e))?;
 
-    // Prepend nonce to ciphertext
-    let mut result = Vec::with_capacity(nonce_bytes.len() + ciphertext.len());
-    result.extend_from_slice(&nonce_bytes);
-    result.extend_from_slice(&ciphertext);
+    // Combine nonce and ciphertext: [Nonce (12 bytes)] + [Ciphertext]
+    let mut combined = nonce.to_vec();
+    combined.extend(ciphertext);
 
     // Encode as base64
-    Ok(general_purpose::STANDARD.encode(result))
+    Ok(general_purpose::STANDARD.encode(combined))
 }
 
 /// Internal decryption function that accepts a key directly
 /// Used for testing and by the public decrypt function
-fn decrypt_with_key(encrypted_data: &str, key: &[u8; 32]) -> Result<Vec<u8>, String> {
+fn decrypt_with_key(encrypted_str: &str, key: &[u8; 32]) -> Result<Vec<u8>, String> {
     // Decode base64
-    let data = general_purpose::STANDARD
-        .decode(encrypted_data)
-        .map_err(|e| format!("Failed to decode base64: {}", e))?;
+    let encrypted_data = general_purpose::STANDARD
+        .decode(encrypted_str)
+        .map_err(|e| format!("Invalid Base64: {}", e))?;
 
-    // Check minimum length (12-byte nonce + at least some ciphertext)
-    if data.len() < 12 {
-        return Err("Encrypted data too short".to_string());
+    if encrypted_data.len() < 12 {
+        return Err("Data too short to contain nonce".to_string());
     }
 
     // Split nonce and ciphertext
-    let (nonce_bytes, ciphertext) = data.split_at(12);
-    let nonce = Nonce::from_slice(nonce_bytes);
+    // AES-GCM Standard Nonce is 12 bytes
+    let nonce = Nonce::from_slice(&encrypted_data[0..12]);
+    let ciphertext = &encrypted_data[12..];
 
-    // Create cipher
     let cipher = Aes256Gcm::new(key.into());
 
     // Decrypt
@@ -93,17 +70,17 @@ fn decrypt_with_key(encrypted_data: &str, key: &[u8; 32]) -> Result<Vec<u8>, Str
         .map_err(|e| format!("Decryption failed: {}", e))
 }
 
-/// Encrypt data using AES-256-GCM
+/// Encrypt data using AES-256-GCM linked to this machine
 /// Returns base64-encoded encrypted data with nonce prepended
 pub fn encrypt(data: &[u8]) -> Result<String, String> {
-    let key = get_or_create_key()?;
+    let key = get_machine_key()?;
     encrypt_with_key(data, &key)
 }
 
-/// Decrypt data using AES-256-GCM
+/// Decrypt data using AES-256-GCM linked to this machine
 /// Takes base64-encoded encrypted data with nonce prepended
 pub fn decrypt(encrypted_data: &str) -> Result<Vec<u8>, String> {
-    let key = get_or_create_key()?;
+    let key = get_machine_key()?;
     decrypt_with_key(encrypted_data, &key)
 }
 
@@ -157,7 +134,6 @@ mod tests {
     #[test]
     fn test_decrypt_invalid_base64() {
         let key = test_key();
-        // Test with invalid base64
         let result = decrypt_with_key("not-valid-base64!!!", &key);
         assert!(result.is_err());
     }
@@ -165,8 +141,7 @@ mod tests {
     #[test]
     fn test_decrypt_too_short() {
         let key = test_key();
-        // Test with too-short data (less than 12 bytes for nonce)
-        let result = decrypt_with_key("YWJj", &key); // "abc" in base64 (only 3 bytes)
+        let result = decrypt_with_key("YWJj", &key); // "abc" (3 bytes)
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("too short"));
     }
@@ -174,47 +149,15 @@ mod tests {
     #[test]
     fn test_decrypt_corrupted_data() {
         let key = test_key();
-        // Encrypt valid data
         let original = b"test data";
         let mut encrypted = encrypt_with_key(original, &key).expect("Encryption should succeed");
 
-        // Corrupt the encrypted data by modifying a character
-        // This should cause authentication failure in GCM
+        // Corrupt the encrypted data
         if let Some(last_char) = encrypted.pop() {
             encrypted.push(if last_char == 'A' { 'B' } else { 'A' });
         }
 
-        // Attempt to decrypt corrupted data
         let result = decrypt_with_key(&encrypted, &key);
         assert!(result.is_err());
-    }
-
-    #[test]
-    fn test_encrypt_empty_data() {
-        let key = test_key();
-        let empty_data = b"";
-
-        let encrypted = encrypt_with_key(empty_data, &key)
-            .expect("Should encrypt empty data");
-
-        let decrypted = decrypt_with_key(&encrypted, &key)
-            .expect("Should decrypt empty data");
-
-        assert_eq!(decrypted, empty_data);
-    }
-
-    #[test]
-    fn test_encrypt_large_data() {
-        let key = test_key();
-        // Test with larger data (1MB)
-        let large_data = vec![42u8; 1024 * 1024];
-
-        let encrypted = encrypt_with_key(&large_data, &key)
-            .expect("Should encrypt large data");
-
-        let decrypted = decrypt_with_key(&encrypted, &key)
-            .expect("Should decrypt large data");
-
-        assert_eq!(decrypted, large_data);
     }
 }

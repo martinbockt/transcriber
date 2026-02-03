@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useTheme } from '@/components/theme-provider';
 import { getStorageUsage } from '@/lib/storage';
-import { X, Shield } from 'lucide-react';
+import { X, Shield, Eye, EyeOff } from 'lucide-react';
 import { logError } from '@/lib/error-sanitizer';
 import { useTranslation } from '@/components/language-provider';
 import { useRouter, usePathname } from 'next/navigation';
@@ -65,6 +65,7 @@ const formatStorageSize = (bytes: number): string => {
 
 export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDialogProps) {
   const [apiKey, setApiKey] = useState('');
+  const [showApiKey, setShowApiKey] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'validating' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [storageUsage, setStorageUsage] = useState<{
@@ -121,13 +122,20 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
   }, [open, saveStatus, showClearConfirm]);
 
   const validateApiKey = async (key: string): Promise<boolean> => {
+    // Create AbortController with 10 second timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     try {
       const response = await fetch('https://api.openai.com/v1/models', {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${key}`,
         },
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const error = await response.json();
@@ -136,7 +144,12 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
 
       return true;
     } catch (error) {
+      clearTimeout(timeoutId);
+
       if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error('Validation timed out. Please check your internet connection.');
+        }
         throw new Error(error.message);
       }
       throw new Error('Failed to validate API key');
@@ -163,22 +176,42 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
     // Validate API key with OpenAI
     setSaveStatus('validating');
     try {
+      console.log('Starting API key validation...');
       await validateApiKey(apiKey);
+      console.log('API key validation successful');
 
-      // Save to Tauri secure storage instead of localStorage
-      await invoke('set_secure_value', {
+      // Save to Tauri secure storage with timeout
+      console.log('Saving API key to secure storage...');
+      const savePromise = invoke('set_secure_value', {
         key: STORAGE_KEY,
         value: apiKey,
       });
 
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(
+          () =>
+            reject(
+              new Error(
+                'Storage operation timed out after 30 seconds. Please check if there are any permission dialogs waiting for your response.',
+              ),
+            ),
+          30000,
+        );
+      });
+
+      await Promise.race([savePromise, timeoutPromise]);
+      console.log('API key saved successfully');
+
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
+      console.error('Failed to save API key:', error);
       const message =
         error instanceof Error ? error.message : dictionary.errors.apiKeyValidationFailed;
       setErrorMessage(message);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
+      logError('Failed to save API key', error);
     }
   };
 
@@ -242,13 +275,32 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                   key is stored securely using OS-level encryption (keychain/keyring).
                 </p>
                 <div className="flex gap-2">
-                  <Input
-                    type="password"
-                    placeholder="sk-..."
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    className="flex-1"
-                  />
+                  <div className="relative flex-1">
+                    <Input
+                      type={showApiKey ? 'text' : 'password'}
+                      placeholder="sk-..."
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowApiKey(!showApiKey)}
+                      tabIndex={-1}
+                    >
+                      {showApiKey ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      <span className="sr-only">
+                        {showApiKey ? dictionary.settings.hideApiKey : dictionary.settings.showApiKey}
+                      </span>
+                    </Button>
+                  </div>
                   <Button
                     onClick={handleSaveApiKey}
                     variant={saveStatus === 'success' ? 'default' : 'outline'}

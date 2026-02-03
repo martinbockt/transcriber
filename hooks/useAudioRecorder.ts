@@ -196,18 +196,22 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
     // Clear existing
     if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
 
+    // Use WebRTC recording in both browser and Tauri modes for real-time transcription
+    const recordingMethod = startActualRecording;
+
     countdownIntervalRef.current = window.setInterval(() => {
       count -= 1;
       setCountdown(count);
       if (count === 0) {
         if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
         setCountdown(null);
-        startActualRecording();
+        recordingMethod();
       }
     }, 1000);
   }, [startActualRecording]);
 
   const stop = useCallback(() => {
+    // Use WebRTC recording cleanup for both browser and Tauri modes
     setIsRecording(false);
 
     if (elapsedTimeIntervalRef.current) {

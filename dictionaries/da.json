@@ -39,7 +39,9 @@
     "light": "Lys",
     "dark": "Mørk",
     "system": "System",
-    "openaiApiKey": "OpenAI API-nøgle"
+    "openaiApiKey": "OpenAI API-nøgle",
+    "showApiKey": "Vis API-nøgle",
+    "hideApiKey": "Skjul API-nøgle"
   },
   "detailView": {
     "edit": "Rediger",

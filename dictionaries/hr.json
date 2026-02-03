@@ -39,7 +39,9 @@
     "light": "Svijetlo",
     "dark": "Tamno",
     "system": "Sustav",
-    "openaiApiKey": "OpenAI API ključ"
+    "openaiApiKey": "OpenAI API ključ",
+    "showApiKey": "Prikaži API ključ",
+    "hideApiKey": "Sakrij API ključ"
   },
   "detailView": {
     "edit": "Uredi",

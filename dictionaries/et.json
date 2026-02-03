@@ -39,7 +39,9 @@
     "light": "Hele",
     "dark": "Tume",
     "system": "Süsteem",
-    "openaiApiKey": "OpenAI API võti"
+    "openaiApiKey": "OpenAI API võti",
+    "showApiKey": "Kuva API võti",
+    "hideApiKey": "Peida API võti"
   },
   "detailView": {
     "edit": "Muuda",

@@ -39,7 +39,9 @@
     "light": "Светла",
     "dark": "Тъмна",
     "system": "Системна",
-    "openaiApiKey": "OpenAI API ключ"
+    "openaiApiKey": "OpenAI API ключ",
+    "showApiKey": "Покажи API ключ",
+    "hideApiKey": "Скрий API ключ"
   },
   "detailView": {
     "edit": "Редактирай",

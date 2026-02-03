@@ -39,7 +39,9 @@
     "light": "Világos",
     "dark": "Sötét",
     "system": "Rendszer",
-    "openaiApiKey": "OpenAI API kulcs"
+    "openaiApiKey": "OpenAI API kulcs",
+    "showApiKey": "API kulcs megjelenítése",
+    "hideApiKey": "API kulcs elrejtése"
   },
   "detailView": {
     "edit": "Szerkesztés",

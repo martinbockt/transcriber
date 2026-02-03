@@ -39,7 +39,9 @@
     "light": "Vaalea",
     "dark": "Tumma",
     "system": "Järjestelmä",
-    "openaiApiKey": "OpenAI API-avain"
+    "openaiApiKey": "OpenAI API-avain",
+    "showApiKey": "Näytä API-avain",
+    "hideApiKey": "Piilota API-avain"
   },
   "detailView": {
     "edit": "Muokkaa",
