@@ -1,9 +1,14 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { runMainPerformanceTest, runPerformanceTest, runPerformanceTestSuite, type PerformanceTestResult } from "@/lib/performance-test";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  runMainPerformanceTest,
+  runPerformanceTest,
+  runPerformanceTestSuite,
+  type PerformanceTestResult,
+} from '@/lib/performance-test';
 
 export default function PerformanceTestPage() {
   const [running, setRunning] = useState(false);
@@ -15,8 +20,11 @@ export default function PerformanceTestPage() {
   } | null>(null);
 
   const runTest = async (
-    testFn: () => Promise<PerformanceTestResult | { tests: PerformanceTestResult[]; allPassed: boolean; summary: string }>,
-    isSuite: boolean = false
+    testFn: () => Promise<
+      | PerformanceTestResult
+      | { tests: PerformanceTestResult[]; allPassed: boolean; summary: string }
+    >,
+    isSuite: boolean = false,
   ) => {
     setRunning(true);
     setResults([]);
@@ -32,7 +40,7 @@ export default function PerformanceTestPage() {
         setResults([result]);
       }
     } catch (error) {
-      console.error("Test failed:", error);
+      console.error('Test failed:', error);
       alert(`Test failed: ${error}`);
     } finally {
       setRunning(false);
@@ -40,27 +48,27 @@ export default function PerformanceTestPage() {
   };
 
   const formatTime = (ms: number): string => {
-    return ms.toFixed(2) + "ms";
+    return ms.toFixed(2) + 'ms';
   };
 
   const getStatusIcon = (passed: boolean): string => {
-    return passed ? "✅" : "❌";
+    return passed ? '✅' : '❌';
   };
 
   const getStatusColor = (passed: boolean): string => {
-    return passed ? "text-green-600" : "text-red-600";
+    return passed ? 'text-green-600' : 'text-red-600';
   };
 
   return (
-    <div className="container mx-auto p-8 max-w-6xl">
+    <div className="container mx-auto max-w-6xl p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Encryption Performance Test</h1>
+        <h1 className="mb-2 text-3xl font-bold">Encryption Performance Test</h1>
         <p className="text-muted-foreground">
           Measure encryption overhead for large datasets (50+ voice items with audio)
         </p>
       </div>
 
-      <div className="grid gap-4 mb-8">
+      <div className="mb-8 grid gap-4">
         <Card>
           <CardHeader>
             <CardTitle>Quick Tests</CardTitle>
@@ -74,7 +82,7 @@ export default function PerformanceTestPage() {
               disabled={running}
               className="w-full"
             >
-              {running ? "Running..." : "Run Main Test (50 items + audio)"}
+              {running ? 'Running...' : 'Run Main Test (50 items + audio)'}
             </Button>
             <Button
               onClick={() => runTest(() => runPerformanceTest(50, false, 500))}
@@ -117,7 +125,7 @@ export default function PerformanceTestPage() {
               variant="default"
               className="w-full"
             >
-              {running ? "Running Full Suite..." : "Run Full Test Suite"}
+              {running ? 'Running Full Suite...' : 'Run Full Test Suite'}
             </Button>
           </CardContent>
         </Card>
@@ -131,7 +139,7 @@ export default function PerformanceTestPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <pre className="whitespace-pre-wrap text-sm">{suiteResults.summary}</pre>
+            <pre className="text-sm whitespace-pre-wrap">{suiteResults.summary}</pre>
           </CardContent>
         </Card>
       )}
@@ -145,7 +153,7 @@ export default function PerformanceTestPage() {
                 <CardTitle className="flex items-center justify-between">
                   <span>{result.testName}</span>
                   <span className={getStatusColor(result.passed)}>
-                    {getStatusIcon(result.passed)} {result.passed ? "PASS" : "FAIL"}
+                    {getStatusIcon(result.passed)} {result.passed ? 'PASS' : 'FAIL'}
                   </span>
                 </CardTitle>
                 <CardDescription>
@@ -153,61 +161,70 @@ export default function PerformanceTestPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="mb-4 grid grid-cols-2 gap-4">
                   <div>
-                    <div className="text-sm text-muted-foreground">Encryption Time</div>
-                    <div className={`text-2xl font-bold ${
-                      result.encryptionTimeMs < result.threshold
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}>
+                    <div className="text-muted-foreground text-sm">Encryption Time</div>
+                    <div
+                      className={`text-2xl font-bold ${
+                        result.encryptionTimeMs < result.threshold
+                          ? 'text-green-600'
+                          : 'text-red-600'
+                      }`}
+                    >
                       {formatTime(result.encryptionTimeMs)}
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-muted-foreground text-xs">
                       Threshold: {formatTime(result.threshold)}
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Decryption Time</div>
-                    <div className={`text-2xl font-bold ${
-                      result.decryptionTimeMs < result.threshold
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}>
+                    <div className="text-muted-foreground text-sm">Decryption Time</div>
+                    <div
+                      className={`text-2xl font-bold ${
+                        result.decryptionTimeMs < result.threshold
+                          ? 'text-green-600'
+                          : 'text-red-600'
+                      }`}
+                    >
                       {formatTime(result.decryptionTimeMs)}
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-muted-foreground text-xs">
                       Threshold: {formatTime(result.threshold)}
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                <div className="grid grid-cols-2 gap-4 border-t pt-4">
                   <div>
-                    <div className="text-sm text-muted-foreground">Total Time</div>
+                    <div className="text-muted-foreground text-sm">Total Time</div>
                     <div className="text-lg font-semibold">{formatTime(result.totalTimeMs)}</div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Avg Item Size</div>
+                    <div className="text-muted-foreground text-sm">Avg Item Size</div>
                     <div className="text-lg font-semibold">{result.details.avgItemSize}</div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                <div className="grid grid-cols-2 gap-4 border-t pt-4">
                   <div>
-                    <div className="text-sm text-muted-foreground">Encryption Rate</div>
+                    <div className="text-muted-foreground text-sm">Encryption Rate</div>
                     <div className="text-lg font-semibold">{result.details.encryptionRate}</div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Decryption Rate</div>
+                    <div className="text-muted-foreground text-sm">Decryption Rate</div>
                     <div className="text-lg font-semibold">{result.details.decryptionRate}</div>
                   </div>
                 </div>
 
-                <div className="mt-4 p-3 bg-muted rounded-md">
+                <div className="bg-muted mt-4 rounded-md p-3">
                   <div className="text-sm">
-                    <div><strong>With Audio:</strong> {result.details.withAudio ? "Yes" : "No"}</div>
-                    <div><strong>Data Size:</strong> {result.dataSize} ({result.dataSizeBytes.toLocaleString()} bytes)</div>
+                    <div>
+                      <strong>With Audio:</strong> {result.details.withAudio ? 'Yes' : 'No'}
+                    </div>
+                    <div>
+                      <strong>Data Size:</strong> {result.dataSize} (
+                      {result.dataSizeBytes.toLocaleString()} bytes)
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -219,9 +236,7 @@ export default function PerformanceTestPage() {
       {!running && results.length === 0 && (
         <Card>
           <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">
-              Run a test to see results here
-            </p>
+            <p className="text-muted-foreground text-center">Run a test to see results here</p>
           </CardContent>
         </Card>
       )}

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useRef, useCallback } from 'react';
 import { validateAudioBlob } from '@/lib/validation';
@@ -76,7 +76,10 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
 
           if (!validationResult.valid) {
             setError(validationResult.error || 'Audio validation failed');
-            logError('Audio validation failed', { error: validationResult.error, details: validationResult.details });
+            logError('Audio validation failed', {
+              error: validationResult.error,
+              details: validationResult.details,
+            });
             setAudioBlob(null);
           } else {
             setAudioBlob(blob);
@@ -87,7 +90,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
           setAudioBlob(null);
         }
 
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       };
 
       mediaRecorder.start();
@@ -97,7 +100,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
       // Start elapsed time counter
       setElapsedTime(0);
       elapsedTimeIntervalRef.current = window.setInterval(() => {
-        setElapsedTime(prev => prev + 1);
+        setElapsedTime((prev) => prev + 1);
       }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start recording');

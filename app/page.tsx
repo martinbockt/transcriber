@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useMemo, useRef } from "react";
-import { Sidebar } from "@/components/Sidebar";
-import { DetailView } from "@/components/DetailView";
-import { EmptyState } from "@/components/EmptyState";
-import { KeyboardShortcutsDialog } from "@/components/KeyboardShortcutsDialog";
-import { ExportDialog } from "@/components/ExportDialog";
-import { SettingsDialog } from "@/components/SettingsDialog";
-import { useAudioRecorder } from "@/hooks/useAudioRecorder";
-import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { processVoiceRecording, RateLimitError } from "@/lib/ai";
-import { searchVoiceItems } from "@/lib/search";
-import { MOCK_HISTORY } from "@/lib/mock-data";
-import { encryptData, decryptData } from "@/lib/crypto";
-import { logError } from "@/lib/error-sanitizer";
-import type { VoiceItem, IntentType } from "@/types/voice-item";
-import type { DateRange } from "@/components/SearchBar";
-import type { AudioPlayerRef } from "@/components/AudioPlayer";
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { Sidebar } from '@/components/Sidebar';
+import { DetailView } from '@/components/DetailView';
+import { EmptyState } from '@/components/EmptyState';
+import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
+import { ExportDialog } from '@/components/ExportDialog';
+import { SettingsDialog } from '@/components/SettingsDialog';
+import { useAudioRecorder } from '@/hooks/useAudioRecorder';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { processVoiceRecording, RateLimitError } from '@/lib/ai';
+import { searchVoiceItems } from '@/lib/search';
+import { MOCK_HISTORY } from '@/lib/mock-data';
+import { encryptData, decryptData } from '@/lib/crypto';
+import { logError } from '@/lib/error-sanitizer';
+import type { VoiceItem, IntentType } from '@/types/voice-item';
+import type { DateRange } from '@/components/SearchBar';
+import type { AudioPlayerRef } from '@/components/AudioPlayer';
 
-const STORAGE_KEY = "voice-assistant-history";
+const STORAGE_KEY = 'voice-assistant-history';
 
 export default function Home() {
   const [items, setItems] = useState<VoiceItem[]>([]);
@@ -35,9 +35,9 @@ export default function Home() {
   const isUndoRedoAction = useRef<boolean>(false);
 
   // Search state
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedIntents, setSelectedIntents] = useState<IntentType[]>([]);
-  const [dateRange, setDateRange] = useState<DateRange>("all");
+  const [dateRange, setDateRange] = useState<DateRange>('all');
 
   const {
     isRecording,
@@ -80,9 +80,7 @@ export default function Home() {
     if (historyIndex.current > 0) {
       historyIndex.current--;
       isUndoRedoAction.current = true;
-      setItems(
-        JSON.parse(JSON.stringify(history.current[historyIndex.current])),
-      );
+      setItems(JSON.parse(JSON.stringify(history.current[historyIndex.current])));
     }
   };
 
@@ -91,9 +89,7 @@ export default function Home() {
     if (historyIndex.current < history.current.length - 1) {
       historyIndex.current++;
       isUndoRedoAction.current = true;
-      setItems(
-        JSON.parse(JSON.stringify(history.current[historyIndex.current])),
-      );
+      setItems(JSON.parse(JSON.stringify(history.current[historyIndex.current])));
     }
   };
 
@@ -129,7 +125,7 @@ export default function Home() {
             const encrypted = await encryptData(jsonString);
             localStorage.setItem(STORAGE_KEY, encrypted);
           } catch (parseErr) {
-            console.error("Failed to parse stored items:", parseErr);
+            console.error('Failed to parse stored items:', parseErr);
             // Fallback to mock data
             setItems(MOCK_HISTORY);
             history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
@@ -158,7 +154,7 @@ export default function Home() {
           const encrypted = await encryptData(jsonString);
           localStorage.setItem(STORAGE_KEY, encrypted);
         } catch (err) {
-          console.error("Failed to encrypt and save items:", err);
+          console.error('Failed to encrypt and save items:', err);
         }
       }, 500);
 
@@ -202,18 +198,16 @@ export default function Home() {
       setItems((prev) => [newItem, ...prev]);
       setActiveItemId(newItem.id);
     } catch (err) {
-      logError("Processing error", err);
+      logError('Processing error', err);
 
       // Handle rate limit errors with user-friendly message
       if (err instanceof RateLimitError) {
         const retrySeconds = Math.ceil(err.retryAfterMs / 1000);
         setError(
-          `${err.message} Try recording again in ${retrySeconds} second${retrySeconds !== 1 ? "s" : ""}.`,
+          `${err.message} Try recording again in ${retrySeconds} second${retrySeconds !== 1 ? 's' : ''}.`,
         );
       } else {
-        setError(
-          err instanceof Error ? err.message : "Failed to process audio",
-        );
+        setError(err instanceof Error ? err.message : 'Failed to process audio');
       }
     } finally {
       setIsProcessing(false);
@@ -275,12 +269,7 @@ export default function Home() {
 
   // Filter and sort items (pinned items first)
   const filteredItems = useMemo(() => {
-    const filtered = searchVoiceItems(
-      items,
-      searchQuery,
-      selectedIntents,
-      dateRange,
-    );
+    const filtered = searchVoiceItems(items, searchQuery, selectedIntents, dateRange);
     // Sort so pinned items appear at top, maintaining chronological order within each group
     return filtered.sort((a, b) => {
       const isPinnedA = !!a.pinned;
@@ -343,10 +332,7 @@ export default function Home() {
 
         // Preserve original AI transcript on first edit
         const updates: any = { originalTranscript: newTranscript };
-        if (
-          !item.originalAITranscript &&
-          item.originalTranscript !== newTranscript
-        ) {
+        if (!item.originalAITranscript && item.originalTranscript !== newTranscript) {
           updates.originalAITranscript = item.originalTranscript;
         }
 
@@ -359,9 +345,9 @@ export default function Home() {
 
   // Clear search function
   const clearSearch = () => {
-    setSearchQuery("");
+    setSearchQuery('');
     setSelectedIntents([]);
-    setDateRange("all");
+    setDateRange('all');
     searchInputRef.current?.blur();
   };
 
@@ -380,11 +366,7 @@ export default function Home() {
     onEscape: () => {
       if (isRecording) {
         stop();
-      } else if (
-        searchQuery ||
-        selectedIntents.length > 0 ||
-        dateRange !== "all"
-      ) {
+      } else if (searchQuery || selectedIntents.length > 0 || dateRange !== 'all') {
         clearSearch();
       }
     },
@@ -411,7 +393,7 @@ export default function Home() {
   });
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="bg-background flex h-screen">
       <Sidebar
         ref={searchInputRef}
         items={filteredItems}
@@ -432,39 +414,33 @@ export default function Home() {
         onOpenSettings={() => setShowSettings(true)}
       />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex flex-1 flex-col">
         {/* Status Bar */}
-        {(isProcessing ||
-          isRecording ||
-          countdown !== null ||
-          error ||
-          recorderError) && (
-          <div className="border-b px-8 py-3 bg-muted/50">
+        {(isProcessing || isRecording || countdown !== null || error || recorderError) && (
+          <div className="bg-muted/50 border-b px-8 py-3">
             {countdown !== null && (
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
-                <span className="text-sm font-medium">
-                  Starting in {countdown}...
-                </span>
+                <div className="h-2 w-2 animate-pulse rounded-full bg-yellow-500" />
+                <span className="text-sm font-medium">Starting in {countdown}...</span>
               </div>
             )}
             {isRecording && countdown === null && (
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                <div className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
                 <span className="text-sm font-medium">
                   Recording: {Math.floor(elapsedTime / 60)}:
-                  {(elapsedTime % 60).toString().padStart(2, "0")}
+                  {(elapsedTime % 60).toString().padStart(2, '0')}
                 </span>
               </div>
             )}
             {isProcessing && (
               <div className="flex items-center gap-2">
-                <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                <div className="border-primary h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
                 <span className="text-sm font-medium">Processing audio...</span>
               </div>
             )}
             {(error || recorderError) && (
-              <div className="text-sm text-destructive font-medium">
+              <div className="text-destructive text-sm font-medium">
                 Error: {error || recorderError}
               </div>
             )}
@@ -492,11 +468,7 @@ export default function Home() {
       <KeyboardShortcutsDialog open={showHelp} onOpenChange={setShowHelp} />
 
       {/* Export Dialog */}
-      <ExportDialog
-        open={showExportDialog}
-        onOpenChange={setShowExportDialog}
-        items={items}
-      />
+      <ExportDialog open={showExportDialog} onOpenChange={setShowExportDialog} items={items} />
       {/* Settings Dialog */}
       <SettingsDialog
         open={showSettings}

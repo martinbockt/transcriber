@@ -144,10 +144,7 @@ export class RateLimiter {
  * @param burst - Optional burst capacity (defaults to requestsPerMinute)
  * @returns RateLimiter instance
  */
-export function createRateLimiter(
-  requestsPerMinute: number,
-  burst?: number
-): RateLimiter {
+export function createRateLimiter(requestsPerMinute: number, burst?: number): RateLimiter {
   const refillRate = requestsPerMinute / 60; // Convert to requests per second
   const maxTokens = burst ?? requestsPerMinute;
 

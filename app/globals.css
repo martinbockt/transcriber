@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -125,16 +125,8 @@
   body {
     @apply bg-background text-foreground;
     background-image:
-      radial-gradient(
-        circle at 20% 10%,
-        hsl(262 52% 47% / 0.03) 0%,
-        transparent 50%
-      ),
-      radial-gradient(
-        circle at 80% 90%,
-        hsl(262 83% 58% / 0.05) 0%,
-        transparent 50%
-      );
+      radial-gradient(circle at 20% 10%, hsl(262 52% 47% / 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 90%, hsl(262 83% 58% / 0.05) 0%, transparent 50%);
   }
 }
 

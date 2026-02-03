@@ -4,7 +4,7 @@
  * Matches backend encryption approach (src-tauri/src/crypto.rs)
  */
 
-const ENCRYPTION_KEY_STORAGE = "voice-assistant-encryption-key";
+const ENCRYPTION_KEY_STORAGE = 'voice-assistant-encryption-key';
 const PBKDF2_ITERATIONS = 100000;
 const SALT_LENGTH = 16;
 const NONCE_LENGTH = 12; // Standard for AES-GCM
@@ -31,8 +31,8 @@ function getOrCreateMasterKey(): string {
 
     return keyBase64;
   } catch (err) {
-    console.error("Failed to get or create master key:", err);
-    throw new Error("Encryption key initialization failed");
+    console.error('Failed to get or create master key:', err);
+    throw new Error('Encryption key initialization failed');
   }
 }
 
@@ -51,32 +51,28 @@ export async function deriveKey(
     const keyBytes = Uint8Array.from(atob(masterKey), (c) => c.charCodeAt(0));
 
     // Import master key as raw key material
-    const keyMaterial = await crypto.subtle.importKey(
-      "raw",
-      keyBytes,
-      "PBKDF2",
-      false,
-      ["deriveKey"],
-    );
+    const keyMaterial = await crypto.subtle.importKey('raw', keyBytes, 'PBKDF2', false, [
+      'deriveKey',
+    ]);
 
     // Derive AES-GCM key using PBKDF2
     const derivedKey = await crypto.subtle.deriveKey(
       {
-        name: "PBKDF2",
+        name: 'PBKDF2',
         salt: salt,
         iterations: PBKDF2_ITERATIONS,
-        hash: "SHA-256",
+        hash: 'SHA-256',
       },
       keyMaterial,
-      { name: "AES-GCM", length: 256 },
+      { name: 'AES-GCM', length: 256 },
       false,
-      ["encrypt", "decrypt"],
+      ['encrypt', 'decrypt'],
     );
 
     return derivedKey;
   } catch (err) {
-    console.error("Key derivation failed:", err);
-    throw new Error("Failed to derive encryption key");
+    console.error('Key derivation failed:', err);
+    throw new Error('Failed to derive encryption key');
   }
 }
 
@@ -108,7 +104,7 @@ export async function encryptData(data: string): Promise<string> {
     // Encrypt
     const ciphertext = await crypto.subtle.encrypt(
       {
-        name: "AES-GCM",
+        name: 'AES-GCM',
         iv: nonce,
       },
       key,
@@ -116,23 +112,21 @@ export async function encryptData(data: string): Promise<string> {
     );
 
     // Combine salt + nonce + ciphertext
-    const result = new Uint8Array(
-      salt.length + nonce.length + ciphertext.byteLength,
-    );
+    const result = new Uint8Array(salt.length + nonce.length + ciphertext.byteLength);
     result.set(salt, 0);
     result.set(nonce, salt.length);
     result.set(new Uint8Array(ciphertext), salt.length + nonce.length);
 
     // Encode as base64
-    let binary = "";
+    let binary = '';
     const len = result.byteLength;
     for (let i = 0; i < len; i++) {
       binary += String.fromCharCode(result[i]);
     }
     return btoa(binary);
   } catch (err) {
-    console.error("Encryption failed:", err);
-    throw new Error("Failed to encrypt data");
+    console.error('Encryption failed:', err);
+    throw new Error('Failed to encrypt data');
   }
 }
 
@@ -147,14 +141,12 @@ export async function decryptData(encryptedData: string): Promise<string> {
     const masterKey = getOrCreateMasterKey();
 
     // Decode from base64
-    const dataBytes = Uint8Array.from(atob(encryptedData), (c) =>
-      c.charCodeAt(0),
-    );
+    const dataBytes = Uint8Array.from(atob(encryptedData), (c) => c.charCodeAt(0));
 
     // Check minimum length (16-byte salt + 12-byte nonce + ciphertext)
     const minLength = SALT_LENGTH + NONCE_LENGTH;
     if (dataBytes.length < minLength) {
-      throw new Error("Encrypted data too short");
+      throw new Error('Encrypted data too short');
     }
 
     // Extract salt, nonce, and ciphertext
@@ -168,7 +160,7 @@ export async function decryptData(encryptedData: string): Promise<string> {
     // Decrypt
     const decryptedBytes = await crypto.subtle.decrypt(
       {
-        name: "AES-GCM",
+        name: 'AES-GCM',
         iv: nonce,
       },
       key,
@@ -179,8 +171,8 @@ export async function decryptData(encryptedData: string): Promise<string> {
     const decoder = new TextDecoder();
     return decoder.decode(decryptedBytes);
   } catch (err) {
-    console.error("Decryption failed:", err);
-    throw new Error("Failed to decrypt data");
+    console.error('Decryption failed:', err);
+    throw new Error('Failed to decrypt data');
   }
 }
 
@@ -193,6 +185,6 @@ export function clearEncryptionKey(): void {
   try {
     localStorage.removeItem(ENCRYPTION_KEY_STORAGE);
   } catch (err) {
-    console.error("Failed to clear encryption key:", err);
+    console.error('Failed to clear encryption key:', err);
   }
 }

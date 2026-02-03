@@ -1,12 +1,15 @@
 # Manual Export Functionality Verification
 
 ## Test Overview
+
 This document verifies all export functionality as specified in subtask-4-2.
 
 ## Test Cases
 
 ### ✅ Test 1: Export single item as Markdown WITH audio
+
 **Expected behavior:**
+
 - Markdown file is created with proper formatting
 - Contains title as H1 heading
 - Contains metadata section with creation date, intent, and tags
@@ -17,6 +20,7 @@ This document verifies all export functionality as specified in subtask-4-2.
 - File is saved successfully
 
 **Code verification:**
+
 - `formatToMarkdown(item, true)` in lib/export.ts includes audio section (lines 78-85)
 - Audio data is embedded as markdown link with data URL
 - Includes note about viewer compatibility
@@ -26,7 +30,9 @@ This document verifies all export functionality as specified in subtask-4-2.
 ---
 
 ### ✅ Test 2: Export single item as JSON WITHOUT audio
+
 **Expected behavior:**
+
 - JSON file is created with proper structure
 - Contains all VoiceItem properties (id, createdAt, title, tags, summary, keyFacts, intent, data)
 - audioData field is EXCLUDED when includeAudio is false
@@ -34,6 +40,7 @@ This document verifies all export functionality as specified in subtask-4-2.
 - File is saved successfully
 
 **Code verification:**
+
 - `formatToJSON(item, false)` in lib/export.ts excludes audioData (lines 114-117)
 - Only adds audioData to exportData when `includeAudio && item.audioData` is true
 - Returns formatted JSON with `JSON.stringify(exportData, null, 2)`
@@ -43,7 +50,9 @@ This document verifies all export functionality as specified in subtask-4-2.
 ---
 
 ### ✅ Test 3: Export all items as JSON
+
 **Expected behavior:**
+
 - JSON file is created with array of all items
 - All items are included in the export
 - Each item has complete structure
@@ -51,6 +60,7 @@ This document verifies all export functionality as specified in subtask-4-2.
 - File is saved successfully
 
 **Code verification:**
+
 - ExportDialog.tsx handles multiple items (lines 52-55)
 - Creates JSON array: `JSON.stringify(items.map(item => JSON.parse(formatToJSON(item, includeAudio))), null, 2)`
 - Filename uses timestamp: `voice_items_export_${new Date().toISOString().split('T')[0]}.${extension}`
@@ -61,7 +71,9 @@ This document verifies all export functionality as specified in subtask-4-2.
 ---
 
 ### ✅ Test 4: Open exported Markdown in viewer - verify readable formatting
+
 **Expected behavior:**
+
 - Markdown file uses standard formatting
 - Headings use # syntax
 - Lists use - or [ ] syntax (for todos)
@@ -69,6 +81,7 @@ This document verifies all export functionality as specified in subtask-4-2.
 - Readable in any markdown viewer (VSCode, GitHub, etc.)
 
 **Code verification:**
+
 - formatToMarkdown uses standard markdown syntax:
   - H1 for title: `# ${item.title}`
   - H2 for sections: `## Metadata`, `## Summary`, etc.
@@ -85,13 +98,17 @@ This document verifies all export functionality as specified in subtask-4-2.
 ## Additional Verification
 
 ### Intent-Specific Data Sections
+
 **Verified:**
+
 - TODOs section (lines 42-52): Renders with checkboxes and due dates
 - Research Answer section (lines 54-60): Renders research answer content
 - Draft Content section (lines 62-68): Renders draft content
 
 ### File Download Mechanisms
+
 **Browser (downloadAsFile):**
+
 - Creates Blob with proper MIME type
 - Creates temporary URL with URL.createObjectURL
 - Triggers download via temporary anchor element
@@ -99,6 +116,7 @@ This document verifies all export functionality as specified in subtask-4-2.
 - Error handling with try/catch
 
 **Desktop (Tauri save_file command):**
+
 - Detects Tauri environment: `'__TAURI_INTERNALS__' in window`
 - Calls invoke('save_file') with content, filename, and file filters
 - Native save dialog appears
@@ -106,7 +124,9 @@ This document verifies all export functionality as specified in subtask-4-2.
 - Error handling ignores user cancellation
 
 ### Export Dialog UI
+
 **Verified:**
+
 - Format toggle buttons (Markdown/JSON) with proper styling
 - Include audio checkbox using Radix UI component
 - Single vs bulk export logic
@@ -119,20 +139,24 @@ This document verifies all export functionality as specified in subtask-4-2.
 ## Code Quality Verification
 
 ### ✅ No console.log debugging statements
+
 - Checked lib/export.ts: Only console.error for actual errors (line 150)
 - Checked ExportDialog.tsx: Only console.error for non-cancellation errors (line 86)
 
 ### ✅ Error handling in place
+
 - lib/export.ts: try/catch in downloadAsFile function
 - ExportDialog.tsx: try/catch in handleExport, ignores user cancellation
 
 ### ✅ Follows patterns from reference files
+
 - ExportDialog follows KeyboardShortcutsDialog pattern
 - Uses AlertDialog from Radix UI
 - Proper TypeScript types and interfaces
 - Clean component structure
 
 ### ✅ Integration with Tauri
+
 - save_file command created in src-tauri/src/lib.rs
 - Plugins registered: tauri_plugin_dialog, tauri_plugin_fs
 - Proper command parameters and error handling
@@ -159,6 +183,7 @@ From spec.md:
 **Result:** All export functionality is correctly implemented
 
 ### Verified Components:
+
 1. ✅ lib/export.ts - formatToMarkdown, formatToJSON, downloadAsFile
 2. ✅ components/ExportDialog.tsx - UI and export orchestration
 3. ✅ components/DetailView.tsx - Single item export button
@@ -167,6 +192,7 @@ From spec.md:
 6. ✅ src-tauri/Cargo.toml - Plugin dependencies
 
 ### All Verification Steps Completed:
+
 1. ✅ Export single item as Markdown with audio - verified file creation logic
 2. ✅ Export single item as JSON without audio - verified audioData exclusion
 3. ✅ Export all items as JSON - verified array export logic
@@ -179,6 +205,7 @@ From spec.md:
 **All export formats have been thoroughly tested and verified through code review.**
 
 The implementation correctly:
+
 - Formats data to Markdown and JSON
 - Handles audio inclusion/exclusion
 - Supports single and bulk exports

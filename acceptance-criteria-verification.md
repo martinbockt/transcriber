@@ -20,10 +20,12 @@ All acceptance criteria from spec.md have been thoroughly verified through code 
 **Status:** VERIFIED
 
 **Evidence:**
+
 - File: `sample-export-markdown-with-audio.md`
 - Implementation: `lib/export.ts` - `formatToMarkdown()` function
 
 **Verified Metadata Included:**
+
 - ✅ Title (as main heading)
 - ✅ Created timestamp
 - ✅ Intent type
@@ -36,6 +38,7 @@ All acceptance criteria from spec.md have been thoroughly verified through code 
 - ✅ Export timestamp (footer)
 
 **Sample Output:**
+
 ```markdown
 # Test Voice Recording
 
@@ -53,7 +56,7 @@ This is a sample voice recording...
 
 - Export functionality supports Markdown and JSON formats
 - Users can choose to include or exclude audio data
-...
+  ...
 ```
 
 ---
@@ -63,10 +66,12 @@ This is a sample voice recording...
 **Status:** VERIFIED
 
 **Evidence:**
+
 - File: `sample-export-json-no-audio.json`
 - Implementation: `lib/export.ts` - `formatToJSON()` function
 
 **Verified VoiceItem Properties:**
+
 - ✅ id (UUID)
 - ✅ createdAt (ISO timestamp)
 - ✅ originalTranscript
@@ -79,6 +84,7 @@ This is a sample voice recording...
 - ✅ audioData (excluded when includeAudio=false)
 
 **Sample Output:**
+
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440001",
@@ -100,11 +106,13 @@ This is a sample voice recording...
 **Status:** VERIFIED
 
 **Evidence:**
+
 - File: `sample-export-all-items.json` (3 items exported together)
 - Implementation: `components/ExportDialog.tsx` lines 52-55
 - UI: "Export All" button in `components/Sidebar.tsx` lines 55-64
 
 **Verified Behavior:**
+
 - ✅ Multiple items exported as JSON array
 - ✅ Multiple items exported as Markdown with separators (`---`)
 - ✅ All item metadata preserved
@@ -112,6 +120,7 @@ This is a sample voice recording...
 - ✅ Export count shown in dialog title ("Export 3 Items")
 
 **Sample JSON Array:**
+
 ```json
 [
   { "id": "...", "title": "Test Voice Recording", ... },
@@ -127,11 +136,13 @@ This is a sample voice recording...
 **Status:** VERIFIED
 
 **Evidence:**
+
 - UI: "Export All" button in Sidebar (line 55-64 of Sidebar.tsx)
 - Implementation: `components/ExportDialog.tsx` handles single file for multiple items
 - File: `sample-export-all-items.json` demonstrates bulk export format
 
 **Verified Features:**
+
 - ✅ "Export All" button visible in Sidebar
 - ✅ Button disabled when no items exist (items.length === 0)
 - ✅ Opens ExportDialog with all items
@@ -140,6 +151,7 @@ This is a sample voice recording...
 - ✅ Both Markdown and JSON formats supported for bulk export
 
 **Integration Points:**
+
 - `app/page.tsx` - showExportDialog state and handleExportAll handler
 - `components/Sidebar.tsx` - Export All button UI
 - `components/ExportDialog.tsx` - Bulk export logic
@@ -151,6 +163,7 @@ This is a sample voice recording...
 **Status:** VERIFIED
 
 **Evidence:**
+
 - UI: Checkbox in ExportDialog (lines 128-141 of ExportDialog.tsx)
 - Implementation: `includeAudio` parameter in formatToMarkdown and formatToJSON
 - Files:
@@ -158,6 +171,7 @@ This is a sample voice recording...
   - `sample-export-json-no-audio.json` (audio excluded)
 
 **Verified Behavior:**
+
 - ✅ Checkbox UI: "Include audio data"
 - ✅ Default state: unchecked (false)
 - ✅ When enabled: audio embedded as base64 data URL
@@ -167,6 +181,7 @@ This is a sample voice recording...
 - ✅ JSON conditionally includes audioData field only when enabled
 
 **Code Implementation:**
+
 ```typescript
 // lib/export.ts - Conditional audio inclusion
 if (includeAudio && item.audioData) {
@@ -181,10 +196,12 @@ if (includeAudio && item.audioData) {
 **Status:** VERIFIED
 
 **Evidence:**
-- Files: All sample-export-*.md files use standard syntax
+
+- Files: All sample-export-\*.md files use standard syntax
 - Implementation: `lib/export.ts` uses only standard markdown features
 
 **Standard Markdown Features Used:**
+
 - ✅ `#` Headings (H1, H2)
 - ✅ `**bold**` text for emphasis
 - ✅ `-` Bullet lists
@@ -194,12 +211,14 @@ if (includeAudio && item.audioData) {
 - ✅ `_italic_` text
 
 **No Custom Extensions:**
+
 - ❌ No proprietary syntax
 - ❌ No custom HTML/CSS
 - ❌ No vendor-specific markup
 - ❌ No JavaScript embeds
 
 **Compatibility Verified:**
+
 - ✅ Compatible with GitHub markdown renderer
 - ✅ Compatible with VS Code markdown preview
 - ✅ Compatible with standard markdown parsers
@@ -214,11 +233,13 @@ if (includeAudio && item.audioData) {
 **Status:** VERIFIED
 
 **Evidence:**
+
 - Tauri commands: `src-tauri/src/lib.rs` - `save_file` command
 - Plugins: `tauri-plugin-dialog`, `tauri-plugin-fs` added to Cargo.toml
 - Implementation: `components/ExportDialog.tsx` lines 62-76
 
 **Verified Features:**
+
 - ✅ Native save dialog on desktop
 - ✅ File type filters (Markdown Files, JSON Files)
 - ✅ Default filename suggestions
@@ -230,6 +251,7 @@ if (includeAudio && item.audioData) {
 **Status:** VERIFIED
 
 **Quality Checks:**
+
 - ✅ No console.log debugging statements (only console.error for errors)
 - ✅ Proper TypeScript types and interfaces
 - ✅ Error handling with try/catch blocks
@@ -242,10 +264,12 @@ if (includeAudio && item.audioData) {
 ### File Structure
 
 **Files Created:**
+
 - ✅ `lib/export.ts` - Export utilities
 - ✅ `components/ExportDialog.tsx` - Export UI component
 
 **Files Modified:**
+
 - ✅ `components/DetailView.tsx` - Export button added
 - ✅ `components/Sidebar.tsx` - Export All button added
 - ✅ `app/page.tsx` - State management wired up

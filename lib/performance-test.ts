@@ -35,9 +35,9 @@ function generateMockVoiceItem(index: number, includeAudio: boolean): VoiceItem 
 
   // Generate realistic transcript (100-500 words)
   const transcriptLength = 100 + Math.floor(Math.random() * 400);
-  const transcript = `This is a realistic voice transcript item number ${index}. `.repeat(
-    Math.ceil(transcriptLength / 10)
-  ).substring(0, transcriptLength * 5); // Average 5 chars per word
+  const transcript = `This is a realistic voice transcript item number ${index}. `
+    .repeat(Math.ceil(transcriptLength / 10))
+    .substring(0, transcriptLength * 5); // Average 5 chars per word
 
   // Generate base64-encoded audio data if requested (simulating 30 seconds of audio)
   // Real audio is approximately 480KB for 30s at 128kbps
@@ -76,14 +76,24 @@ function generateMockVoiceItem(index: number, includeAudio: boolean): VoiceItem 
       baseItem.data.todos = [
         { task: `Task 1 for item ${index}`, done: false, due: null },
         { task: `Task 2 for item ${index}`, done: Math.random() > 0.5, due: null },
-        { task: `Task 3 for item ${index}`, done: false, due: new Date(Date.now() + 86400000).toISOString() },
+        {
+          task: `Task 3 for item ${index}`,
+          done: false,
+          due: new Date(Date.now() + 86400000).toISOString(),
+        },
       ];
       break;
     case 'RESEARCH':
-      baseItem.data.researchAnswer = `This is a detailed research answer for item ${index}. It contains multiple paragraphs with comprehensive information. `.repeat(5);
+      baseItem.data.researchAnswer =
+        `This is a detailed research answer for item ${index}. It contains multiple paragraphs with comprehensive information. `.repeat(
+          5,
+        );
       break;
     case 'DRAFT':
-      baseItem.data.draftContent = `This is polished draft content for item ${index}. It is well-formatted and ready to use. `.repeat(10);
+      baseItem.data.draftContent =
+        `This is polished draft content for item ${index}. It is well-formatted and ready to use. `.repeat(
+          10,
+        );
       break;
     case 'NOTE':
       // No additional data for NOTE intent
@@ -141,7 +151,7 @@ async function measureDecryption(encryptedData: string): Promise<number> {
 export async function runPerformanceTest(
   itemCount: number,
   includeAudio: boolean,
-  thresholdMs: number = 500
+  thresholdMs: number = 500,
 ): Promise<PerformanceTestResult> {
   console.log(`\n🔬 Starting performance test: ${itemCount} items (audio: ${includeAudio})...`);
 
@@ -194,8 +204,12 @@ export async function runPerformanceTest(
   console.log('\n📈 Performance Test Results:');
   console.log(`   Test: ${result.testName}`);
   console.log(`   Data Size: ${result.dataSize}`);
-  console.log(`   Encryption: ${result.encryptionTimeMs.toFixed(2)}ms (${result.details.encryptionRate})`);
-  console.log(`   Decryption: ${result.decryptionTimeMs.toFixed(2)}ms (${result.details.decryptionRate})`);
+  console.log(
+    `   Encryption: ${result.encryptionTimeMs.toFixed(2)}ms (${result.details.encryptionRate})`,
+  );
+  console.log(
+    `   Decryption: ${result.decryptionTimeMs.toFixed(2)}ms (${result.details.decryptionRate})`,
+  );
   console.log(`   Total Time: ${result.totalTimeMs.toFixed(2)}ms`);
   console.log(`   Status: ${result.passed ? '✅ PASS' : '❌ FAIL'} (threshold: ${thresholdMs}ms)`);
 
@@ -228,7 +242,7 @@ export async function runPerformanceTestSuite(): Promise<{
   // Test 4: 10 items with audio (quick test)
   tests.push(await runPerformanceTest(10, true, 200));
 
-  const allPassed = tests.every(t => t.passed);
+  const allPassed = tests.every((t) => t.passed);
 
   // Generate summary
   console.log('\n' + '━'.repeat(60));
@@ -246,10 +260,11 @@ export async function runPerformanceTestSuite(): Promise<{
   console.log(`Overall: ${allPassed ? '✅ ALL TESTS PASSED' : '❌ SOME TESTS FAILED'}`);
   console.log('━'.repeat(60));
 
-  const summary = `Performance Test Suite: ${allPassed ? 'PASSED' : 'FAILED'}\n` +
+  const summary =
+    `Performance Test Suite: ${allPassed ? 'PASSED' : 'FAILED'}\n` +
     `Tests run: ${tests.length}\n` +
-    `Tests passed: ${tests.filter(t => t.passed).length}\n` +
-    `Tests failed: ${tests.filter(t => !t.passed).length}`;
+    `Tests passed: ${tests.filter((t) => t.passed).length}\n` +
+    `Tests failed: ${tests.filter((t) => !t.passed).length}`;
 
   return {
     tests,

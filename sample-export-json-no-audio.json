@@ -3,11 +3,7 @@
   "createdAt": "2026-02-02T09:15:00.000Z",
   "originalTranscript": "We had our quarterly planning meeting this morning. The main topics were budget allocation, team growth, and our product roadmap for Q1. We've been approved to hire two more engineers.",
   "title": "Meeting Notes - Q1 Planning",
-  "tags": [
-    "meeting",
-    "planning",
-    "q1"
-  ],
+  "tags": ["meeting", "planning", "q1"],
   "summary": "Quarterly planning meeting discussing goals and priorities for Q1. Team aligned on key initiatives and resource allocation.",
   "keyFacts": [
     "Budget approved for new features",

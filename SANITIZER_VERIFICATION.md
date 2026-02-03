@@ -3,12 +3,15 @@
 ## Manual Verification Test Results
 
 ### Test Case 1: API Key Redaction
+
 **Input:**
+
 ```
 "Failed to authenticate with API key: sk-proj-abc123def456ghi789jkl012mno345pqr678"
 ```
 
 **Expected Output:**
+
 ```
 "Failed to authenticate with API key: [OPENAI_API_KEY_REDACTED]"
 ```
@@ -20,12 +23,15 @@
 ---
 
 ### Test Case 2: Bearer Token Redaction
+
 **Input:**
+
 ```
 "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0"
 ```
 
 **Expected Output:**
+
 ```
 "Authorization: Bearer [TOKEN_REDACTED]"
 ```
@@ -37,12 +43,15 @@
 ---
 
 ### Test Case 3: Email Redaction
+
 **Input:**
+
 ```
 "User john.doe@example.com reported an error"
 ```
 
 **Expected Output:**
+
 ```
 "User [EMAIL_REDACTED] reported an error"
 ```
@@ -54,13 +63,16 @@
 ---
 
 ### Test Case 4: File Path Redaction
+
 **Input:**
+
 ```
 "Error reading file: /home/user/secret/api-keys.txt"
 "Error reading file: C:\\Users\\Admin\\Documents\\secrets.env"
 ```
 
 **Expected Output:**
+
 ```
 "Error reading file: [PATH_REDACTED]"
 "Error reading file: [PATH_REDACTED]"
@@ -73,13 +85,16 @@
 ---
 
 ### Test Case 5: Error Object Sanitization
+
 **Input:**
+
 ```javascript
-const error = new Error("API request failed with key sk-test1234567890abcdefghijk");
-error.apiKey = "sk-another1234567890abcdefgh";
+const error = new Error('API request failed with key sk-test1234567890abcdefghijk');
+error.apiKey = 'sk-another1234567890abcdefgh';
 ```
 
 **Expected Behavior:**
+
 - `error.message` is sanitized: "[OPENAI_API_KEY_REDACTED]"
 - Custom properties are recursively sanitized
 - Stack trace is preserved in dev, stripped in production
@@ -89,11 +104,14 @@ error.apiKey = "sk-another1234567890abcdefgh";
 ---
 
 ### Test Case 6: Production vs Development Mode
+
 **Production Mode (`NODE_ENV=production`):**
+
 - Stack traces are completely removed
 - Only error name and sanitized message are preserved
 
 **Development Mode:**
+
 - Stack traces are sanitized but preserved for debugging
 - Full error context available
 
@@ -102,18 +120,21 @@ error.apiKey = "sk-another1234567890abcdefgh";
 ---
 
 ### Test Case 7: Nested Object Sanitization
+
 **Input:**
+
 ```javascript
 const errorData = {
-  message: "Failed",
+  message: 'Failed',
   config: {
-    apiKey: "sk-secret1234567890abcdefghij",
-    user: { email: "admin@example.com" }
-  }
+    apiKey: 'sk-secret1234567890abcdefghij',
+    user: { email: 'admin@example.com' },
+  },
 };
 ```
 
 **Expected Output:**
+
 ```javascript
 {
   message: "Failed",
@@ -131,6 +152,7 @@ const errorData = {
 ## Code Quality Verification
 
 ### Pattern Compliance
+
 - ✅ Follows existing code style from `lib/utils.ts`
 - ✅ Uses TypeScript with proper typing
 - ✅ Includes comprehensive JSDoc comments
@@ -138,7 +160,8 @@ const errorData = {
 - ✅ Clean, maintainable code structure
 
 ### Functionality Coverage
-- ✅ OpenAI API key detection (sk-* pattern)
+
+- ✅ OpenAI API key detection (sk-\* pattern)
 - ✅ Bearer token detection
 - ✅ Email address detection
 - ✅ File path detection (Unix & Windows)
@@ -148,6 +171,7 @@ const errorData = {
 - ✅ Safe logging functions (logError, logWarning, logInfo)
 
 ### Security Features
+
 - ✅ Multiple API key patterns covered
 - ✅ Global regex flags for complete replacement
 - ✅ Production mode strips all stack traces
@@ -159,6 +183,7 @@ const errorData = {
 ## Integration Readiness
 
 The error sanitizer is ready for integration into:
+
 1. `lib/ai.ts` - Replace 3 console.error calls
 2. `app/page.tsx` - Replace console.error call
 3. `lib/storage.ts` - Replace 5 console.error calls
@@ -167,6 +192,7 @@ The error sanitizer is ready for integration into:
 6. Other components with console.error usage
 
 **Usage Example:**
+
 ```typescript
 import { logError, sanitizeError } from '@/lib/error-sanitizer';
 

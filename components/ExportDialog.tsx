@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,12 +10,12 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { formatToMarkdown, formatToJSON, downloadAsFile } from "@/lib/export";
-import type { VoiceItem } from "@/types/voice-item";
-import { invoke } from "@tauri-apps/api/core";
-import { logError } from "@/lib/error-sanitizer";
+} from '@/components/ui/alert-dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { formatToMarkdown, formatToJSON, downloadAsFile } from '@/lib/export';
+import type { VoiceItem } from '@/types/voice-item';
+import { invoke } from '@tauri-apps/api/core';
+import { logError } from '@/lib/error-sanitizer';
 
 interface ExportDialogProps {
   open: boolean;
@@ -23,10 +23,10 @@ interface ExportDialogProps {
   items: VoiceItem[];
 }
 
-type ExportFormat = "markdown" | "json";
+type ExportFormat = 'markdown' | 'json';
 
 export function ExportDialog({ open, onOpenChange, items }: ExportDialogProps) {
-  const [format, setFormat] = useState<ExportFormat>("markdown");
+  const [format, setFormat] = useState<ExportFormat>('markdown');
   const [includeAudio, setIncludeAudio] = useState(false);
 
   const handleExport = async () => {
@@ -43,45 +43,40 @@ export function ExportDialog({ open, onOpenChange, items }: ExportDialogProps) {
         // Single item export
         const item = items[0];
         content =
-          format === "markdown"
+          format === 'markdown'
             ? formatToMarkdown(item, includeAudio)
             : formatToJSON(item, includeAudio);
 
-        extension = format === "markdown" ? "md" : "json";
-        mimeType = format === "markdown" ? "text/markdown" : "application/json";
-        filename = `${item.title.replace(/[^a-z0-9]/gi, "_")}.${extension}`;
+        extension = format === 'markdown' ? 'md' : 'json';
+        mimeType = format === 'markdown' ? 'text/markdown' : 'application/json';
+        filename = `${item.title.replace(/[^a-z0-9]/gi, '_')}.${extension}`;
       } else {
         // Multiple items export - combine into single file
         content =
-          format === "markdown"
-            ? items
-                .map((item) => formatToMarkdown(item, includeAudio))
-                .join("\n\n---\n\n")
+          format === 'markdown'
+            ? items.map((item) => formatToMarkdown(item, includeAudio)).join('\n\n---\n\n')
             : JSON.stringify(
-                items.map((item) =>
-                  JSON.parse(formatToJSON(item, includeAudio)),
-                ),
+                items.map((item) => JSON.parse(formatToJSON(item, includeAudio))),
                 null,
                 2,
               );
 
-        extension = format === "markdown" ? "md" : "json";
-        mimeType = format === "markdown" ? "text/markdown" : "application/json";
-        filename = `voice_items_export_${new Date().toISOString().split("T")[0]}.${extension}`;
+        extension = format === 'markdown' ? 'md' : 'json';
+        mimeType = format === 'markdown' ? 'text/markdown' : 'application/json';
+        filename = `voice_items_export_${new Date().toISOString().split('T')[0]}.${extension}`;
       }
 
       // Detect if running in Tauri (desktop app) or browser
-      const isTauri =
-        typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+      const isTauri = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
 
       if (isTauri) {
         // Use Tauri native file dialog
-        await invoke("save_file", {
+        await invoke('save_file', {
           content,
           defaultFilename: filename,
           filters: [
             {
-              name: format === "markdown" ? "Markdown Files" : "JSON Files",
+              name: format === 'markdown' ? 'Markdown Files' : 'JSON Files',
               extensions: [extension],
             },
           ],
@@ -94,15 +89,14 @@ export function ExportDialog({ open, onOpenChange, items }: ExportDialogProps) {
       onOpenChange(false);
     } catch (error) {
       // Only log error if it's not a user cancellation
-      if (error !== "User cancelled save dialog") {
-        logError("Export failed", error);
+      if (error !== 'User cancelled save dialog') {
+        logError('Export failed', error);
       }
     }
   };
 
   const itemCount = items.length;
-  const dialogTitle =
-    itemCount === 1 ? "Export Item" : `Export ${itemCount} Items`;
+  const dialogTitle = itemCount === 1 ? 'Export Item' : `Export ${itemCount} Items`;
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -113,26 +107,24 @@ export function ExportDialog({ open, onOpenChange, items }: ExportDialogProps) {
             <div className="space-y-4 py-4">
               {/* Format Selection */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Format
-                </label>
+                <label className="text-foreground text-sm font-medium">Format</label>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => setFormat("markdown")}
-                    className={`flex-1 px-3 py-2 text-sm rounded-md border transition-colors ${
-                      format === "markdown"
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background text-foreground border-border hover:bg-muted"
+                    onClick={() => setFormat('markdown')}
+                    className={`flex-1 rounded-md border px-3 py-2 text-sm transition-colors ${
+                      format === 'markdown'
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-background text-foreground border-border hover:bg-muted'
                     }`}
                   >
                     Markdown
                   </button>
                   <button
-                    onClick={() => setFormat("json")}
-                    className={`flex-1 px-3 py-2 text-sm rounded-md border transition-colors ${
-                      format === "json"
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background text-foreground border-border hover:bg-muted"
+                    onClick={() => setFormat('json')}
+                    className={`flex-1 rounded-md border px-3 py-2 text-sm transition-colors ${
+                      format === 'json'
+                        ? 'bg-primary text-primary-foreground border-primary'
+                        : 'bg-background text-foreground border-border hover:bg-muted'
                     }`}
                   >
                     JSON
@@ -145,13 +137,11 @@ export function ExportDialog({ open, onOpenChange, items }: ExportDialogProps) {
                 <Checkbox
                   id="include-audio"
                   checked={includeAudio}
-                  onCheckedChange={(checked) =>
-                    setIncludeAudio(checked === true)
-                  }
+                  onCheckedChange={(checked) => setIncludeAudio(checked === true)}
                 />
                 <label
                   htmlFor="include-audio"
-                  className="text-sm font-medium text-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-foreground text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Include audio data
                 </label>
@@ -160,9 +150,7 @@ export function ExportDialog({ open, onOpenChange, items }: ExportDialogProps) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => onOpenChange(false)}>
-            Cancel
-          </AlertDialogCancel>
+          <AlertDialogCancel onClick={() => onOpenChange(false)}>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={handleExport}>Export</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

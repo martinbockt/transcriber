@@ -1,9 +1,11 @@
 # Performance Testing Guide
 
 ## Overview
+
 This guide helps verify the search performance meets the <100ms requirement with 1000+ items.
 
 ## Prerequisites
+
 - Dev server running (`pnpm dev`)
 - Chrome or Firefox with DevTools
 
@@ -78,6 +80,7 @@ Type in search and check console for timing.
 ## Expected Results
 
 Based on optimizations:
+
 - **1000 items**: <80ms (well under 100ms target)
 - **500 items**: ~20-40ms
 - **100 items**: ~5-10ms
@@ -85,12 +88,14 @@ Based on optimizations:
 ## Troubleshooting
 
 **If search is slow (>100ms)**:
+
 1. Check regex compilation is outside loop (should be)
 2. Verify early filtering happens before text search
 3. Ensure useMemo dependencies are correct in page.tsx
 4. Check browser isn't throttling (close other tabs)
 
 **If UI stutters**:
+
 1. Verify useMemo is used in page.tsx for filteredItems
 2. Check React DevTools for unnecessary re-renders
 3. Ensure search function doesn't mutate state

@@ -47,7 +47,7 @@ export interface ValidationResult {
 export class AudioValidationError extends Error {
   constructor(
     message: string,
-    public details?: Record<string, unknown>
+    public details?: Record<string, unknown>,
   ) {
     super(message);
     this.name = 'AudioValidationError';
@@ -112,11 +112,7 @@ async function getAudioDuration(blob: Blob): Promise<number> {
  * @param maxDuration - Maximum allowed duration (optional)
  * @returns true if valid, false otherwise
  */
-function validateDuration(
-  duration: number,
-  minDuration?: number,
-  maxDuration?: number
-): boolean {
+function validateDuration(duration: number, minDuration?: number, maxDuration?: number): boolean {
   if (minDuration !== undefined && duration < minDuration) {
     return false;
   }
@@ -134,7 +130,7 @@ function validateDuration(
  */
 export async function validateAudioBlob(
   blob: Blob,
-  config?: Partial<AudioValidationConfig>
+  config?: Partial<AudioValidationConfig>,
 ): Promise<ValidationResult> {
   try {
     // Parse and merge with default config
@@ -179,7 +175,9 @@ export async function validateAudioBlob(
       try {
         const duration = await getAudioDuration(blob);
 
-        if (!validateDuration(duration, validationConfig.minDuration, validationConfig.maxDuration)) {
+        if (
+          !validateDuration(duration, validationConfig.minDuration, validationConfig.maxDuration)
+        ) {
           const constraints: string[] = [];
           if (validationConfig.minDuration !== undefined) {
             constraints.push(`minimum ${validationConfig.minDuration}s`);
@@ -244,7 +242,7 @@ export async function validateAudioBlob(
  */
 export async function validateAudioBlobOrThrow(
   blob: Blob,
-  config?: Partial<AudioValidationConfig>
+  config?: Partial<AudioValidationConfig>,
 ): Promise<void> {
   const result = await validateAudioBlob(blob, config);
   if (!result.valid) {

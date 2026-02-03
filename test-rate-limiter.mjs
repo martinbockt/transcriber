@@ -117,7 +117,7 @@ async function runTests() {
   console.log('=== Test 2: Token Refill ===');
   console.log('Waiting 2 seconds for token refill...');
 
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   const tokensAfter = limiter.getAvailableTokens();
   console.log('Tokens after 2 seconds:', tokensAfter);
@@ -139,7 +139,9 @@ async function runTests() {
   console.log('Created limiter with 60 req/min');
   console.log('Available tokens:', simpleLimiter.getAvailableTokens());
   console.log('Expected: 60 tokens');
-  console.log(simpleLimiter.getAvailableTokens() === 60 ? '✓ Test 4 PASSED\n' : '✗ Test 4 FAILED\n');
+  console.log(
+    simpleLimiter.getAvailableTokens() === 60 ? '✓ Test 4 PASSED\n' : '✗ Test 4 FAILED\n',
+  );
 
   // Test 5: Rapid calls verification
   console.log('=== Test 5: Rapid Calls (Core Verification) ===');
@@ -154,8 +156,8 @@ async function runTests() {
     results.push(rapidLimiter.acquire());
   }
 
-  const rapidSuccess = results.filter(r => r).length;
-  const rapidFail = results.filter(r => !r).length;
+  const rapidSuccess = results.filter((r) => r).length;
+  const rapidFail = results.filter((r) => !r).length;
 
   console.log(`Rapid results: ${rapidSuccess} success, ${rapidFail} blocked`);
   console.log('Expected: 3 success, 2 blocked');

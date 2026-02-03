@@ -59,7 +59,10 @@ export function sanitizeString(text: string): string {
   sanitized = sanitized.replace(SENSITIVE_PATTERNS.filePath, REDACTION_REPLACEMENTS.filePath);
 
   // Redact generic API keys
-  sanitized = sanitized.replace(SENSITIVE_PATTERNS.genericApiKey, REDACTION_REPLACEMENTS.genericApiKey);
+  sanitized = sanitized.replace(
+    SENSITIVE_PATTERNS.genericApiKey,
+    REDACTION_REPLACEMENTS.genericApiKey,
+  );
 
   return sanitized;
 }
@@ -143,7 +146,8 @@ export function logError(message: string, error?: unknown): void {
     const sanitizedError = sanitizeError(error);
     console.log(`[ERROR] ${sanitizedMessage}:`, sanitizedError);
   } else if (error !== undefined) {
-    const sanitizedData = typeof error === 'object' ? sanitizeObject(error) : sanitizeString(String(error));
+    const sanitizedData =
+      typeof error === 'object' ? sanitizeObject(error) : sanitizeString(String(error));
     console.log(`[ERROR] ${sanitizedMessage}:`, sanitizedData);
   } else {
     console.log(`[ERROR] ${sanitizedMessage}`);
@@ -159,7 +163,8 @@ export function logWarning(message: string, data?: unknown): void {
   const sanitizedMessage = sanitizeString(message);
 
   if (data !== undefined) {
-    const sanitizedData = typeof data === 'object' ? sanitizeObject(data) : sanitizeString(String(data));
+    const sanitizedData =
+      typeof data === 'object' ? sanitizeObject(data) : sanitizeString(String(data));
     console.log(`[WARN] ${sanitizedMessage}:`, sanitizedData);
   } else {
     console.log(`[WARN] ${sanitizedMessage}`);
@@ -175,7 +180,8 @@ export function logInfo(message: string, data?: unknown): void {
   const sanitizedMessage = sanitizeString(message);
 
   if (data !== undefined) {
-    const sanitizedData = typeof data === 'object' ? sanitizeObject(data) : sanitizeString(String(data));
+    const sanitizedData =
+      typeof data === 'object' ? sanitizeObject(data) : sanitizeString(String(data));
     console.log(`[INFO] ${sanitizedMessage}:`, sanitizedData);
   } else {
     console.log(`[INFO] ${sanitizedMessage}`);

@@ -57,7 +57,8 @@ const mockItem3: VoiceItem = {
   intent: 'RESEARCH',
   data: {
     todos: null,
-    researchAnswer: 'Markdown is great for human readability, JSON is better for machine processing.',
+    researchAnswer:
+      'Markdown is great for human readability, JSON is better for machine processing.',
     draftContent: null,
   },
   audioData: 'data:audio/webm;base64,UmVzZWFyY2hBdWRpbw==',
@@ -132,7 +133,10 @@ console.log('\n✅ Test 6: Export item with research answer as Markdown');
 console.log('-'.repeat(60));
 const markdownResearch = formatToMarkdown(mockItem3, false);
 console.log('Contains Research Answer section:', markdownResearch.includes('## Research Answer'));
-console.log('Contains answer text:', markdownResearch.includes('Markdown is great for human readability'));
+console.log(
+  'Contains answer text:',
+  markdownResearch.includes('Markdown is great for human readability'),
+);
 writeFileSync(join(__dirname, 'test-output-research.md'), markdownResearch);
 console.log('✓ Saved to: test-output-research.md');
 
@@ -141,9 +145,9 @@ console.log('\n✅ Test 7: Export multiple items as JSON array');
 console.log('-'.repeat(60));
 const allItems = [mockItem1, mockItem2, mockItem3];
 const jsonArray = JSON.stringify(
-  allItems.map(item => JSON.parse(formatToJSON(item, false))),
+  allItems.map((item) => JSON.parse(formatToJSON(item, false))),
   null,
-  2
+  2,
 );
 const parsedArray = JSON.parse(jsonArray);
 console.log('Valid JSON array:', Array.isArray(parsedArray));
@@ -151,21 +155,23 @@ console.log('Contains 3 items:', parsedArray.length === 3);
 console.log('First item correct:', parsedArray[0].id === 'test-1');
 console.log('Second item correct:', parsedArray[1].id === 'test-2');
 console.log('Third item correct:', parsedArray[2].id === 'test-3');
-console.log('No audio data in any item:', parsedArray.every((item: any) => !item.audioData));
+console.log(
+  'No audio data in any item:',
+  parsedArray.every((item: any) => !item.audioData),
+);
 writeFileSync(join(__dirname, 'test-output-all-items.json'), jsonArray);
 console.log('✓ Saved to: test-output-all-items.json');
 
 // Test 8: Export multiple items as combined Markdown
 console.log('\n✅ Test 8: Export multiple items as combined Markdown');
 console.log('-'.repeat(60));
-const combinedMarkdown = allItems
-  .map(item => formatToMarkdown(item, false))
-  .join('\n\n---\n\n');
+const combinedMarkdown = allItems.map((item) => formatToMarkdown(item, false)).join('\n\n---\n\n');
 console.log('Combined Markdown length:', combinedMarkdown.length);
-console.log('Contains all titles:',
+console.log(
+  'Contains all titles:',
   combinedMarkdown.includes('# Test Voice Item 1') &&
-  combinedMarkdown.includes('# Test Voice Item 2') &&
-  combinedMarkdown.includes('# Test Voice Item 3')
+    combinedMarkdown.includes('# Test Voice Item 2') &&
+    combinedMarkdown.includes('# Test Voice Item 3'),
 );
 console.log('Contains separators:', (combinedMarkdown.match(/---/g) || []).length >= 2);
 writeFileSync(join(__dirname, 'test-output-all-items.md'), combinedMarkdown);

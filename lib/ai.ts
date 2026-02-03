@@ -1,11 +1,11 @@
-import { createOpenAI } from "@ai-sdk/openai";
-import { generateObject } from "ai";
-import { z } from "zod";
-import { v4 as uuidv4 } from "uuid";
-import type { VoiceItem, IntentType } from "@/types/voice-item";
-import { createRateLimiter } from "@/lib/rate-limiter";
+import { createOpenAI } from '@ai-sdk/openai';
+import { generateObject } from 'ai';
+import { z } from 'zod';
+import { v4 as uuidv4 } from 'uuid';
+import type { VoiceItem, IntentType } from '@/types/voice-item';
+import { createRateLimiter } from '@/lib/rate-limiter';
 
-const STORAGE_KEY = "openai_api_key";
+const STORAGE_KEY = 'openai_api_key';
 
 /**
  * Sanitizes an error object to remove sensitive information like API keys
@@ -13,17 +13,17 @@ const STORAGE_KEY = "openai_api_key";
  */
 function sanitizeError(error: unknown): string {
   if (!error) {
-    return "Unknown error";
+    return 'Unknown error';
   }
 
   // Convert error to string representation
-  let errorStr = "";
+  let errorStr = '';
   if (error instanceof Error) {
     errorStr = `${error.name}: ${error.message}`;
     if (error.stack) {
       errorStr += `\n${error.stack}`;
     }
-  } else if (typeof error === "string") {
+  } else if (typeof error === 'string') {
     errorStr = error;
   } else {
     try {
@@ -34,31 +34,16 @@ function sanitizeError(error: unknown): string {
   }
 
   // Remove API keys (various formats)
-  errorStr = errorStr.replace(/sk-[a-zA-Z0-9]{32,}/g, "[REDACTED_API_KEY]");
-  errorStr = errorStr.replace(
-    /Bearer\s+sk-[a-zA-Z0-9]{32,}/gi,
-    "Bearer [REDACTED_API_KEY]",
-  );
+  errorStr = errorStr.replace(/sk-[a-zA-Z0-9]{32,}/g, '[REDACTED_API_KEY]');
+  errorStr = errorStr.replace(/Bearer\s+sk-[a-zA-Z0-9]{32,}/gi, 'Bearer [REDACTED_API_KEY]');
 
   // Remove authorization headers
-  errorStr = errorStr.replace(
-    /authorization['":\s]+[^,}\s]+/gi,
-    "authorization: [REDACTED]",
-  );
-  errorStr = errorStr.replace(
-    /"Authorization":\s*"[^"]+"/gi,
-    '"Authorization": "[REDACTED]"',
-  );
+  errorStr = errorStr.replace(/authorization['":\s]+[^,}\s]+/gi, 'authorization: [REDACTED]');
+  errorStr = errorStr.replace(/"Authorization":\s*"[^"]+"/gi, '"Authorization": "[REDACTED]"');
 
   // Remove any other potential keys (env vars, tokens, etc.)
-  errorStr = errorStr.replace(
-    /api[_-]?key['":\s]*[a-zA-Z0-9_-]{16,}/gi,
-    "api_key: [REDACTED]",
-  );
-  errorStr = errorStr.replace(
-    /token['":\s]*[a-zA-Z0-9_-]{16,}/gi,
-    "token: [REDACTED]",
-  );
+  errorStr = errorStr.replace(/api[_-]?key['":\s]*[a-zA-Z0-9_-]{16,}/gi, 'api_key: [REDACTED]');
+  errorStr = errorStr.replace(/token['":\s]*[a-zA-Z0-9_-]{16,}/gi, 'token: [REDACTED]');
 
   return errorStr;
 }
@@ -81,7 +66,7 @@ export class RateLimitError extends Error {
     public endpoint: string,
   ) {
     super(message);
-    this.name = "RateLimitError";
+    this.name = 'RateLimitError';
   }
 }
 
@@ -99,26 +84,23 @@ const gptRateLimiter = createRateLimiter(3, 5);
 
 async function getApiKey(): Promise<string> {
   // Check Tauri secure storage first (user-provided key)
-  if (typeof window !== "undefined" && "__TAURI__" in window) {
+  if (typeof window !== 'undefined' && '__TAURI__' in window) {
     try {
-      const { invoke } = await import("@tauri-apps/api/core");
-      const storedKey = await invoke<string>("get_secure_value", {
+      const { invoke } = await import('@tauri-apps/api/core');
+      const storedKey = await invoke<string>('get_secure_value', {
         key: STORAGE_KEY,
       });
       if (storedKey) {
         return storedKey;
       }
     } catch (error) {
-      logSanitizedError(
-        "Failed to retrieve API key from secure storage:",
-        error,
-      );
+      logSanitizedError('Failed to retrieve API key from secure storage:', error);
       // Fall through to environment variable
     }
   }
 
   // Fall back to localStorage for web-only mode (development)
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     const storedKey = localStorage.getItem(STORAGE_KEY);
     if (storedKey) {
       return storedKey;
@@ -131,21 +113,19 @@ async function getApiKey(): Promise<string> {
     return envKey;
   }
 
-  throw new Error(
-    "OpenAI API key is not configured. Please add your API key in Settings.",
-  );
+  throw new Error('OpenAI API key is not configured. Please add your API key in Settings.');
 }
 
 const VoiceItemSchema = z.object({
-  title: z.string().describe("A short, descriptive title (max 60 characters)"),
-  tags: z.array(z.string()).describe("2-5 relevant tags for categorization"),
-  summary: z.string().describe("A 2-3 sentence summary of the content"),
+  title: z.string().describe('A short, descriptive title (max 60 characters)'),
+  tags: z.array(z.string()).describe('2-5 relevant tags for categorization'),
+  summary: z.string().describe('A 2-3 sentence summary of the content'),
   keyFacts: z
     .array(z.string())
-    .describe("Bullet points with hard facts like names, dates, amounts"),
+    .describe('Bullet points with hard facts like names, dates, amounts'),
   intent: z
-    .enum(["TODO", "RESEARCH", "DRAFT", "NOTE"])
-    .describe("The primary intent of the voice input"),
+    .enum(['TODO', 'RESEARCH', 'DRAFT', 'NOTE'])
+    .describe('The primary intent of the voice input'),
   data: z.object({
     todos: z
       .array(
@@ -156,15 +136,9 @@ const VoiceItemSchema = z.object({
         }),
       )
       .nullable()
-      .describe("List of action items if intent is TODO"),
-    researchAnswer: z
-      .string()
-      .nullable()
-      .describe("AI-generated answer if intent is RESEARCH"),
-    draftContent: z
-      .string()
-      .nullable()
-      .describe("Polished, ready-to-use text if intent is DRAFT"),
+      .describe('List of action items if intent is TODO'),
+    researchAnswer: z.string().nullable().describe('AI-generated answer if intent is RESEARCH'),
+    draftContent: z.string().nullable().describe('Polished, ready-to-use text if intent is DRAFT'),
   }),
 });
 
@@ -174,9 +148,9 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     const retryAfterMs = whisperRateLimiter.getTimeUntilTokensAvailable(1);
     const retryAfterSeconds = Math.ceil(retryAfterMs / 1000);
     throw new RateLimitError(
-      `Rate limit exceeded for transcription. Please wait ${retryAfterSeconds} second${retryAfterSeconds !== 1 ? "s" : ""} and try again.`,
+      `Rate limit exceeded for transcription. Please wait ${retryAfterSeconds} second${retryAfterSeconds !== 1 ? 's' : ''} and try again.`,
       retryAfterMs,
-      "whisper",
+      'whisper',
     );
   }
 
@@ -184,46 +158,41 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 
   try {
     const formData = new FormData();
-    formData.append("file", audioBlob, "audio.webm");
-    formData.append("model", "whisper-1");
+    formData.append('file', audioBlob, 'audio.webm');
+    formData.append('model', 'whisper-1');
 
-    const response = await fetch(
-      "https://api.openai.com/v1/audio/transcriptions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: formData,
+    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
       },
-    );
+      body: formData,
+    });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(
-        `Transcription failed: ${error.error?.message || response.statusText}`,
-      );
+      throw new Error(`Transcription failed: ${error.error?.message || response.statusText}`);
     }
 
     const data = await response.json();
     return data.text;
   } catch (error) {
-    logSanitizedError("Transcription error:", error);
+    logSanitizedError('Transcription error:', error);
     throw error;
   }
 }
 
 export async function processContent(
   transcript: string,
-): Promise<Omit<VoiceItem, "id" | "createdAt" | "originalTranscript">> {
+): Promise<Omit<VoiceItem, 'id' | 'createdAt' | 'originalTranscript'>> {
   // Check rate limit before making API call
   if (!gptRateLimiter.acquire()) {
     const retryAfterMs = gptRateLimiter.getTimeUntilTokensAvailable(1);
     const retryAfterSeconds = Math.ceil(retryAfterMs / 1000);
     throw new RateLimitError(
-      `Rate limit exceeded for content processing. Please wait ${retryAfterSeconds} second${retryAfterSeconds !== 1 ? "s" : ""} and try again.`,
+      `Rate limit exceeded for content processing. Please wait ${retryAfterSeconds} second${retryAfterSeconds !== 1 ? 's' : ''} and try again.`,
       retryAfterMs,
-      "gpt-4o",
+      'gpt-4o',
     );
   }
 
@@ -232,7 +201,7 @@ export async function processContent(
   try {
     const openai = createOpenAI({ apiKey });
     const result = await generateObject({
-      model: openai("gpt-4o"),
+      model: openai('gpt-4o'),
       schema: VoiceItemSchema,
       prompt: `Analyze the following voice transcript and extract structured information.
 
@@ -262,7 +231,7 @@ Be thorough and accurate. Ensure the output is immediately useful to the user.`,
 
     return result.object;
   } catch (error) {
-    logSanitizedError("Processing error:", error);
+    logSanitizedError('Processing error:', error);
     throw error;
   }
 }
@@ -279,20 +248,18 @@ async function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
-export async function processVoiceRecording(
-  audioBlob: Blob,
-): Promise<VoiceItem> {
+export async function processVoiceRecording(audioBlob: Blob): Promise<VoiceItem> {
   // Validate audio blob before making API calls
   if (!audioBlob) {
-    throw new Error("Invalid audio: No audio blob provided");
+    throw new Error('Invalid audio: No audio blob provided');
   }
 
   if (audioBlob.size === 0) {
-    throw new Error("Invalid audio: Audio blob is empty");
+    throw new Error('Invalid audio: Audio blob is empty');
   }
 
-  if (!audioBlob.type.startsWith("audio/")) {
-    throw new Error("Invalid audio: Blob must be an audio file");
+  if (!audioBlob.type.startsWith('audio/')) {
+    throw new Error('Invalid audio: Blob must be an audio file');
   }
 
   const transcript = await transcribeAudio(audioBlob);

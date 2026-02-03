@@ -4,13 +4,17 @@ export const MOCK_HISTORY: VoiceItem[] = [
   {
     id: '1',
     createdAt: new Date('2024-01-15T10:30:00').toISOString(),
-    originalTranscript: 'I need to call John about the quarterly report by Friday, review the budget spreadsheet, and schedule a meeting with the marketing team to discuss the new campaign launch.',
-    originalAITranscript: 'I need to call John about the quarterly report by Friday, review the budget spreadsheet, and schedule a meeting with the marketing team to discuss the new campaign launch.',
+    originalTranscript:
+      'I need to call John about the quarterly report by Friday, review the budget spreadsheet, and schedule a meeting with the marketing team to discuss the new campaign launch.',
+    originalAITranscript:
+      'I need to call John about the quarterly report by Friday, review the budget spreadsheet, and schedule a meeting with the marketing team to discuss the new campaign launch.',
     title: 'Q1 Tasks and Meetings',
     originalAITitle: 'Q1 Tasks and Meetings',
     tags: ['Work', 'Urgent', 'Q1'],
-    summary: 'Multiple work-related tasks including contacting John about quarterly reports, budget review, and scheduling a marketing meeting for the new campaign.',
-    originalAISummary: 'Multiple work-related tasks including contacting John about quarterly reports, budget review, and scheduling a marketing meeting for the new campaign.',
+    summary:
+      'Multiple work-related tasks including contacting John about quarterly reports, budget review, and scheduling a marketing meeting for the new campaign.',
+    originalAISummary:
+      'Multiple work-related tasks including contacting John about quarterly reports, budget review, and scheduling a marketing meeting for the new campaign.',
     keyFacts: ['Contact: John', 'Deadline: Friday', 'Department: Marketing'],
     originalAIKeyFacts: ['Contact: John', 'Deadline: Friday', 'Department: Marketing'],
     intent: 'TODO',
@@ -27,13 +31,17 @@ export const MOCK_HISTORY: VoiceItem[] = [
   {
     id: '2',
     createdAt: new Date('2024-01-14T15:45:00').toISOString(),
-    originalTranscript: 'What are the best practices for implementing OAuth 2.0 authentication in a Next.js application? I need to understand the security implications and the recommended libraries.',
-    originalAITranscript: 'What are the best practices for implementing OAuth 2.0 authentication in a Next.js application? I need to understand the security implications and the recommended libraries.',
+    originalTranscript:
+      'What are the best practices for implementing OAuth 2.0 authentication in a Next.js application? I need to understand the security implications and the recommended libraries.',
+    originalAITranscript:
+      'What are the best practices for implementing OAuth 2.0 authentication in a Next.js application? I need to understand the security implications and the recommended libraries.',
     title: 'OAuth 2.0 in Next.js',
     originalAITitle: 'OAuth 2.0 in Next.js',
     tags: ['Development', 'Security', 'Next.js'],
-    summary: 'Research request about implementing OAuth 2.0 authentication in Next.js, focusing on security best practices and library recommendations.',
-    originalAISummary: 'Research request about implementing OAuth 2.0 authentication in Next.js, focusing on security best practices and library recommendations.',
+    summary:
+      'Research request about implementing OAuth 2.0 authentication in Next.js, focusing on security best practices and library recommendations.',
+    originalAISummary:
+      'Research request about implementing OAuth 2.0 authentication in Next.js, focusing on security best practices and library recommendations.',
     keyFacts: ['Framework: Next.js', 'Auth method: OAuth 2.0'],
     originalAIKeyFacts: ['Framework: Next.js', 'Auth method: OAuth 2.0'],
     intent: 'RESEARCH',
@@ -72,15 +80,23 @@ export const MOCK_HISTORY: VoiceItem[] = [
   {
     id: '3',
     createdAt: new Date('2024-01-13T09:15:00').toISOString(),
-    originalTranscript: 'I need to write a professional email to Sarah explaining why the project delivery will be delayed by two weeks due to unexpected technical challenges with the API integration.',
-    originalAITranscript: 'I need to write a professional email to Sarah explaining why the project delivery will be delayed by two weeks due to unexpected technical challenges with the API integration.',
+    originalTranscript:
+      'I need to write a professional email to Sarah explaining why the project delivery will be delayed by two weeks due to unexpected technical challenges with the API integration.',
+    originalAITranscript:
+      'I need to write a professional email to Sarah explaining why the project delivery will be delayed by two weeks due to unexpected technical challenges with the API integration.',
     title: 'Project Delay Email to Sarah',
     originalAITitle: 'Project Delay Email to Sarah',
     tags: ['Communication', 'Email', 'Project'],
-    summary: 'Draft request for a professional email explaining a two-week project delay caused by API integration technical issues.',
-    originalAISummary: 'Draft request for a professional email explaining a two-week project delay caused by API integration technical issues.',
+    summary:
+      'Draft request for a professional email explaining a two-week project delay caused by API integration technical issues.',
+    originalAISummary:
+      'Draft request for a professional email explaining a two-week project delay caused by API integration technical issues.',
     keyFacts: ['Recipient: Sarah', 'Delay: 2 weeks', 'Reason: API integration challenges'],
-    originalAIKeyFacts: ['Recipient: Sarah', 'Delay: 2 weeks', 'Reason: API integration challenges'],
+    originalAIKeyFacts: [
+      'Recipient: Sarah',
+      'Delay: 2 weeks',
+      'Reason: API integration challenges',
+    ],
     intent: 'DRAFT',
     data: {
       todos: null,
@@ -111,15 +127,27 @@ Best regards,
   {
     id: '4',
     createdAt: new Date('2024-01-12T14:20:00').toISOString(),
-    originalTranscript: 'Remember that the new coffee machine in the break room needs descaling every three months. The water filter should also be replaced quarterly. The manual is in the top drawer next to the machine.',
-    originalAITranscript: 'Remember that the new coffee machine in the break room needs descaling every three months. The water filter should also be replaced quarterly. The manual is in the top drawer next to the machine.',
+    originalTranscript:
+      'Remember that the new coffee machine in the break room needs descaling every three months. The water filter should also be replaced quarterly. The manual is in the top drawer next to the machine.',
+    originalAITranscript:
+      'Remember that the new coffee machine in the break room needs descaling every three months. The water filter should also be replaced quarterly. The manual is in the top drawer next to the machine.',
     title: 'Coffee Machine Maintenance',
     originalAITitle: 'Coffee Machine Maintenance',
     tags: ['Office', 'Maintenance', 'Reminder'],
-    summary: 'Maintenance instructions for the office coffee machine including descaling frequency and water filter replacement schedule.',
-    originalAISummary: 'Maintenance instructions for the office coffee machine including descaling frequency and water filter replacement schedule.',
-    keyFacts: ['Descaling: Every 3 months', 'Filter replacement: Quarterly', 'Manual location: Top drawer'],
-    originalAIKeyFacts: ['Descaling: Every 3 months', 'Filter replacement: Quarterly', 'Manual location: Top drawer'],
+    summary:
+      'Maintenance instructions for the office coffee machine including descaling frequency and water filter replacement schedule.',
+    originalAISummary:
+      'Maintenance instructions for the office coffee machine including descaling frequency and water filter replacement schedule.',
+    keyFacts: [
+      'Descaling: Every 3 months',
+      'Filter replacement: Quarterly',
+      'Manual location: Top drawer',
+    ],
+    originalAIKeyFacts: [
+      'Descaling: Every 3 months',
+      'Filter replacement: Quarterly',
+      'Manual location: Top drawer',
+    ],
     intent: 'NOTE',
     data: {
       todos: null,

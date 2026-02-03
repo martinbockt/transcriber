@@ -1,18 +1,18 @@
-import { encryptData, decryptData } from "@/lib/crypto";
-import { logError } from "./error-sanitizer";
+import { encryptData, decryptData } from '@/lib/crypto';
+import { logError } from './error-sanitizer';
 
-export type Theme = "light" | "dark" | "system";
+export type Theme = 'light' | 'dark' | 'system';
 
 export interface Settings {
   apiKey?: string;
   theme: Theme;
 }
 
-const SETTINGS_STORAGE_KEY = "voice-assistant-settings";
-const VOICE_HISTORY_STORAGE_KEY = "voice-assistant-history";
+const SETTINGS_STORAGE_KEY = 'voice-assistant-settings';
+const VOICE_HISTORY_STORAGE_KEY = 'voice-assistant-history';
 
 const DEFAULT_SETTINGS: Settings = {
-  theme: "system",
+  theme: 'system',
 };
 
 /**
@@ -37,12 +37,12 @@ export async function getSettings(): Promise<Settings> {
           await saveSettings(parsed);
           return { ...DEFAULT_SETTINGS, ...parsed };
         } catch (parseErr) {
-          console.error("Failed to parse stored settings:", parseErr);
+          console.error('Failed to parse stored settings:', parseErr);
         }
       }
     }
   } catch (err) {
-    logError("Failed to retrieve settings:", err);
+    logError('Failed to retrieve settings:', err);
   }
   return DEFAULT_SETTINGS;
 }
@@ -60,7 +60,7 @@ export async function saveSettings(settings: Partial<Settings>): Promise<void> {
     const encrypted = await encryptData(jsonString);
     localStorage.setItem(SETTINGS_STORAGE_KEY, encrypted);
   } catch (err) {
-    logError("Failed to save settings", err);
+    logError('Failed to save settings', err);
     throw err;
   }
 }
@@ -73,7 +73,7 @@ export function clearSettings(): void {
   try {
     localStorage.removeItem(SETTINGS_STORAGE_KEY);
   } catch (err) {
-    logError("Failed to clear settings", err);
+    logError('Failed to clear settings', err);
     throw err;
   }
 }
@@ -140,13 +140,13 @@ export async function migrateVoiceHistoryData(): Promise<MigrationResult> {
           migrated: false,
           alreadyEncrypted: false,
           noData: false,
-          error: "Data is neither encrypted nor valid JSON",
+          error: 'Data is neither encrypted nor valid JSON',
         };
       }
     }
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : "Unknown error";
-    console.error("Failed to migrate voice history data:", err);
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    console.error('Failed to migrate voice history data:', err);
     return {
       success: false,
       migrated: false,
@@ -177,7 +177,7 @@ export function calculateStorageSize(str: string): number {
     // Use Blob to accurately calculate byte size (handles multi-byte characters)
     return new Blob([str]).size;
   } catch (err) {
-    logError("Failed to calculate storage size", err);
+    logError('Failed to calculate storage size', err);
     // Fallback: estimate 2 bytes per character for UTF-16
     return str.length * 2;
   }
@@ -218,7 +218,7 @@ export function getStorageUsage(): StorageUsage {
       itemCount,
     };
   } catch (err) {
-    logError("Failed to get storage usage", err);
+    logError('Failed to get storage usage', err);
     return {
       used: 0,
       total: 5 * 1024 * 1024,

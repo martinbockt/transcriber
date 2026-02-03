@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
@@ -30,12 +30,7 @@ export function DraftView({ item }: DraftViewProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-3">
           <CardTitle className="text-lg font-semibold tracking-tight">Draft Content</CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleCopy}
-            className="gap-2 shrink-0"
-          >
+          <Button variant="outline" size="sm" onClick={handleCopy} className="shrink-0 gap-2">
             {copied ? (
               <>
                 <Check className="h-4 w-4" />
@@ -51,7 +46,7 @@ export function DraftView({ item }: DraftViewProps) {
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="bg-[hsl(var(--intent-draft))]/5 border border-[hsl(var(--intent-draft))]/20 p-4 rounded-lg">
+        <div className="rounded-lg border border-[hsl(var(--intent-draft))]/20 bg-[hsl(var(--intent-draft))]/5 p-4">
           <MarkdownRenderer content={draftContent} />
         </div>
       </CardContent>

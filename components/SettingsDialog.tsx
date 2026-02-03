@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { invoke } from "@tauri-apps/api/core";
+import { useState, useEffect } from 'react';
+import { invoke } from '@tauri-apps/api/core';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,16 +11,16 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { useTheme } from "@/components/theme-provider";
-import { getStorageUsage } from "@/lib/storage";
-import { X, Shield } from "lucide-react";
-import { logError } from "@/lib/error-sanitizer";
+} from '@/components/ui/alert-dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { useTheme } from '@/components/theme-provider';
+import { getStorageUsage } from '@/lib/storage';
+import { X, Shield } from 'lucide-react';
+import { logError } from '@/lib/error-sanitizer';
 
 interface SettingsDialogProps {
   open: boolean;
@@ -28,18 +28,18 @@ interface SettingsDialogProps {
   onDataCleared?: () => void;
 }
 
-const STORAGE_KEY = "openai_api_key";
-const APP_VERSION = "0.1.0";
-const APP_NAME = "Voice Assistant";
+const STORAGE_KEY = 'openai_api_key';
+const APP_VERSION = '0.1.0';
+const APP_NAME = 'Voice Assistant';
 
 // Keyboard shortcuts reference
 const shortcuts = [
-  { key: "N", description: "Start new recording" },
-  { key: "Delete", description: "Delete current recording" },
-  { key: "Backspace", description: "Delete current recording (alt)" },
-  { key: "Escape", description: "Stop recording" },
-  { key: "?", description: "Show keyboard shortcuts" },
-  { key: "Cmd+,", description: "Open settings" },
+  { key: 'N', description: 'Start new recording' },
+  { key: 'Delete', description: 'Delete current recording' },
+  { key: 'Backspace', description: 'Delete current recording (alt)' },
+  { key: 'Escape', description: 'Stop recording' },
+  { key: '?', description: 'Show keyboard shortcuts' },
+  { key: 'Cmd+,', description: 'Open settings' },
 ];
 
 // Utility function to format bytes to KB/MB
@@ -53,20 +53,14 @@ const formatStorageSize = (bytes: number): string => {
   }
 };
 
-export function SettingsDialog({
-  open,
-  onOpenChange,
-  onDataCleared,
-}: SettingsDialogProps) {
-  const [apiKey, setApiKey] = useState("");
-  const [saveStatus, setSaveStatus] = useState<
-    "idle" | "validating" | "success" | "error"
-  >("idle");
-  const [errorMessage, setErrorMessage] = useState("");
+export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDialogProps) {
+  const [apiKey, setApiKey] = useState('');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'validating' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
   const [storageUsage, setStorageUsage] = useState<{
     bytes: number;
     formatted: string;
-  }>({ bytes: 0, formatted: "0 KB" });
+  }>({ bytes: 0, formatted: '0 KB' });
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const { theme, setTheme } = useTheme();
 
@@ -74,14 +68,14 @@ export function SettingsDialog({
   useEffect(() => {
     const loadApiKey = async () => {
       try {
-        const savedKey = await invoke<string>("get_secure_value", {
+        const savedKey = await invoke<string>('get_secure_value', {
           key: STORAGE_KEY,
         });
         if (savedKey) {
           setApiKey(savedKey);
         }
       } catch (error) {
-        logError("Failed to load API key", error);
+        logError('Failed to load API key', error);
       }
     };
     loadApiKey();
@@ -100,8 +94,8 @@ export function SettingsDialog({
 
   const validateApiKey = async (key: string): Promise<boolean> => {
     try {
-      const response = await fetch("https://api.openai.com/v1/models", {
-        method: "GET",
+      const response = await fetch('https://api.openai.com/v1/models', {
+        method: 'GET',
         headers: {
           Authorization: `Bearer ${key}`,
         },
@@ -109,7 +103,7 @@ export function SettingsDialog({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error?.message || "Invalid API key");
+        throw new Error(error.error?.message || 'Invalid API key');
       }
 
       return true;
@@ -117,64 +111,61 @@ export function SettingsDialog({
       if (error instanceof Error) {
         throw new Error(error.message);
       }
-      throw new Error("Failed to validate API key");
+      throw new Error('Failed to validate API key');
     }
   };
 
   const handleSaveApiKey = async () => {
     // Basic validation
     if (!apiKey.trim()) {
-      setErrorMessage("API key cannot be empty");
-      setSaveStatus("error");
-      setTimeout(() => setSaveStatus("idle"), 3000);
+      setErrorMessage('API key cannot be empty');
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
       return;
     }
 
     // Validate OpenAI API key format (should start with sk-)
-    if (!apiKey.startsWith("sk-")) {
-      setErrorMessage(
-        'Invalid API key format. OpenAI keys should start with "sk-"',
-      );
-      setSaveStatus("error");
-      setTimeout(() => setSaveStatus("idle"), 3000);
+    if (!apiKey.startsWith('sk-')) {
+      setErrorMessage('Invalid API key format. OpenAI keys should start with "sk-"');
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
       return;
     }
 
     // Validate API key with OpenAI
-    setSaveStatus("validating");
+    setSaveStatus('validating');
     try {
       await validateApiKey(apiKey);
 
       // Save to Tauri secure storage instead of localStorage
-      await invoke("set_secure_value", {
+      await invoke('set_secure_value', {
         key: STORAGE_KEY,
         value: apiKey,
       });
 
-      setSaveStatus("success");
-      setTimeout(() => setSaveStatus("idle"), 3000);
+      setSaveStatus('success');
+      setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to validate API key";
+      const message = error instanceof Error ? error.message : 'Failed to validate API key';
       setErrorMessage(message);
-      setSaveStatus("error");
-      setTimeout(() => setSaveStatus("idle"), 3000);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
     }
   };
 
   const handleClearAllData = async () => {
     // Clear API key from secure storage
     try {
-      await invoke("delete_secure_value", { key: STORAGE_KEY });
+      await invoke('delete_secure_value', { key: STORAGE_KEY });
     } catch (error) {
-      logError("Failed to delete API key from secure storage", error);
+      logError('Failed to delete API key from secure storage', error);
     }
 
     // Clear all localStorage data
     localStorage.clear();
 
     // Reset API key input
-    setApiKey("");
+    setApiKey('');
 
     // Close confirmation dialog
     setShowClearConfirm(false);
@@ -186,18 +177,16 @@ export function SettingsDialog({
   };
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-2xl max-h-[80vh]">
+      <AlertDialogContent className="max-h-[80vh] max-w-2xl">
         <AlertDialogHeader>
           <AlertDialogTitle>Settings</AlertDialogTitle>
           <AlertDialogDescription asChild>
-            <div className="text-foreground">
-              Manage your preferences and application settings
-            </div>
+            <div className="text-foreground">Manage your preferences and application settings</div>
           </AlertDialogDescription>
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+            className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none"
             onClick={() => onOpenChange(false)}
           >
             <X className="h-4 w-4" />
@@ -209,20 +198,19 @@ export function SettingsDialog({
           <div className="space-y-6 py-4">
             {/* API Key Section */}
             <section>
-              <div className="flex items-center gap-2 mb-3">
+              <div className="mb-3 flex items-center gap-2">
                 <h3 className="text-sm font-medium">OpenAI API Key</h3>
-                <div className="flex items-center gap-1 px-2 py-0.5 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-md">
+                <div className="flex items-center gap-1 rounded-md border border-green-300 bg-green-100 px-2 py-0.5 dark:border-green-700 dark:bg-green-900/30">
                   <Shield className="h-3 w-3 text-green-600 dark:text-green-400" />
-                  <span className="text-xs text-green-700 dark:text-green-300 font-medium">
+                  <span className="text-xs font-medium text-green-700 dark:text-green-300">
                     Encrypted
                   </span>
                 </div>
               </div>
               <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Enter your OpenAI API key to enable voice transcription and AI
-                  processing. Your key is stored securely using OS-level
-                  encryption (keychain/keyring).
+                <p className="text-muted-foreground text-sm">
+                  Enter your OpenAI API key to enable voice transcription and AI processing. Your
+                  key is stored securely using OS-level encryption (keychain/keyring).
                 </p>
                 <div className="flex gap-2">
                   <Input
@@ -234,20 +222,20 @@ export function SettingsDialog({
                   />
                   <Button
                     onClick={handleSaveApiKey}
-                    variant={saveStatus === "success" ? "default" : "outline"}
-                    disabled={saveStatus === "validating"}
+                    variant={saveStatus === 'success' ? 'default' : 'outline'}
+                    disabled={saveStatus === 'validating'}
                   >
-                    {saveStatus === "validating"
-                      ? "Validating..."
-                      : saveStatus === "success"
-                        ? "Saved!"
-                        : "Save"}
+                    {saveStatus === 'validating'
+                      ? 'Validating...'
+                      : saveStatus === 'success'
+                        ? 'Saved!'
+                        : 'Save'}
                   </Button>
                 </div>
-                {saveStatus === "error" && (
-                  <p className="text-sm text-destructive">{errorMessage}</p>
+                {saveStatus === 'error' && (
+                  <p className="text-destructive text-sm">{errorMessage}</p>
                 )}
-                {saveStatus === "success" && (
+                {saveStatus === 'success' && (
                   <p className="text-sm text-green-600 dark:text-green-400">
                     API key saved successfully
                   </p>
@@ -259,34 +247,34 @@ export function SettingsDialog({
 
             {/* Preferences Section */}
             <section>
-              <h3 className="text-sm font-medium mb-3">Preferences</h3>
+              <h3 className="mb-3 text-sm font-medium">Preferences</h3>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="theme-toggle">Theme</Label>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Choose your preferred color theme for the application
                   </p>
                   <div className="flex gap-2">
                     <Button
-                      variant={theme === "light" ? "default" : "outline"}
+                      variant={theme === 'light' ? 'default' : 'outline'}
                       size="sm"
-                      onClick={() => setTheme("light")}
+                      onClick={() => setTheme('light')}
                       className="flex-1"
                     >
                       Light
                     </Button>
                     <Button
-                      variant={theme === "dark" ? "default" : "outline"}
+                      variant={theme === 'dark' ? 'default' : 'outline'}
                       size="sm"
-                      onClick={() => setTheme("dark")}
+                      onClick={() => setTheme('dark')}
                       className="flex-1"
                     >
                       Dark
                     </Button>
                     <Button
-                      variant={theme === "system" ? "default" : "outline"}
+                      variant={theme === 'system' ? 'default' : 'outline'}
                       size="sm"
-                      onClick={() => setTheme("system")}
+                      onClick={() => setTheme('system')}
                       className="flex-1"
                     >
                       System
@@ -300,11 +288,11 @@ export function SettingsDialog({
 
             {/* Data Management Section */}
             <section>
-              <div className="flex items-center gap-2 mb-3">
+              <div className="mb-3 flex items-center gap-2">
                 <h3 className="text-sm font-medium">Data Management</h3>
-                <div className="flex items-center gap-1 px-2 py-0.5 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-md">
+                <div className="flex items-center gap-1 rounded-md border border-green-300 bg-green-100 px-2 py-0.5 dark:border-green-700 dark:bg-green-900/30">
                   <Shield className="h-3 w-3 text-green-600 dark:text-green-400" />
-                  <span className="text-xs text-green-700 dark:text-green-300 font-medium">
+                  <span className="text-xs font-medium text-green-700 dark:text-green-300">
                     Encrypted at Rest
                   </span>
                 </div>
@@ -312,23 +300,21 @@ export function SettingsDialog({
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Storage Usage</Label>
-                  <p className="text-sm text-muted-foreground">
-                    All recordings and transcripts are encrypted at rest using
-                    AES-256-GCM encryption
+                  <p className="text-muted-foreground text-sm">
+                    All recordings and transcripts are encrypted at rest using AES-256-GCM
+                    encryption
                   </p>
-                  <div className="flex items-center justify-between p-3 border rounded-md">
+                  <div className="flex items-center justify-between rounded-md border p-3">
                     <span className="text-sm">Total Usage</span>
-                    <span className="text-sm font-medium">
-                      {storageUsage.formatted}
-                    </span>
+                    <span className="text-sm font-medium">{storageUsage.formatted}</span>
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label>Clear Data</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Remove all recordings, settings, and encrypted data from local
-                    storage and secure keychain
+                  <p className="text-muted-foreground text-sm">
+                    Remove all recordings, settings, and encrypted data from local storage and
+                    secure keychain
                   </p>
                   <Button
                     variant="destructive"
@@ -346,17 +332,17 @@ export function SettingsDialog({
 
             {/* Keyboard Shortcuts Section */}
             <section>
-              <h3 className="text-sm font-medium mb-3">Keyboard Shortcuts</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <h3 className="mb-3 text-sm font-medium">Keyboard Shortcuts</h3>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 {shortcuts.map((shortcut) => (
                   <div
                     key={shortcut.key}
-                    className="group flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                    className="group bg-card hover:bg-accent/50 flex items-center justify-between rounded-lg border p-3 transition-colors"
                   >
-                    <span className="text-sm text-foreground font-medium">
+                    <span className="text-foreground text-sm font-medium">
                       {shortcut.description}
                     </span>
-                    <kbd className="ml-3 px-3 py-1.5 text-xs font-bold text-foreground bg-muted/80 border-2 border-border rounded-md shadow-sm group-hover:border-primary/50 transition-colors">
+                    <kbd className="text-foreground bg-muted/80 border-border group-hover:border-primary/50 ml-3 rounded-md border-2 px-3 py-1.5 text-xs font-bold shadow-sm transition-colors">
                       {shortcut.key}
                     </kbd>
                   </div>
@@ -368,19 +354,17 @@ export function SettingsDialog({
 
             {/* About Section */}
             <section>
-              <h3 className="text-sm font-medium mb-3">About</h3>
+              <h3 className="mb-3 text-sm font-medium">About</h3>
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between p-3 border rounded-md">
+                  <div className="flex items-center justify-between rounded-md border p-3">
                     <span className="text-sm font-medium">{APP_NAME}</span>
-                    <span className="text-sm text-muted-foreground">
-                      v{APP_VERSION}
-                    </span>
+                    <span className="text-muted-foreground text-sm">v{APP_VERSION}</span>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  A voice-powered assistant that transcribes and processes your
-                  audio recordings using OpenAI's advanced AI technology.
+                <p className="text-muted-foreground text-sm">
+                  A voice-powered assistant that transcribes and processes your audio recordings
+                  using OpenAI's advanced AI technology.
                 </p>
                 <div className="flex gap-2">
                   <Button
@@ -390,7 +374,7 @@ export function SettingsDialog({
                     onClick={() => {
                       // TODO: Replace with actual documentation URL
                       alert(
-                        "Documentation link not configured. Please add your documentation URL.",
+                        'Documentation link not configured. Please add your documentation URL.',
                       );
                     }}
                   >
@@ -403,7 +387,7 @@ export function SettingsDialog({
                     onClick={() => {
                       // TODO: Replace with actual GitHub repository URL
                       alert(
-                        "GitHub repository link not configured. Please add your repository URL.",
+                        'GitHub repository link not configured. Please add your repository URL.',
                       );
                     }}
                   >
@@ -422,9 +406,8 @@ export function SettingsDialog({
           <AlertDialogHeader>
             <AlertDialogTitle>Clear All Data?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete all your recordings, settings, and
-              encrypted data from both local storage and secure keychain. This
-              action cannot be undone.
+              This will permanently delete all your recordings, settings, and encrypted data from
+              both local storage and secure keychain. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

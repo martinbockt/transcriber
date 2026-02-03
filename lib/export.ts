@@ -32,7 +32,7 @@ export function formatToMarkdown(item: VoiceItem, includeAudio: boolean = false)
   if (item.keyFacts && item.keyFacts.length > 0) {
     lines.push('## Key Facts');
     lines.push('');
-    item.keyFacts.forEach(fact => {
+    item.keyFacts.forEach((fact) => {
       lines.push(`- ${fact}`);
     });
     lines.push('');
@@ -44,7 +44,7 @@ export function formatToMarkdown(item: VoiceItem, includeAudio: boolean = false)
     if (item.data.todos && item.data.todos.length > 0) {
       lines.push('## Tasks');
       lines.push('');
-      item.data.todos.forEach(todo => {
+      item.data.todos.forEach((todo) => {
         const checkbox = todo.done ? '[x]' : '[ ]';
         const dueDate = todo.due ? ` (Due: ${todo.due})` : '';
         lines.push(`- ${checkbox} ${todo.task}${dueDate}`);
@@ -81,7 +81,9 @@ export function formatToMarkdown(item: VoiceItem, includeAudio: boolean = false)
     lines.push('');
     lines.push(`[Audio Recording](${item.audioData})`);
     lines.push('');
-    lines.push('_Note: Audio is embedded as a base64 data URL. Some markdown viewers may not support audio playback._');
+    lines.push(
+      '_Note: Audio is embedded as a base64 data URL. Some markdown viewers may not support audio playback._',
+    );
     lines.push('');
   }
 
@@ -127,7 +129,11 @@ export function formatToJSON(item: VoiceItem, includeAudio: boolean = false): st
  * @param filename The name of the file to download
  * @param mimeType The MIME type of the file (default: text/plain)
  */
-export function downloadAsFile(content: string, filename: string, mimeType: string = 'text/plain'): void {
+export function downloadAsFile(
+  content: string,
+  filename: string,
+  mimeType: string = 'text/plain',
+): void {
   try {
     // Create a Blob from the content
     const blob = new Blob([content], { type: mimeType });
