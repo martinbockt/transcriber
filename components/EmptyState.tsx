@@ -43,11 +43,11 @@ export function EmptyState({ onNewRecording }: EmptyStateProps) {
           <p className="text-muted-foreground text-xs font-medium">Quick Tips</p>
           <div className="grid grid-cols-2 gap-3 text-left">
             <div className="bg-muted/30 space-y-1 rounded-lg p-3">
-              <p className="text-xs font-semibold">⌘ + N</p>
+              <p className="text-xs font-semibold">N</p>
               <p className="text-muted-foreground text-xs">New Recording</p>
             </div>
             <div className="bg-muted/30 space-y-1 rounded-lg p-3">
-              <p className="text-xs font-semibold">⌘ + /</p>
+              <p className="text-xs font-semibold">?</p>
               <p className="text-muted-foreground text-xs">Shortcuts</p>
             </div>
           </div>

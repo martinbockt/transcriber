@@ -78,7 +78,7 @@ Each intent determines which fields in the `data` object are populated. The UI c
   - All `VoiceItem[]` data persists to localStorage under key `voice-assistant-history`
   - Loaded on mount, saved on every change
   - Includes base64-encoded audio data for playback
-- **Mock Data Fallback**: [lib/mock-data.ts](lib/mock-data.ts) provides sample data for first-time users
+  - Starts with empty state for first-time users
 
 ### Custom Hooks Architecture
 
@@ -220,7 +220,6 @@ This enables seamless workflow integration where the app can be summoned instant
 
 - No formal test suite currently exists
 - Manual testing via `pnpm dev` or `pnpm tauri:dev`
-- Mock data in [lib/mock-data.ts](lib/mock-data.ts) can be used to test UI without API calls
 
 ## Build Artifacts
 

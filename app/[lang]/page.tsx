@@ -12,7 +12,6 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { processRealtimeRecording, RateLimitError } from '@/lib/ai';
 import { useTranslation } from '@/components/language-provider';
 import { searchVoiceItems } from '@/lib/search';
-import { MOCK_HISTORY } from '@/lib/mock-data';
 import { encryptData, decryptData } from '@/lib/crypto';
 import { logError } from '@/lib/error-sanitizer';
 import type { VoiceItem, IntentType } from '@/types/voice-item';
@@ -129,19 +128,19 @@ export default function Home() {
             localStorage.setItem(STORAGE_KEY, encrypted);
           } catch (parseErr) {
             console.error('Failed to parse stored items:', parseErr);
-            // Fallback to mock data
-            setItems(MOCK_HISTORY);
-            history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
+            // Start with empty state
+            setItems([]);
+            history.current = [[]];
             historyIndex.current = 0;
-            setActiveItemId(MOCK_HISTORY[0]?.id || null);
+            setActiveItemId(null);
           }
         }
       } else {
-        // Use mock data on first load
-        setItems(MOCK_HISTORY);
-        history.current = [JSON.parse(JSON.stringify(MOCK_HISTORY))];
+        // Start with empty state on first load
+        setItems([]);
+        history.current = [[]];
         historyIndex.current = 0;
-        setActiveItemId(MOCK_HISTORY[0]?.id || null);
+        setActiveItemId(null);
       }
     };
 

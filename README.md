@@ -143,7 +143,6 @@ The bundle will include:
 │   └── useAudioRecorder.ts   # Audio recording hook
 ├── lib/
 │   ├── ai.ts                 # OpenAI API integration
-│   ├── mock-data.ts          # Sample data for testing
 │   └── utils.ts              # Utility functions
 ├── src-tauri/
 │   ├── Cargo.toml            # Rust dependencies
@@ -179,10 +178,6 @@ The bundle will include:
    - Original transcript (collapsible)
 4. **Background Mode**: Minimize to system tray and activate with the global hotkey when needed
 
-## Mock Data
-
-The app comes with sample data for testing the UI. Once you start recording, your actual recordings will be stored in localStorage and persist between sessions.
-
 ## Design Decisions
 
 ### Global Hotkey Activation
@@ -204,6 +199,7 @@ The application separates transcription from content processing:
 2. **Stage 2 - Enrichment**: GPT-4o analyzes intent, extracts tasks, generates summaries, and adds metadata
 
 This separation allows for:
+
 - **Flexibility**: Easy to swap AI providers for either stage
 - **Optimization**: Different models can be used for different tasks
 - **Reliability**: Failures in one stage don't affect the other
@@ -212,6 +208,7 @@ This separation allows for:
 ### Local-First Architecture
 
 All data is stored locally using encrypted localStorage:
+
 - **Privacy**: Your voice data never leaves your machine except for AI processing
 - **Offline Access**: Review past recordings without internet connection
 - **Performance**: Instant load times and search
