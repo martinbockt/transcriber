@@ -2,6 +2,10 @@
 
 An AI-powered desktop application for voice recording, transcription, and intelligent content processing built with Tauri 2.0 and Next.js.
 
+## Notes
+
+Only tested on macOS + browser. When using Windows, test with `pnpm dev` (browser only) instead.
+
 ## Features
 
 - 🎤 **Voice Recording**: Record audio directly from your microphone with real-time audio level visualization
