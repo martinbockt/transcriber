@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef } from 'react';
+import { forwardRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
   Mic,
@@ -12,6 +12,8 @@ import {
   Settings,
   Pin,
   WifiOff,
+  AlertCircle,
+  RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -23,6 +25,7 @@ import type { VoiceItem, IntentType } from '@/types/voice-item';
 import { cn } from '@/lib/utils';
 import { useTranslation } from '@/components/language-provider';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { getFailedRecordingsCount } from '@/lib/failed-recordings';
 
 interface SidebarProps {
   items: VoiceItem[];
@@ -41,6 +44,7 @@ interface SidebarProps {
   onDateRangeChange: (range: DateRange) => void;
   onOpenSettings?: () => void;
   onTogglePin: (itemId: string) => void;
+  onRetryAllFailed?: () => void;
 }
 
 const intentIcons: Record<IntentType, typeof ListTodo> = {
@@ -102,6 +106,7 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
     onDateRangeChange,
     onOpenSettings,
     onTogglePin,
+    onRetryAllFailed,
   },
   ref,
 ) {
@@ -114,6 +119,18 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
   const showResultCount = hasActiveFilters && items.length > 0;
   const { dictionary, locale } = useTranslation();
   const { isOnline } = useNetworkStatus();
+
+  // Track failed recordings count
+  const [failedRecordingsCount, setFailedRecordingsCount] = useState(0);
+
+  // Load failed recordings count on mount and when items change
+  useEffect(() => {
+    async function loadFailedCount() {
+      const count = await getFailedRecordingsCount();
+      setFailedRecordingsCount(count);
+    }
+    loadFailedCount();
+  }, [items.length]); // Refresh when items are added (successful retry)
 
   return (
     <div className="bg-muted/10 flex h-screen w-80 flex-col border-r">
@@ -164,6 +181,25 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
           <div className="mt-2 flex items-center gap-2 rounded-md bg-amber-100 px-3 py-2 text-sm text-amber-900 dark:bg-amber-950/50 dark:text-amber-200">
             <WifiOff className="h-4 w-4 flex-shrink-0" />
             <span>Offline - Some features may be unavailable</span>
+          </div>
+        )}
+        {failedRecordingsCount > 0 && onRetryAllFailed && (
+          <div className="mt-2 flex items-center gap-2 rounded-md bg-red-100 px-3 py-2 text-sm text-red-900 dark:bg-red-950/50 dark:text-red-200">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <div className="flex flex-1 items-center justify-between gap-2">
+              <span>
+                {failedRecordingsCount} failed recording{failedRecordingsCount > 1 ? 's' : ''}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs hover:bg-red-200 dark:hover:bg-red-900"
+                onClick={onRetryAllFailed}
+              >
+                <RefreshCw className="mr-1 h-3 w-3" />
+                Retry All
+              </Button>
+            </div>
           </div>
         )}
       </div>
