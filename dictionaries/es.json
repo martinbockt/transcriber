@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Inicio",
+    "settings": "Configuración",
+    "newRecording": "Nueva grabación",
+    "searchPlaceholder": "Buscar...",
+    "exportAll": "Exportar todo",
+    "noResults": "No hay resultados",
+    "tryAdjusting": "Intenta ajustar tu búsqueda o filtros",
+    "noRecordings": "Aún no hay grabaciones",
+    "startPrompt": "Haz clic en el botón de arriba para comenzar",
+    "results": "resultados encontrados",
+    "result": "resultado encontrado"
+  },
+  "searchBar": {
+    "placeholder": "Buscar elementos de voz...",
+    "filterByType": "Filtrar por tipo:",
+    "filterByDate": "Filtrar por fecha:",
+    "clearFilters": "Borrar filtros",
+    "dateRanges": {
+      "all": "Todo el tiempo",
+      "today": "Hoy",
+      "week": "Esta semana",
+      "month": "Este mes"
+    }
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "includeAudio": "Incluir datos de audio",
+    "format": "Formato"
+  },
+  "settings": {
+    "title": "Configuración",
+    "language": "Idioma",
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema",
+    "openaiApiKey": "Clave API de OpenAI"
+  },
+  "detailView": {
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "download": "Descargar",
+    "originalTranscript": "Transcripción original",
+    "summary": "Resumen",
+    "keyFacts": "Datos clave",
+    "noAudio": "No hay audio disponible para esta grabación",
+    "deleteTitle": "¿Eliminar grabación?",
+    "deleteConfirm": "Esto eliminará permanentemente \"{title}\" y todos los datos asociados. Esta acción no se puede deshacer."
+  },
+  "export": {
+    "titleSingle": "Exportar elemento",
+    "titleMultiple": "Exportar {count} elementos",
+    "exportButton": "Exportar"
+  },
+  "intents": {
+    "todo": "Tarea",
+    "research": "Investigación",
+    "draft": "Borrador",
+    "note": "Nota"
+  },
+  "status": {
+    "starting": "Comenzando en",
+    "recording": "Grabando",
+    "processing": "Procesando audio...",
+    "error": "Error"
+  },
+  "emptyState": {
+    "title": "Aún no hay grabaciones",
+    "description": "Inicia una nueva grabación para capturar tus pensamientos, tareas o preguntas de investigación.",
+    "newRecording": "Iniciar grabación"
+  },
+  "errors": {
+    "apiKeyEmpty": "La clave API no puede estar vacía",
+    "apiKeyInvalidFormat": "Formato de clave API inválido. Las claves de OpenAI deben comenzar con \"sk-\"",
+    "apiKeyValidationFailed": "Falló la validación de la clave API",
+    "audioProcessingFailed": "Falló el procesamiento del audio",
+    "rateLimitExceeded": "Límite de velocidad excedido. Por favor intenta de nuevo más tarde.",
+    "generic": "Error"
+  }
+}

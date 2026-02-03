@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { IntentType } from '@/types/voice-item';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/components/language-provider';
 
 export type DateRange = 'all' | 'today' | 'week' | 'month';
 
@@ -28,17 +29,20 @@ const intentColors: Record<IntentType, string> = {
   NOTE: 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-300',
 };
 
-const dateRangeLabels: Record<DateRange, string> = {
-  all: 'All Time',
-  today: 'Today',
-  week: 'This Week',
-  month: 'This Month',
-};
+// Date labels will be handled by the component using the dictionary
+// const dateRangeLabels: Record<DateRange, string> = {
+//   all: 'All Time',
+//   today: 'Today',
+//   week: 'This Week',
+//   month: 'This Month',
+// };
 
 export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function SearchBar(
   { searchQuery, onSearchChange, selectedIntents, onIntentsChange, dateRange, onDateRangeChange },
   ref,
 ) {
+  const { dictionary } = useTranslation();
+
   const toggleIntent = (intent: IntentType) => {
     if (selectedIntents.includes(intent)) {
       onIntentsChange(selectedIntents.filter((i) => i !== intent));
@@ -63,7 +67,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
         <Input
           ref={ref}
           type="text"
-          placeholder="Search voice items..."
+          placeholder={dictionary.searchBar.placeholder}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pr-9 pl-9"
@@ -81,7 +85,9 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
 
       {/* Intent Type Filters */}
       <div className="space-y-2">
-        <div className="text-muted-foreground px-1 text-xs font-medium">Filter by type:</div>
+        <div className="text-muted-foreground px-1 text-xs font-medium">
+          {dictionary.searchBar.filterByType}
+        </div>
         <div className="flex flex-wrap gap-2">
           {intentTypes.map((intent) => {
             const isSelected = selectedIntents.includes(intent);
@@ -101,7 +107,9 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
 
       {/* Date Range Filters */}
       <div className="space-y-2">
-        <div className="text-muted-foreground px-1 text-xs font-medium">Filter by date:</div>
+        <div className="text-muted-foreground px-1 text-xs font-medium">
+          {dictionary.searchBar.filterByDate}
+        </div>
         <div className="flex flex-wrap gap-2">
           {(['all', 'today', 'week', 'month'] as DateRange[]).map((range) => (
             <Button
@@ -111,7 +119,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
               onClick={() => onDateRangeChange(range)}
               className="text-xs"
             >
-              {dateRangeLabels[range]}
+              {dictionary.searchBar.dateRanges[range]}
             </Button>
           ))}
         </div>
@@ -126,7 +134,7 @@ export const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(function S
           className="text-muted-foreground w-full text-xs"
         >
           <X className="mr-1 h-3 w-3" />
-          Clear all filters
+          {dictionary.searchBar.clearFilters}
         </Button>
       )}
     </div>

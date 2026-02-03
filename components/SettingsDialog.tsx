@@ -21,6 +21,16 @@ import { useTheme } from '@/components/theme-provider';
 import { getStorageUsage } from '@/lib/storage';
 import { X, Shield } from 'lucide-react';
 import { logError } from '@/lib/error-sanitizer';
+import { useTranslation } from '@/components/language-provider';
+import { useRouter, usePathname } from 'next/navigation';
+import { i18n } from '@/i18n-config';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface SettingsDialogProps {
   open: boolean;
@@ -63,6 +73,24 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
   }>({ bytes: 0, formatted: '0 KB' });
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const { theme, setTheme } = useTheme();
+  const { dictionary, locale } = useTranslation();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleLanguageChange = (newLocale: string) => {
+    const segments = pathname.split('/');
+    if (segments.length > 1 && i18n.locales.includes(segments[1] as any)) {
+      segments[1] = newLocale;
+    } else {
+      segments.splice(1, 0, newLocale);
+    }
+
+    // Persist preference
+    localStorage.setItem('i18nextLng', newLocale);
+
+    const newPath = segments.join('/');
+    router.push(newPath);
+  };
 
   // Load API key from Tauri secure storage on mount
   useEffect(() => {
@@ -118,7 +146,7 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
   const handleSaveApiKey = async () => {
     // Basic validation
     if (!apiKey.trim()) {
-      setErrorMessage('API key cannot be empty');
+      setErrorMessage(dictionary.errors.apiKeyEmpty);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
       return;
@@ -126,7 +154,7 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
 
     // Validate OpenAI API key format (should start with sk-)
     if (!apiKey.startsWith('sk-')) {
-      setErrorMessage('Invalid API key format. OpenAI keys should start with "sk-"');
+      setErrorMessage(dictionary.errors.apiKeyInvalidFormat);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
       return;
@@ -146,7 +174,8 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to validate API key';
+      const message =
+        error instanceof Error ? error.message : dictionary.errors.apiKeyValidationFailed;
       setErrorMessage(message);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 3000);
@@ -179,7 +208,7 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="max-h-[80vh] max-w-2xl">
         <AlertDialogHeader>
-          <AlertDialogTitle>Settings</AlertDialogTitle>
+          <AlertDialogTitle>{dictionary.settings.title}</AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="text-foreground">Manage your preferences and application settings</div>
           </AlertDialogDescription>
@@ -250,7 +279,42 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
               <h3 className="mb-3 text-sm font-medium">Preferences</h3>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="theme-toggle">Theme</Label>
+                  <Label>{dictionary.settings.language}</Label>
+                  <Select value={locale} onValueChange={handleLanguageChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="de">Deutsch</SelectItem>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="es">Español</SelectItem>
+                      <SelectItem value="it">Italiano</SelectItem>
+                      <SelectItem value="pt">Português</SelectItem>
+                      <SelectItem value="nl">Nederlands</SelectItem>
+                      <SelectItem value="pl">Polski</SelectItem>
+                      <SelectItem value="sv">Svenska</SelectItem>
+                      <SelectItem value="fi">Suomi</SelectItem>
+                      <SelectItem value="da">Dansk</SelectItem>
+                      <SelectItem value="cs">Čeština</SelectItem>
+                      <SelectItem value="el">Ελληνικά</SelectItem>
+                      <SelectItem value="hu">Magyar</SelectItem>
+                      <SelectItem value="ro">Română</SelectItem>
+                      <SelectItem value="bg">Български</SelectItem>
+                      <SelectItem value="hr">Hrvatski</SelectItem>
+                      <SelectItem value="sk">Slovenčina</SelectItem>
+                      <SelectItem value="sl">Slovenščina</SelectItem>
+                      <SelectItem value="et">Eesti</SelectItem>
+                      <SelectItem value="lv">Latviešu</SelectItem>
+                      <SelectItem value="lt">Lietuvių</SelectItem>
+                      <SelectItem value="mt">Malti</SelectItem>
+                      <SelectItem value="ga">Gaeilge</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="theme-toggle">{dictionary.settings.theme}</Label>
                   <p className="text-muted-foreground text-sm">
                     Choose your preferred color theme for the application
                   </p>
@@ -261,7 +325,7 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                       onClick={() => setTheme('light')}
                       className="flex-1"
                     >
-                      Light
+                      {dictionary.settings.light}
                     </Button>
                     <Button
                       variant={theme === 'dark' ? 'default' : 'outline'}
@@ -269,7 +333,7 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                       onClick={() => setTheme('dark')}
                       className="flex-1"
                     >
-                      Dark
+                      {dictionary.settings.dark}
                     </Button>
                     <Button
                       variant={theme === 'system' ? 'default' : 'outline'}
@@ -277,7 +341,7 @@ export function SettingsDialog({ open, onOpenChange, onDataCleared }: SettingsDi
                       onClick={() => setTheme('system')}
                       className="flex-1"
                     >
-                      System
+                      {dictionary.settings.system}
                     </Button>
                   </div>
                 </div>

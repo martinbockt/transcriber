@@ -20,6 +20,7 @@ import { Separator } from '@/components/ui/separator';
 import { SearchBar, type DateRange } from '@/components/SearchBar';
 import type { VoiceItem, IntentType } from '@/types/voice-item';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '@/components/language-provider';
 
 interface SidebarProps {
   items: VoiceItem[];
@@ -109,6 +110,7 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
   // Calculate total items (would need to be passed from parent in real scenario)
   // For now, we show count when filters are active
   const showResultCount = hasActiveFilters && items.length > 0;
+  const { dictionary, locale } = useTranslation();
   return (
     <div className="bg-muted/10 flex h-screen w-80 flex-col border-r">
       <div className="space-y-2 p-4">
@@ -139,10 +141,10 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
             className={cn('mr-2 h-5 w-5', (isRecording || countdown !== null) && 'animate-pulse')}
           />
           {countdown !== null
-            ? `Starting in ${countdown}...`
+            ? `${dictionary.status.starting} ${countdown}...`
             : isRecording
-              ? `Recording: ${Math.floor(elapsedTime / 60)}:${(elapsedTime % 60).toString().padStart(2, '0')}`
-              : 'New Recording'}
+              ? `${dictionary.status.recording}: ${Math.floor(elapsedTime / 60)}:${(elapsedTime % 60).toString().padStart(2, '0')}`
+              : dictionary.navigation.newRecording}
         </Button>
         <Button
           onClick={onExportAll}
@@ -152,7 +154,7 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
           className="w-full"
         >
           <Download className="mr-2 h-5 w-5" />
-          Export All
+          {dictionary.navigation.exportAll}
         </Button>
       </div>
 
@@ -170,7 +172,8 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
         />
         {showResultCount && (
           <p className="text-muted-foreground mt-2 text-xs">
-            {items.length} {items.length === 1 ? 'result' : 'results'} found
+            {items.length}{' '}
+            {items.length === 1 ? dictionary.navigation.result : dictionary.navigation.results}
           </p>
         )}
       </div>
@@ -183,13 +186,13 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
             <div className="text-muted-foreground py-8 text-center">
               {hasActiveFilters ? (
                 <>
-                  <p className="text-sm">No matching results</p>
-                  <p className="mt-1 text-xs">Try adjusting your search or filters</p>
+                  <p className="text-sm">{dictionary.navigation.noResults}</p>
+                  <p className="mt-1 text-xs">{dictionary.navigation.tryAdjusting}</p>
                 </>
               ) : (
                 <>
-                  <p className="text-sm">No recordings yet</p>
-                  <p className="mt-1 text-xs">Click the button above to start</p>
+                  <p className="text-sm">{dictionary.navigation.noRecordings}</p>
+                  <p className="mt-1 text-xs">{dictionary.navigation.startPrompt}</p>
                 </>
               )}
             </div>
@@ -245,7 +248,7 @@ export const Sidebar = forwardRef<HTMLInputElement, SidebarProps>(function Sideb
                           isActive ? 'text-accent-foreground/80' : 'text-muted-foreground',
                         )}
                       >
-                        {new Date(item.createdAt).toLocaleDateString('en-US', {
+                        {new Date(item.createdAt).toLocaleDateString(locale, {
                           month: 'short',
                           day: 'numeric',
                           hour: '2-digit',

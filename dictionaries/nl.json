@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Home",
+    "settings": "Instellingen",
+    "newRecording": "Nieuwe opname",
+    "searchPlaceholder": "Zoeken...",
+    "exportAll": "Alles exporteren",
+    "noResults": "Geen resultaten gevonden",
+    "tryAdjusting": "Probeer je zoekopdracht of filters aan te passen",
+    "noRecordings": "Nog geen opnames",
+    "startPrompt": "Klik op de knop hierboven om te beginnen",
+    "results": "resultaten gevonden",
+    "result": "resultaat gevonden"
+  },
+  "searchBar": {
+    "placeholder": "Zoek spraakitems...",
+    "filterByType": "Filter op type:",
+    "filterByDate": "Filter op datum:",
+    "clearFilters": "Wis alle filters",
+    "dateRanges": {
+      "all": "Altijd",
+      "today": "Vandaag",
+      "week": "Deze week",
+      "month": "Deze maand"
+    }
+  },
+  "common": {
+    "cancel": "Annuleren",
+    "confirm": "Bevestigen",
+    "delete": "Verwijderen",
+    "save": "Opslaan",
+    "includeAudio": "Inclusief audiogegevens",
+    "format": "Formaat"
+  },
+  "settings": {
+    "title": "Instellingen",
+    "language": "Taal",
+    "theme": "Thema",
+    "light": "Licht",
+    "dark": "Donker",
+    "system": "Systeem",
+    "openaiApiKey": "OpenAI API-sleutel"
+  },
+  "detailView": {
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "download": "Downloaden",
+    "originalTranscript": "Origineel transcript",
+    "summary": "Samenvatting",
+    "keyFacts": "Belangrijkste feiten",
+    "noAudio": "Geen audio beschikbaar voor deze opname",
+    "deleteTitle": "Opname verwijderen?",
+    "deleteConfirm": "Dit verwijdert \"{title}\" en alle bijbehorende gegevens definitief. Deze actie kan niet ongedaan worden gemaakt."
+  },
+  "export": {
+    "titleSingle": "Item exporteren",
+    "titleMultiple": "{count} items exporteren",
+    "exportButton": "Exporteren"
+  },
+  "intents": {
+    "todo": "Te doen",
+    "research": "Onderzoek",
+    "draft": "Concept",
+    "note": "Notitie"
+  },
+  "status": {
+    "starting": "Begint in",
+    "recording": "Opnemen",
+    "processing": "Audio verwerken...",
+    "error": "Fout"
+  },
+  "emptyState": {
+    "title": "Nog geen opnames",
+    "description": "Start een nieuwe opname om je gedachten, taken of onderzoeksvragen vast te leggen.",
+    "newRecording": "Opname starten"
+  },
+  "errors": {
+    "apiKeyEmpty": "API-sleutel mag niet leeg zijn",
+    "apiKeyInvalidFormat": "Ongeldig API-sleutelformaat. OpenAI-sleutels moeten beginnen met \"sk-\"",
+    "apiKeyValidationFailed": "Validatie van API-sleutel mislukt",
+    "audioProcessingFailed": "Audioverwerking mislukt",
+    "rateLimitExceeded": "Snelheidslimiet overschreden. Probeer het later opnieuw.",
+    "generic": "Fout"
+  }
+}

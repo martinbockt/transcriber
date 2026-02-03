@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Home",
+    "settings": "Settings",
+    "newRecording": "New Recording",
+    "searchPlaceholder": "Search...",
+    "exportAll": "Export All",
+    "noResults": "No matching results",
+    "tryAdjusting": "Try adjusting your search or filters",
+    "noRecordings": "No recordings yet",
+    "startPrompt": "Click the button above to start",
+    "results": "results found",
+    "result": "result found"
+  },
+  "searchBar": {
+    "placeholder": "Search voice items...",
+    "filterByType": "Filter by type:",
+    "filterByDate": "Filter by date:",
+    "clearFilters": "Clear all filters",
+    "dateRanges": {
+      "all": "All Time",
+      "today": "Today",
+      "week": "This Week",
+      "month": "This Month"
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "save": "Save",
+    "includeAudio": "Include audio data",
+    "format": "Format"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "openaiApiKey": "OpenAI API Key"
+  },
+  "detailView": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "download": "Download",
+    "originalTranscript": "Original Transcript",
+    "summary": "Summary",
+    "keyFacts": "Key Facts",
+    "noAudio": "No audio available for this recording",
+    "deleteTitle": "Delete Recording?",
+    "deleteConfirm": "This will permanently delete \"{title}\" and all associated data. This action cannot be undone."
+  },
+  "export": {
+    "titleSingle": "Export Item",
+    "titleMultiple": "Export {count} Items",
+    "exportButton": "Export"
+  },
+  "intents": {
+    "todo": "To-Do",
+    "research": "Research",
+    "draft": "Draft",
+    "note": "Note"
+  },
+  "status": {
+    "starting": "Starting in",
+    "recording": "Recording",
+    "processing": "Processing audio...",
+    "error": "Error"
+  },
+  "emptyState": {
+    "title": "No recordings yet",
+    "description": "Start a new recording to capture your thoughts, tasks, or research questions.",
+    "newRecording": "Start Recording"
+  },
+  "errors": {
+    "apiKeyEmpty": "API key cannot be empty",
+    "apiKeyInvalidFormat": "Invalid API key format. OpenAI keys should start with \"sk-\"",
+    "apiKeyValidationFailed": "Failed to validate API key",
+    "audioProcessingFailed": "Failed to process audio",
+    "rateLimitExceeded": "Rate limit exceeded. Please try again later.",
+    "generic": "Error"
+  }
+}

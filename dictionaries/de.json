@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Startseite",
+    "settings": "Einstellungen",
+    "newRecording": "Neue Aufnahme",
+    "searchPlaceholder": "Suchen...",
+    "exportAll": "Alle exportieren",
+    "noResults": "Keine Ergebnisse",
+    "tryAdjusting": "Versuche deine Suche oder Filter anzupassen",
+    "noRecordings": "Noch keine Aufnahmen",
+    "startPrompt": "Klicke auf den Button oben um zu starten",
+    "results": "Ergebnisse gefunden",
+    "result": "Ergebnis gefunden"
+  },
+  "searchBar": {
+    "placeholder": "Suche Aufnahmen...",
+    "filterByType": "Nach Typ filtern:",
+    "filterByDate": "Nach Datum filtern:",
+    "clearFilters": "Filter zurücksetzen",
+    "dateRanges": {
+      "all": "Alle",
+      "today": "Heute",
+      "week": "Diese Woche",
+      "month": "Diesen Monat"
+    }
+  },
+  "common": {
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "delete": "Löschen",
+    "save": "Speichern",
+    "includeAudio": "Audiodaten einschließen",
+    "format": "Format"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "language": "Sprache",
+    "theme": "Design",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System",
+    "openaiApiKey": "OpenAI API Schlüssel"
+  },
+  "detailView": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "download": "Herunterladen",
+    "originalTranscript": "Original Transkript",
+    "summary": "Zusammenfassung",
+    "keyFacts": "Wichtige Fakten",
+    "noAudio": "Keine Audio-Daten verfügbar",
+    "deleteTitle": "Aufnahme löschen?",
+    "deleteConfirm": "Dies wird \"{title}\" und alle zugehörigen Daten dauerhaft löschen. Diese Aktion kann nicht rückgängig gemacht werden."
+  },
+  "export": {
+    "titleSingle": "Element exportieren",
+    "titleMultiple": "{count} Elemente exportieren",
+    "exportButton": "Exportieren"
+  },
+  "intents": {
+    "todo": "Aufgabe",
+    "research": "Recherche",
+    "draft": "Entwurf",
+    "note": "Notiz"
+  },
+  "status": {
+    "starting": "Startet in",
+    "recording": "Aufnahme",
+    "processing": "Verarbeite Audio...",
+    "error": "Fehler"
+  },
+  "emptyState": {
+    "title": "Noch keine Aufnahmen",
+    "description": "Starte eine neue Aufnahme, um deine Gedanken, Aufgaben oder Fragen festzuhalten.",
+    "newRecording": "Aufnahme starten"
+  },
+  "errors": {
+    "apiKeyEmpty": "API-Schlüssel darf nicht leer sein",
+    "apiKeyInvalidFormat": "Ungültiges API-Schlüsselformat. OpenAI-Schlüssel sollten mit \"sk-\" beginnen",
+    "apiKeyValidationFailed": "Validierung des API-Schlüssels fehlgeschlagen",
+    "audioProcessingFailed": "Audioverarbeitung fehlgeschlagen",
+    "rateLimitExceeded": "Ratenlimit überschritten. Bitte versuchen Sie es später erneut.",
+    "generic": "Fehler"
+  }
+}

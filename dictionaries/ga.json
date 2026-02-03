@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Baile",
+    "settings": "Socruithe",
+    "newRecording": "Taifeadadh Nua",
+    "searchPlaceholder": "Cuardaigh...",
+    "exportAll": "Easpórtáil Gach Rud",
+    "noResults": "Níl aon torthaí",
+    "tryAdjusting": "Bain triail as do chuardach nó scagairí a athrú",
+    "noRecordings": "Níl aon taifeadtaí fós ann",
+    "startPrompt": "Cliceáil an cnaipe thuas chun tosú",
+    "results": "toradh aimsithe",
+    "result": "toradh aimsithe"
+  },
+  "searchBar": {
+    "placeholder": "Cuardaigh míreanna gutha...",
+    "filterByType": "Scag de réir cineáil:",
+    "filterByDate": "Scag de réir dáta:",
+    "clearFilters": "Glan gach scagaire",
+    "dateRanges": {
+      "all": "Gach Am",
+      "today": "Inniu",
+      "week": "An tSeachtain Seo",
+      "month": "An Mhí Seo"
+    }
+  },
+  "common": {
+    "cancel": "Cealaigh",
+    "confirm": "Deimhnigh",
+    "delete": "Scrios",
+    "save": "Sábháil",
+    "includeAudio": "Cuir sonraí fuaime san áireamh",
+    "format": "Formáid"
+  },
+  "settings": {
+    "title": "Socruithe",
+    "language": "Teanga",
+    "theme": "Téama",
+    "light": "Geal",
+    "dark": "Dorcha",
+    "system": "Córas",
+    "openaiApiKey": "Eochair API OpenAI"
+  },
+  "detailView": {
+    "edit": "Cuir in Eagar",
+    "delete": "Scrios",
+    "download": "Íoslódáil",
+    "originalTranscript": "Trascríbhinn Bhunaidh",
+    "summary": "Achoimre",
+    "keyFacts": "Príomhfhíricí",
+    "noAudio": "Níl aon fhuaim ar fáil don taifeadadh seo",
+    "deleteTitle": "Scrios Taifeadadh?",
+    "deleteConfirm": "Scriosfaidh sé seo \"{title}\" agus gach sonra a bhaineann leis go buan. Ní féidir an gníomh seo a chealú."
+  },
+  "export": {
+    "titleSingle": "Easpórtáil Mír",
+    "titleMultiple": "Easpórtáil {count} Mír",
+    "exportButton": "Easpórtáil"
+  },
+  "intents": {
+    "todo": "Le Déanamh",
+    "research": "Taighde",
+    "draft": "Dréacht",
+    "note": "Nóta"
+  },
+  "status": {
+    "starting": "Ag tosú i",
+    "recording": "Ag taifeadadh",
+    "processing": "Ag próiseáil fuaime...",
+    "error": "Earráid"
+  },
+  "emptyState": {
+    "title": "Níl aon taifeadtaí fós ann",
+    "description": "Tosaigh taifeadadh nua chun do chuid smaointe, tascanna nó ceisteanna taighde a ghabháil.",
+    "newRecording": "Tosaigh ag Taifeadadh"
+  },
+  "errors": {
+    "apiKeyEmpty": "Ní féidir leis an eochair API a bheith folamh",
+    "apiKeyInvalidFormat": "Formáid eochair API neamhbhailí. Ba cheart go dtosódh eochracha OpenAI le \"sk-\"",
+    "apiKeyValidationFailed": "Theip ar bhailíochtú eochair API",
+    "audioProcessingFailed": "Theip ar phróiseáil fuaime",
+    "rateLimitExceeded": "Sáraíodh an teorainn ráta. Bain triail eile as níos déanaí le do thoil.",
+    "generic": "Earráid"
+  }
+}

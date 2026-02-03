@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Accueil",
+    "settings": "Paramètres",
+    "newRecording": "Nouvel enregistrement",
+    "searchPlaceholder": "Rechercher...",
+    "exportAll": "Tout exporter",
+    "noResults": "Aucun résultat trouvé",
+    "tryAdjusting": "Essayez d'ajuster votre recherche ou vos filtres",
+    "noRecordings": "Pas encore d'enregistrements",
+    "startPrompt": "Cliquez sur le bouton ci-dessus pour commencer",
+    "results": "résultats trouvés",
+    "result": "résultat trouvé"
+  },
+  "searchBar": {
+    "placeholder": "Rechercher des éléments vocaux...",
+    "filterByType": "Filtrer par type :",
+    "filterByDate": "Filtrer par date :",
+    "clearFilters": "Effacer tous les filtres",
+    "dateRanges": {
+      "all": "Tout le temps",
+      "today": "Aujourd'hui",
+      "week": "Cette semaine",
+      "month": "Ce mois-ci"
+    }
+  },
+  "common": {
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "save": "Enregistrer",
+    "includeAudio": "Inclure les données audio",
+    "format": "Format"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "language": "Langue",
+    "theme": "Thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système",
+    "openaiApiKey": "Clé API OpenAI"
+  },
+  "detailView": {
+    "edit": "Éditer",
+    "delete": "Supprimer",
+    "download": "Télécharger",
+    "originalTranscript": "Transcription originale",
+    "summary": "Résumé",
+    "keyFacts": "Points clés",
+    "noAudio": "Aucun audio disponible pour cet enregistrement",
+    "deleteTitle": "Supprimer l'enregistrement ?",
+    "deleteConfirm": "Cela supprimera définitivement \"{title}\" et toutes les données associées. Cette action est irréversible."
+  },
+  "export": {
+    "titleSingle": "Exporter l'élément",
+    "titleMultiple": "Exporter {count} éléments",
+    "exportButton": "Exporter"
+  },
+  "intents": {
+    "todo": "À faire",
+    "research": "Recherche",
+    "draft": "Brouillon",
+    "note": "Note"
+  },
+  "status": {
+    "starting": "Démarrage dans",
+    "recording": "Enregistrement",
+    "processing": "Traitement audio...",
+    "error": "Erreur"
+  },
+  "emptyState": {
+    "title": "Pas encore d'enregistrements",
+    "description": "Commencez un nouvel enregistrement pour capturer vos pensées, tâches ou questions de recherche.",
+    "newRecording": "Démarrer l'enregistrement"
+  },
+  "errors": {
+    "apiKeyEmpty": "La clé API ne peut pas être vide",
+    "apiKeyInvalidFormat": "Format de clé API invalide. Les clés OpenAI doivent commencer par \"sk-\"",
+    "apiKeyValidationFailed": "Échec de la validation de la clé API",
+    "audioProcessingFailed": "Échec du traitement audio",
+    "rateLimitExceeded": "Limite de débit dépassée. Veuillez réessayer plus tard.",
+    "generic": "Erreur"
+  }
+}

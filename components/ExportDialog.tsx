@@ -16,6 +16,7 @@ import { formatToMarkdown, formatToJSON, downloadAsFile } from '@/lib/export';
 import type { VoiceItem } from '@/types/voice-item';
 import { invoke } from '@tauri-apps/api/core';
 import { logError } from '@/lib/error-sanitizer';
+import { useTranslation } from '@/components/language-provider';
 
 interface ExportDialogProps {
   open: boolean;
@@ -28,6 +29,7 @@ type ExportFormat = 'markdown' | 'json';
 export function ExportDialog({ open, onOpenChange, items }: ExportDialogProps) {
   const [format, setFormat] = useState<ExportFormat>('markdown');
   const [includeAudio, setIncludeAudio] = useState(false);
+  const { dictionary } = useTranslation();
 
   const handleExport = async () => {
     if (items.length === 0) return;
@@ -102,12 +104,18 @@ export function ExportDialog({ open, onOpenChange, items }: ExportDialogProps) {
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{dialogTitle}</AlertDialogTitle>
+          <AlertDialogTitle>
+            {itemCount === 1
+              ? dictionary.export.titleSingle
+              : dictionary.export.titleMultiple.replace('{count}', itemCount.toString())}
+          </AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-4 py-4">
               {/* Format Selection */}
               <div className="space-y-2">
-                <label className="text-foreground text-sm font-medium">Format</label>
+                <label className="text-foreground text-sm font-medium">
+                  {dictionary.common.format}
+                </label>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setFormat('markdown')}
@@ -143,15 +151,19 @@ export function ExportDialog({ open, onOpenChange, items }: ExportDialogProps) {
                   htmlFor="include-audio"
                   className="text-foreground text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  Include audio data
+                  {dictionary.common.includeAudio}
                 </label>
               </div>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => onOpenChange(false)}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleExport}>Export</AlertDialogAction>
+          <AlertDialogCancel onClick={() => onOpenChange(false)}>
+            {dictionary.common.cancel}
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={handleExport}>
+            {dictionary.export.exportButton}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

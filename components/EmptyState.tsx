@@ -2,12 +2,14 @@
 
 import { Mic, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
+import { useTranslation } from '@/components/language-provider';
 
 interface EmptyStateProps {
   onNewRecording?: () => void;
 }
 
 export function EmptyState({ onNewRecording }: EmptyStateProps) {
+  const { dictionary } = useTranslation();
   return (
     <div className="flex flex-1 items-center justify-center p-8">
       <div className="animate-fadeIn max-w-md space-y-6 text-center">
@@ -20,12 +22,11 @@ export function EmptyState({ onNewRecording }: EmptyStateProps) {
 
         <div className="space-y-2">
           <h2 className="flex items-center justify-center gap-2 text-2xl font-bold tracking-tight">
-            No Recording Selected
+            {dictionary.emptyState.title}
             <Sparkles className="text-accent h-5 w-5" />
           </h2>
           <p className="text-muted-foreground leading-relaxed">
-            Select a recording from the sidebar to view details, or create a new one to get started
-            with AI-powered transcription and analysis.
+            {dictionary.emptyState.description}
           </p>
         </div>
 
@@ -33,7 +34,7 @@ export function EmptyState({ onNewRecording }: EmptyStateProps) {
           <div className="pt-4">
             <Button onClick={onNewRecording} size="lg" className="gap-2">
               <Mic className="h-5 w-5" />
-              Start New Recording
+              {dictionary.emptyState.newRecording}
             </Button>
           </div>
         )}

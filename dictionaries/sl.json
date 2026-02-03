@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Domov",
+    "settings": "Nastavitve",
+    "newRecording": "Nov posnetek",
+    "searchPlaceholder": "Iskanje...",
+    "exportAll": "Izvozi vse",
+    "noResults": "Ni zadetkov",
+    "tryAdjusting": "Poskusite prilagoditi iskanje ali filtre",
+    "noRecordings": "Še ni posnetkov",
+    "startPrompt": "Kliknite zgornji gumb za začetek",
+    "results": "najdenih rezultatov",
+    "result": "najden rezultat"
+  },
+  "searchBar": {
+    "placeholder": "Išči glasovne elemente...",
+    "filterByType": "Filtriraj po vrsti:",
+    "filterByDate": "Filtriraj po datumu:",
+    "clearFilters": "Počisti filtre",
+    "dateRanges": {
+      "all": "Ves čas",
+      "today": "Danes",
+      "week": "Ta teden",
+      "month": "Ta mesec"
+    }
+  },
+  "common": {
+    "cancel": "Prekliči",
+    "confirm": "Potrdi",
+    "delete": "Izbriši",
+    "save": "Shrani",
+    "includeAudio": "Vključi avdio podatke",
+    "format": "Format"
+  },
+  "settings": {
+    "title": "Nastavitve",
+    "language": "Jezik",
+    "theme": "Tema",
+    "light": "Svetla",
+    "dark": "Temna",
+    "system": "Sistemska",
+    "openaiApiKey": "OpenAI API ključ"
+  },
+  "detailView": {
+    "edit": "Uredi",
+    "delete": "Izbriši",
+    "download": "Prenesi",
+    "originalTranscript": "Originalni prepis",
+    "summary": "Povzetek",
+    "keyFacts": "Ključna dejstva",
+    "noAudio": "Za ta posnetek ni na voljo avdia",
+    "deleteTitle": "Izbrisati posnetek?",
+    "deleteConfirm": "To bo trajno izbrisalo \"{title}\" in vse povezane podatke. Tega dejanja ni mogoče razveljaviti."
+  },
+  "export": {
+    "titleSingle": "Izvozi element",
+    "titleMultiple": "Izvozi {count} elementov",
+    "exportButton": "Izvozi"
+  },
+  "intents": {
+    "todo": "Opravilo",
+    "research": "Raziskava",
+    "draft": "Osnutek",
+    "note": "Opomba"
+  },
+  "status": {
+    "starting": "Začetek v",
+    "recording": "Snemanje",
+    "processing": "Obdelava avdia...",
+    "error": "Napaka"
+  },
+  "emptyState": {
+    "title": "Še ni posnetkov",
+    "description": "Začnite nov posnetek, da zajamete svoje misli, naloge ali raziskovalna vprašanja.",
+    "newRecording": "Začni snemanje"
+  },
+  "errors": {
+    "apiKeyEmpty": "API ključ ne sme biti prazen",
+    "apiKeyInvalidFormat": "Neveljaven format API ključa. OpenAI ključi se morajo začeti z \"sk-\"",
+    "apiKeyValidationFailed": "Preverjanje API ključa ni uspelo",
+    "audioProcessingFailed": "Obdelava avdia ni uspela",
+    "rateLimitExceeded": "Prekoračena omejitev hitrosti. Poskusite znova pozneje.",
+    "generic": "Napaka"
+  }
+}

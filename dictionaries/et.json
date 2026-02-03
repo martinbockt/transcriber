@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Avaleht",
+    "settings": "Seaded",
+    "newRecording": "Uus salvestus",
+    "searchPlaceholder": "Otsing...",
+    "exportAll": "Ekspordi kõik",
+    "noResults": "Tulemusi ei leitud",
+    "tryAdjusting": "Proovige kohandada otsingut või filtreid",
+    "noRecordings": "Salvestusi pole veel",
+    "startPrompt": "Alustamiseks klõpsake ülaltoodud nuppu",
+    "results": "tulemust leitud",
+    "result": "tulemus leitud"
+  },
+  "searchBar": {
+    "placeholder": "Otsi häälsalvestusi...",
+    "filterByType": "Filtreeri tüübi järgi:",
+    "filterByDate": "Filtreeri kuupäeva järgi:",
+    "clearFilters": "Tühjenda kõik filtrid",
+    "dateRanges": {
+      "all": "Kõik ajad",
+      "today": "Täna",
+      "week": "See nädal",
+      "month": "See kuu"
+    }
+  },
+  "common": {
+    "cancel": "Tühista",
+    "confirm": "Kinnita",
+    "delete": "Kustuta",
+    "save": "Salvesta",
+    "includeAudio": "Kaasa audioandmed",
+    "format": "Vorming"
+  },
+  "settings": {
+    "title": "Seaded",
+    "language": "Keel",
+    "theme": "Teema",
+    "light": "Hele",
+    "dark": "Tume",
+    "system": "Süsteem",
+    "openaiApiKey": "OpenAI API võti"
+  },
+  "detailView": {
+    "edit": "Muuda",
+    "delete": "Kustuta",
+    "download": "Laadi alla",
+    "originalTranscript": "Algne transkriptsioon",
+    "summary": "Kokkuvõte",
+    "keyFacts": "Põhifaktid",
+    "noAudio": "Selle salvestuse jaoks pole heli saadaval",
+    "deleteTitle": "Kustuta salvestus?",
+    "deleteConfirm": "See kustutab jäädavalt \"{title}\" ja kõik seotud andmed. Seda tegevust ei saa tagasi võtta."
+  },
+  "export": {
+    "titleSingle": "Ekspordi üksus",
+    "titleMultiple": "Ekspordi {count} üksust",
+    "exportButton": "Ekspordi"
+  },
+  "intents": {
+    "todo": "Ülesanne",
+    "research": "Uuring",
+    "draft": "Mustand",
+    "note": "Märge"
+  },
+  "status": {
+    "starting": "Algab",
+    "recording": "Salvestamine",
+    "processing": "Heli töötlemine...",
+    "error": "Viga"
+  },
+  "emptyState": {
+    "title": "Salvestusi pole veel",
+    "description": "Alustage uut salvestust, et jäädvustada oma mõtteid, ülesandeid või uurimisküsimusi.",
+    "newRecording": "Alusta salvestamist"
+  },
+  "errors": {
+    "apiKeyEmpty": "API võti ei tohi olla tühi",
+    "apiKeyInvalidFormat": "Vigane API võtme vorming. OpenAI võtmed peaksid algama \"sk-\"",
+    "apiKeyValidationFailed": "API võtme valideerimine ebaõnnestus",
+    "audioProcessingFailed": "Heli töötlemine ebaõnnestus",
+    "rateLimitExceeded": "Kiiruspiirang ületatud. Palun proovige hiljem uuesti.",
+    "generic": "Viga"
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Domů",
+    "settings": "Nastavení",
+    "newRecording": "Nová nahrávka",
+    "searchPlaceholder": "Hledat...",
+    "exportAll": "Exportovat vše",
+    "noResults": "Žádné výsledky",
+    "tryAdjusting": "Zkuste upravit hledání nebo filtry",
+    "noRecordings": "Zatím žádné nahrávky",
+    "startPrompt": "Klikněte na tlačítko výše pro zahájení",
+    "results": "nalezených výsledků",
+    "result": "nalezený výsledek"
+  },
+  "searchBar": {
+    "placeholder": "Hledat hlasové položky...",
+    "filterByType": "Filtrovat podle typu:",
+    "filterByDate": "Filtrovat podle data:",
+    "clearFilters": "Vymazat filtry",
+    "dateRanges": {
+      "all": "Vše",
+      "today": "Dnes",
+      "week": "Tento týden",
+      "month": "Tento měsíc"
+    }
+  },
+  "common": {
+    "cancel": "Zrušit",
+    "confirm": "Potvrdit",
+    "delete": "Smazat",
+    "save": "Uložit",
+    "includeAudio": "Zahrnout audio data",
+    "format": "Formát"
+  },
+  "settings": {
+    "title": "Nastavení",
+    "language": "Jazyk",
+    "theme": "Motiv",
+    "light": "Světlý",
+    "dark": "Tmavý",
+    "system": "Systémový",
+    "openaiApiKey": "OpenAI API klíč"
+  },
+  "detailView": {
+    "edit": "Upravit",
+    "delete": "Smazat",
+    "download": "Stáhnout",
+    "originalTranscript": "Původní přepis",
+    "summary": "Shrnutí",
+    "keyFacts": "Klíčová fakta",
+    "noAudio": "Pro tuto nahrávku není k dispozici audio",
+    "deleteTitle": "Smazat nahrávku?",
+    "deleteConfirm": "Tímto trvale smažete \"{title}\" a všechna související data. Tuto akci nelze vrátit zpět."
+  },
+  "export": {
+    "titleSingle": "Exportovat položku",
+    "titleMultiple": "Exportovat {count} položek",
+    "exportButton": "Exportovat"
+  },
+  "intents": {
+    "todo": "Úkol",
+    "research": "Výzkum",
+    "draft": "Návrh",
+    "note": "Poznámka"
+  },
+  "status": {
+    "starting": "Začátek za",
+    "recording": "Nahrávání",
+    "processing": "Zpracování audia...",
+    "error": "Chyba"
+  },
+  "emptyState": {
+    "title": "Zatím žádné nahrávky",
+    "description": "Začněte novou nahrávku pro zachycení myšlenek, úkolů nebo otázek k výzkumu.",
+    "newRecording": "Začít nahrávat"
+  },
+  "errors": {
+    "apiKeyEmpty": "API klíč nesmí být prázdný",
+    "apiKeyInvalidFormat": "Neplatný formát API klíče. Klíče OpenAI by měly začínat na \"sk-\"",
+    "apiKeyValidationFailed": "Ověření API klíče selhalo",
+    "audioProcessingFailed": "Zpracování audia selhalo",
+    "rateLimitExceeded": "Překročen limit požadavků. Zkuste to prosím později.",
+    "generic": "Chyba"
+  }
+}

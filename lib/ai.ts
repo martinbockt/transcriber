@@ -142,7 +142,9 @@ const VoiceItemSchema = z.object({
   }),
 });
 
-export async function transcribeAudio(audioBlob: Blob): Promise<string> {
+export async function transcribeAudio(
+  audioBlob: Blob,
+): Promise<{ text: string; language: string }> {
   // Check rate limit before making API call
   if (!whisperRateLimiter.acquire()) {
     const retryAfterMs = whisperRateLimiter.getTimeUntilTokensAvailable(1);
@@ -160,6 +162,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     const formData = new FormData();
     formData.append('file', audioBlob, 'audio.webm');
     formData.append('model', 'whisper-1');
+    formData.append('response_format', 'verbose_json');
 
     const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
@@ -175,7 +178,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
     }
 
     const data = await response.json();
-    return data.text;
+    return { text: data.text, language: data.language };
   } catch (error) {
     logSanitizedError('Transcription error:', error);
     throw error;
@@ -184,6 +187,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
 
 export async function processContent(
   transcript: string,
+  language?: string,
 ): Promise<Omit<VoiceItem, 'id' | 'createdAt' | 'originalTranscript'>> {
   // Check rate limit before making API call
   if (!gptRateLimiter.acquire()) {
@@ -206,26 +210,30 @@ export async function processContent(
       prompt: `Analyze the following voice transcript and extract structured information.
 
 Transcript: "${transcript}"
+${language ? `Detected Language Code: "${language}"` : ''}
 
 Instructions:
-1. Determine the PRIMARY intent:
+1. Identify the language of the transcript${language ? ` (likely '${language}' based on initial detection)` : ''} and ensure ALL generated output is in this language. This applies to the title, summary, key facts, todos, research answers, and draft content. Do NOT translate to English unless the transcript is in English.
+
+2. Determine the PRIMARY intent:
    - TODO: Contains action items or tasks to be done
    - RESEARCH: Contains a question or request for information/analysis
    - DRAFT: Request to write or compose something (email, message, document)
    - NOTE: General information, observations, or thoughts to remember
 
-2. Extract:
+3. Extract (IN THE TRANSCRIPT'S LANGUAGE):
    - A clear, concise title
    - 2-5 relevant tags for categorization
    - A 2-3 sentence summary
    - Key facts (names, dates, amounts, specific details)
 
-3. Based on intent, populate the data field (use null for fields not relevant to the intent):
+4. Based on intent, populate the data field (use null for fields not relevant to the intent):
    - TODO: Extract all action items with clear task descriptions (set done: false for all new tasks, use null for due if no date mentioned). Set researchAnswer and draftContent to null.
    - RESEARCH: Provide a comprehensive, well-researched answer to the question. Set todos and draftContent to null.
    - DRAFT: Write polished, ready-to-use content based on the request. Set todos and researchAnswer to null.
    - NOTE: Set all data fields (todos, researchAnswer, draftContent) to null.
 
+IMPORTANT: Strictly output in the same language as the transcript. Do not translate.
 Be thorough and accurate. Ensure the output is immediately useful to the user.`,
     });
 
@@ -262,8 +270,8 @@ export async function processVoiceRecording(audioBlob: Blob): Promise<VoiceItem>
     throw new Error('Invalid audio: Blob must be an audio file');
   }
 
-  const transcript = await transcribeAudio(audioBlob);
-  const processed = await processContent(transcript);
+  const { text: transcript, language } = await transcribeAudio(audioBlob);
+  const processed = await processContent(transcript, language);
 
   // Convert audio blob to base64 for storage
   const audioData = await blobToBase64(audioBlob);
@@ -273,6 +281,7 @@ export async function processVoiceRecording(audioBlob: Blob): Promise<VoiceItem>
     createdAt: new Date().toISOString(),
     originalTranscript: transcript,
     audioData,
+    language,
     ...processed,
   };
 }

@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Pagrindinis",
+    "settings": "Nustatymai",
+    "newRecording": "Naujas įrašas",
+    "searchPlaceholder": "Paieška...",
+    "exportAll": "Eksportuoti viską",
+    "noResults": "Rezultatų nerasta",
+    "tryAdjusting": "Pabandykite pakoreguoti paiešką ar filtrus",
+    "noRecordings": "Įrašų dar nėra",
+    "startPrompt": "Norėdami pradėti, spustelėkite mygtuką aukščiau",
+    "results": "rezultatų rasta",
+    "result": "rezultatas rastas"
+  },
+  "searchBar": {
+    "placeholder": "Ieškoti balso elementų...",
+    "filterByType": "Filtruoti pagal tipą:",
+    "filterByDate": "Filtruoti pagal datą:",
+    "clearFilters": "Išvalyti filtrus",
+    "dateRanges": {
+      "all": "Visas laikas",
+      "today": "Šiandien",
+      "week": "Šią savaitę",
+      "month": "Šį mėnesį"
+    }
+  },
+  "common": {
+    "cancel": "Atšaukti",
+    "confirm": "Patvirtinti",
+    "delete": "Ištrinti",
+    "save": "Išsaugoti",
+    "includeAudio": "Įtraukti garso duomenis",
+    "format": "Formatas"
+  },
+  "settings": {
+    "title": "Nustatymai",
+    "language": "Kalba",
+    "theme": "Tema",
+    "light": "Šviesi",
+    "dark": "Tamsi",
+    "system": "Sisteminė",
+    "openaiApiKey": "OpenAI API raktas"
+  },
+  "detailView": {
+    "edit": "Redaguoti",
+    "delete": "Ištrinti",
+    "download": "Atsisiųsti",
+    "originalTranscript": "Originali transkripcija",
+    "summary": "Santrauka",
+    "keyFacts": "Pagrindiniai faktai",
+    "noAudio": "Šiam įrašui garso nėra",
+    "deleteTitle": "Ištrinti įrašą?",
+    "deleteConfirm": "Tai visam laikui ištrins \"{title}\" ir visus susijusius duomenis. Šio veiksmo atšaukti negalima."
+  },
+  "export": {
+    "titleSingle": "Eksportuoti elementą",
+    "titleMultiple": "Eksportuoti {count} elementus",
+    "exportButton": "Eksportuoti"
+  },
+  "intents": {
+    "todo": "Užduotis",
+    "research": "Tyrimas",
+    "draft": "Juodraštis",
+    "note": "Pastaba"
+  },
+  "status": {
+    "starting": "Prasideda po",
+    "recording": "Įrašoma",
+    "processing": "Garsas apdorojamas...",
+    "error": "Klaida"
+  },
+  "emptyState": {
+    "title": "Įrašų dar nėra",
+    "description": "Pradėkite naują įrašą, kad užfiksuotumėte savo mintis, užduotis ar tyrimo klausimus.",
+    "newRecording": "Pradėti įrašymą"
+  },
+  "errors": {
+    "apiKeyEmpty": "API raktas negali būti tuščias",
+    "apiKeyInvalidFormat": "Neteisingas API rakto formatas. OpenAI raktai turi prasidėti \"sk-\"",
+    "apiKeyValidationFailed": "Nepavyko patvirtinti API rakto",
+    "audioProcessingFailed": "Nepavyko apdoroti garso",
+    "rateLimitExceeded": "Viršytas greičio limitas. Bandykite dar kartą vėliau.",
+    "generic": "Klaida"
+  }
+}

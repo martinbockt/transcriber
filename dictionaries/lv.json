@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Sākums",
+    "settings": "Iestatījumi",
+    "newRecording": "Jauns ieraksts",
+    "searchPlaceholder": "Meklēt...",
+    "exportAll": "Eksportēt visu",
+    "noResults": "Nav rezultātu",
+    "tryAdjusting": "Mēģiniet pielāgot meklēšanu vai filtrus",
+    "noRecordings": "Vēl nav ierakstu",
+    "startPrompt": "Noklikšķiniet uz pogas augstāk, lai sāktu",
+    "results": "rezultāti atrasti",
+    "result": "rezultāts atrasts"
+  },
+  "searchBar": {
+    "placeholder": "Meklēt balss vienumus...",
+    "filterByType": "Filtrēt pēc veida:",
+    "filterByDate": "Filtrēt pēc datuma:",
+    "clearFilters": "Notīrīt filtrus",
+    "dateRanges": {
+      "all": "Visu laiku",
+      "today": "Šodien",
+      "week": "Šonedēļ",
+      "month": "Šomēnes"
+    }
+  },
+  "common": {
+    "cancel": "Atcelt",
+    "confirm": "Apstiprināt",
+    "delete": "Dzēst",
+    "save": "Saglabāt",
+    "includeAudio": "Iekļaut audio datus",
+    "format": "Formāts"
+  },
+  "settings": {
+    "title": "Iestatījumi",
+    "language": "Valoda",
+    "theme": "Tēma",
+    "light": "Gaiša",
+    "dark": "Tumša",
+    "system": "Sistēmas",
+    "openaiApiKey": "OpenAI API atslēga"
+  },
+  "detailView": {
+    "edit": "Rediģēt",
+    "delete": "Dzēst",
+    "download": "Lejupielādēt",
+    "originalTranscript": "Oriģinālais transkripts",
+    "summary": "Kopsavilkums",
+    "keyFacts": "Galvenie fakti",
+    "noAudio": "Šim ierakstam nav pieejams audio",
+    "deleteTitle": "Dzēst ierakstu?",
+    "deleteConfirm": "Tas neatgriezeniski izdzēsīs \"{title}\" un visus saistītos datus. Šo darbību nevar atsaukt."
+  },
+  "export": {
+    "titleSingle": "Eksportēt vienumu",
+    "titleMultiple": "Eksportēt {count} vienumus",
+    "exportButton": "Eksportēt"
+  },
+  "intents": {
+    "todo": "Uzdevums",
+    "research": "Pētniecība",
+    "draft": "Melnraksts",
+    "note": "Piezīme"
+  },
+  "status": {
+    "starting": "Sākas pēc",
+    "recording": "Ieraksta",
+    "processing": "Apstrādā audio...",
+    "error": "Kļūda"
+  },
+  "emptyState": {
+    "title": "Vēl nav ierakstu",
+    "description": "Sāciet jaunu ierakstu, lai iemūžinātu savas domas, uzdevumus vai pētniecības jautājumus.",
+    "newRecording": "Sākt ierakstīt"
+  },
+  "errors": {
+    "apiKeyEmpty": "API atslēga nevar būt tukša",
+    "apiKeyInvalidFormat": "Nederīgs API atslēgas formāts. OpenAI atslēgām jāsākas ar \"sk-\"",
+    "apiKeyValidationFailed": "Neizdevās validēt API atslēgu",
+    "audioProcessingFailed": "Neizdevās apstrādāt audio",
+    "rateLimitExceeded": "Pārsniegts pieprasījumu limits. Lūdzu, mēģiniet vēlreiz vēlāk.",
+    "generic": "Kļūda"
+  }
+}

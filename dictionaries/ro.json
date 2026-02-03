@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Acasă",
+    "settings": "Setări",
+    "newRecording": "Înregistrare nouă",
+    "searchPlaceholder": "Căutare...",
+    "exportAll": "Exportă tot",
+    "noResults": "Niciun rezultat",
+    "tryAdjusting": "Încercați să ajustați căutarea sau filtrele",
+    "noRecordings": "Încă nu există înregistrări",
+    "startPrompt": "Faceți clic pe butonul de mai sus pentru a începe",
+    "results": "rezultate găsite",
+    "result": "rezultat găsit"
+  },
+  "searchBar": {
+    "placeholder": "Căutați elemente vocale...",
+    "filterByType": "Filtrare după tip:",
+    "filterByDate": "Filtrare după dată:",
+    "clearFilters": "Ștergeți filtrele",
+    "dateRanges": {
+      "all": "Tot timpul",
+      "today": "Azi",
+      "week": "Săptămâna aceasta",
+      "month": "Luna aceasta"
+    }
+  },
+  "common": {
+    "cancel": "Anulare",
+    "confirm": "Confirmare",
+    "delete": "Ștergere",
+    "save": "Salvare",
+    "includeAudio": "Includeți date audio",
+    "format": "Format"
+  },
+  "settings": {
+    "title": "Setări",
+    "language": "Limbă",
+    "theme": "Temă",
+    "light": "Luminos",
+    "dark": "Întunecat",
+    "system": "Sistem",
+    "openaiApiKey": "Cheie API OpenAI"
+  },
+  "detailView": {
+    "edit": "Editare",
+    "delete": "Ștergere",
+    "download": "Descărcare",
+    "originalTranscript": "Transcriere originală",
+    "summary": "Rezumat",
+    "keyFacts": "Fapte cheie",
+    "noAudio": "Nu există audio disponibil pentru această înregistrare",
+    "deleteTitle": "Ștergeți înregistrarea?",
+    "deleteConfirm": "Aceasta va șterge definitiv \"{title}\" și toate datele asociate. Această acțiune nu poate fi anulată."
+  },
+  "export": {
+    "titleSingle": "Exportați elementul",
+    "titleMultiple": "Exportați {count} elemente",
+    "exportButton": "Export"
+  },
+  "intents": {
+    "todo": "De făcut",
+    "research": "Cercetare",
+    "draft": "Ciornă",
+    "note": "Notă"
+  },
+  "status": {
+    "starting": "Începe în",
+    "recording": "Înregistrare",
+    "processing": "Se procesează audio...",
+    "error": "Eroare"
+  },
+  "emptyState": {
+    "title": "Încă nu există înregistrări",
+    "description": "Începeți o nouă înregistrare pentru a vă capta gândurile, sarcinile sau întrebările de cercetare.",
+    "newRecording": "Începe înregistrarea"
+  },
+  "errors": {
+    "apiKeyEmpty": "Cheia API nu poate fi goală",
+    "apiKeyInvalidFormat": "Format de cheie API nevalid. Cheile OpenAI ar trebui să înceapă cu \"sk-\"",
+    "apiKeyValidationFailed": "Validarea cheii API a eșuat",
+    "audioProcessingFailed": "Procesarea audio a eșuat",
+    "rateLimitExceeded": "Limită de rată depășită. Vă rugăm să încercați din nou mai târziu.",
+    "generic": "Eroare"
+  }
+}

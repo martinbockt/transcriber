@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Dar",
+    "settings": "Settings",
+    "newRecording": "Reġistrazzjoni Ġdida",
+    "searchPlaceholder": "Fittex...",
+    "exportAll": "Esporta Kollox",
+    "noResults": "L-ebda riżultat",
+    "tryAdjusting": "Ipprova aġġusta t-tfittxija jew il-filtri tiegħek",
+    "noRecordings": "L-ebda reġistrazzjoni s'issa",
+    "startPrompt": "Agħfas il-buttuna t'hawn fuq biex tibda",
+    "results": "riżultati misjuba",
+    "result": "riżultat misjub"
+  },
+  "searchBar": {
+    "placeholder": "Fittex oġġetti tal-vuċi...",
+    "filterByType": "Iffiltra skond it-tip:",
+    "filterByDate": "Iffiltra skond id-data:",
+    "clearFilters": "Neħħi l-filtri kollha",
+    "dateRanges": {
+      "all": "Kull Żmien",
+      "today": "Illum",
+      "week": "Din il-Ġimgħa",
+      "month": "Dan ix-Xahar"
+    }
+  },
+  "common": {
+    "cancel": "Ikkanċella",
+    "confirm": "Ikkonferma",
+    "delete": "Ħassar",
+    "save": "Issejvja",
+    "includeAudio": "Inkludi data tal-awdjo",
+    "format": "Format"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Lingwa",
+    "theme": "Tema",
+    "light": "Ċar",
+    "dark": "Skur",
+    "system": "Sistema",
+    "openaiApiKey": "OpenAI API Key"
+  },
+  "detailView": {
+    "edit": "Editja",
+    "delete": "Ħassar",
+    "download": "Niżżel",
+    "originalTranscript": "Traskrizzjoni Oriġinali",
+    "summary": "Sommarju",
+    "keyFacts": "Fatti Ewlenin",
+    "noAudio": "L-ebda awdjo disponibbli għal din ir-reġistrazzjoni",
+    "deleteTitle": "Tħassar ir-Reġistrazzjoni?",
+    "deleteConfirm": "Dan se jħassar b'mod permanenti \"{title}\" u d-data kollha assoċjata. Din l-azzjoni ma tistax titreġġa' lura."
+  },
+  "export": {
+    "titleSingle": "Esporta Element",
+    "titleMultiple": "Esporta {count} Elementi",
+    "exportButton": "Esporta"
+  },
+  "intents": {
+    "todo": "Ta' Biex Tagħmel",
+    "research": "Riċerka",
+    "draft": "Abbozz",
+    "note": "Nota"
+  },
+  "status": {
+    "starting": "Tibda fi",
+    "recording": "Qed tirrekordja",
+    "processing": "Qed tipproċessa l-awdjo...",
+    "error": "Żball"
+  },
+  "emptyState": {
+    "title": "L-ebda reġistrazzjoni s'issa",
+    "description": "Ibda reġistrazzjoni ġdida biex taqbad il-ħsibijiet, il-kompiti, jew il-mistoqsijiet tar-riċerka tiegħek.",
+    "newRecording": "Ibda Reġistrazzjoni"
+  },
+  "errors": {
+    "apiKeyEmpty": "L-API key ma tistax tkun vojta",
+    "apiKeyInvalidFormat": "Format tal-API key invalidu. Iċ-ċwievet OpenAI għandhom jibdew b'\"sk-\"",
+    "apiKeyValidationFailed": "Naqas milli jivvalida l-API key",
+    "audioProcessingFailed": "Naqas milli jipproċessa l-awdjo",
+    "rateLimitExceeded": "Limitu tar-rata maqbuż. Jekk jogħġbok erġa' pprova aktar tard.",
+    "generic": "Żball"
+  }
+}

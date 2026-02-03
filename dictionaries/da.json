@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Hjem",
+    "settings": "Indstillinger",
+    "newRecording": "Ny optagelse",
+    "searchPlaceholder": "Søg...",
+    "exportAll": "Eksportér alle",
+    "noResults": "Ingen resultater fundet",
+    "tryAdjusting": "Prøv at justere din søgning eller dine filtre",
+    "noRecordings": "Ingen optagelser endnu",
+    "startPrompt": "Klik på knappen ovenfor for at starte",
+    "results": "resultater fundet",
+    "result": "resultat fundet"
+  },
+  "searchBar": {
+    "placeholder": "Søg i stemmeelementer...",
+    "filterByType": "Filtrér efter type:",
+    "filterByDate": "Filtrér efter dato:",
+    "clearFilters": "Ryd alle filtre",
+    "dateRanges": {
+      "all": "Alle",
+      "today": "I dag",
+      "week": "Denne uge",
+      "month": "Denne måned"
+    }
+  },
+  "common": {
+    "cancel": "Annuller",
+    "confirm": "Bekræft",
+    "delete": "Slet",
+    "save": "Gem",
+    "includeAudio": "Inkluder lyddata",
+    "format": "Format"
+  },
+  "settings": {
+    "title": "Indstillinger",
+    "language": "Sprog",
+    "theme": "Tema",
+    "light": "Lys",
+    "dark": "Mørk",
+    "system": "System",
+    "openaiApiKey": "OpenAI API-nøgle"
+  },
+  "detailView": {
+    "edit": "Rediger",
+    "delete": "Slet",
+    "download": "Download",
+    "originalTranscript": "Original transskription",
+    "summary": "Resumé",
+    "keyFacts": "Nøglefakta",
+    "noAudio": "Ingen lyd tilgængelig for denne optagelse",
+    "deleteTitle": "Slet optagelse?",
+    "deleteConfirm": "Dette vil permanent slette \"{title}\" og alle tilhørende data. Denne handling kan ikke fortrydes."
+  },
+  "export": {
+    "titleSingle": "Eksportér element",
+    "titleMultiple": "Eksportér {count} elementer",
+    "exportButton": "Eksportér"
+  },
+  "intents": {
+    "todo": "Opgave",
+    "research": "Forskning",
+    "draft": "Udkast",
+    "note": "Note"
+  },
+  "status": {
+    "starting": "Starter om",
+    "recording": "Optager",
+    "processing": "Behandler lyd...",
+    "error": "Fejl"
+  },
+  "emptyState": {
+    "title": "Ingen optagelser endnu",
+    "description": "Start en ny optagelse for at fange dine tanker, opgaver eller forskningsspørgsmål.",
+    "newRecording": "Start optagelse"
+  },
+  "errors": {
+    "apiKeyEmpty": "API-nøglen må ikke være tom",
+    "apiKeyInvalidFormat": "Ugyldigt API-nøgleformat. OpenAI-nøgler skal starte med \"sk-\"",
+    "apiKeyValidationFailed": "Kunne ikke validere API-nøgle",
+    "audioProcessingFailed": "Kunne ikke behandle lyd",
+    "rateLimitExceeded": "Hastighedsgrænse overskredet. Prøv igen senere.",
+    "generic": "Fejl"
+  }
+}

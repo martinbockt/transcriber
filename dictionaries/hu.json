@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Kezdőlap",
+    "settings": "Beállítások",
+    "newRecording": "Új felvétel",
+    "searchPlaceholder": "Keresés...",
+    "exportAll": "Összes exportálása",
+    "noResults": "Nincs találat",
+    "tryAdjusting": "Próbálja módosítani a keresést vagy a szűrőket",
+    "noRecordings": "Még nincsenek felvételek",
+    "startPrompt": "Kezdéshez kattintson a fenti gombra",
+    "results": "találat",
+    "result": "találat"
+  },
+  "searchBar": {
+    "placeholder": "Hangfelvételek keresése...",
+    "filterByType": "Szűrés típus szerint:",
+    "filterByDate": "Szűrés dátum szerint:",
+    "clearFilters": "Szűrők törlése",
+    "dateRanges": {
+      "all": "Teljes időszak",
+      "today": "Ma",
+      "week": "Ezen a héten",
+      "month": "Ebben a hónapban"
+    }
+  },
+  "common": {
+    "cancel": "Mégse",
+    "confirm": "Megerősítés",
+    "delete": "Törlés",
+    "save": "Mentés",
+    "includeAudio": "Hangadatok belefoglalása",
+    "format": "Formátum"
+  },
+  "settings": {
+    "title": "Beállítások",
+    "language": "Nyelv",
+    "theme": "Téma",
+    "light": "Világos",
+    "dark": "Sötét",
+    "system": "Rendszer",
+    "openaiApiKey": "OpenAI API kulcs"
+  },
+  "detailView": {
+    "edit": "Szerkesztés",
+    "delete": "Törlés",
+    "download": "Letöltés",
+    "originalTranscript": "Eredeti átirat",
+    "summary": "Összefoglaló",
+    "keyFacts": "Kulcsfontosságú tények",
+    "noAudio": "Nincs elérhető hanganyag ehhez a felvételhez",
+    "deleteTitle": "Felvétel törlése?",
+    "deleteConfirm": "Ez véglegesen törli a \"{title}\" felvételt és az összes kapcsolódó adatot. Ez a művelet nem vonható vissza."
+  },
+  "export": {
+    "titleSingle": "Elem exportálása",
+    "titleMultiple": "{count} elem exportálása",
+    "exportButton": "Exportálás"
+  },
+  "intents": {
+    "todo": "Teendő",
+    "research": "Kutatás",
+    "draft": "Vázlat",
+    "note": "Jegyzet"
+  },
+  "status": {
+    "starting": "Indulás",
+    "recording": "Felvétel",
+    "processing": "Hang feldolgozása...",
+    "error": "Hiba"
+  },
+  "emptyState": {
+    "title": "Még nincsenek felvételek",
+    "description": "Kezdjen új felvételt gondolatai, feladatai vagy kutatási kérdései rögzítéséhez.",
+    "newRecording": "Felvétel indítása"
+  },
+  "errors": {
+    "apiKeyEmpty": "Az API kulcs nem lehet üres",
+    "apiKeyInvalidFormat": "Érvénytelen API kulcs formátum. Az OpenAI kulcsoknak \"sk-\" prefixszel kell kezdődniük",
+    "apiKeyValidationFailed": "Az API kulcs ellenőrzése sikertelen",
+    "audioProcessingFailed": "Hang feldolgozása sikertelen",
+    "rateLimitExceeded": "Sebességkorlát túllépve. Kérjük, próbálja újra később.",
+    "generic": "Hiba"
+  }
+}

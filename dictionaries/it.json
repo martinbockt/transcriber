@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Home",
+    "settings": "Impostazioni",
+    "newRecording": "Nuova registrazione",
+    "searchPlaceholder": "Cerca...",
+    "exportAll": "Esporta tutto",
+    "noResults": "Nessun risultato trovato",
+    "tryAdjusting": "Prova a modificare la ricerca o i filtri",
+    "noRecordings": "Nessuna registrazione ancora",
+    "startPrompt": "Clicca sul pulsante in alto per iniziare",
+    "results": "risultati trovati",
+    "result": "risultato trovato"
+  },
+  "searchBar": {
+    "placeholder": "Cerca elementi vocali...",
+    "filterByType": "Filtra per tipo:",
+    "filterByDate": "Filtra per data:",
+    "clearFilters": "Cancella tutti i filtri",
+    "dateRanges": {
+      "all": "Tutto il tempo",
+      "today": "Oggi",
+      "week": "Questa settimana",
+      "month": "Questo mese"
+    }
+  },
+  "common": {
+    "cancel": "Annulla",
+    "confirm": "Conferma",
+    "delete": "Elimina",
+    "save": "Salva",
+    "includeAudio": "Includi dati audio",
+    "format": "Formato"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "language": "Lingua",
+    "theme": "Tema",
+    "light": "Chiaro",
+    "dark": "Scuro",
+    "system": "Sistema",
+    "openaiApiKey": "Chiave API OpenAI"
+  },
+  "detailView": {
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "download": "Scarica",
+    "originalTranscript": "Trascrizione originale",
+    "summary": "Riepilogo",
+    "keyFacts": "Punti chiave",
+    "noAudio": "Nessun audio disponibile per questa registrazione",
+    "deleteTitle": "Eliminare registrazione?",
+    "deleteConfirm": "Questo eliminerà permanentemente \"{title}\" e tutti i dati associati. Questa azione non può essere annullata."
+  },
+  "export": {
+    "titleSingle": "Esporta elemento",
+    "titleMultiple": "Esporta {count} elementi",
+    "exportButton": "Esporta"
+  },
+  "intents": {
+    "todo": "Da fare",
+    "research": "Ricerca",
+    "draft": "Bozza",
+    "note": "Nota"
+  },
+  "status": {
+    "starting": "Inizia tra",
+    "recording": "Registrazione",
+    "processing": "Elaborazione audio...",
+    "error": "Errore"
+  },
+  "emptyState": {
+    "title": "Nessuna registrazione ancora",
+    "description": "Avvia una nuova registrazione per catturare i tuoi pensieri, compiti o domande di ricerca.",
+    "newRecording": "Avvia registrazione"
+  },
+  "errors": {
+    "apiKeyEmpty": "La chiave API non può essere vuota",
+    "apiKeyInvalidFormat": "Formato chiave API non valido. Le chiavi OpenAI devono iniziare con \"sk-\"",
+    "apiKeyValidationFailed": "Convalida della chiave API fallita",
+    "audioProcessingFailed": "Elaborazione audio fallita",
+    "rateLimitExceeded": "Limite di velocità superato. Riprova più tardi.",
+    "generic": "Errore"
+  }
+}

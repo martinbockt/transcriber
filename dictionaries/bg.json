@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Начало",
+    "settings": "Настройки",
+    "newRecording": "Нова запис",
+    "searchPlaceholder": "Търсене...",
+    "exportAll": "Експортиране на всички",
+    "noResults": "Няма намерени резултати",
+    "tryAdjusting": "Опитайте да промените търсенето или филтрите",
+    "noRecordings": "Все още няма записи",
+    "startPrompt": "Кликнете бутона по-горе, за да започнете",
+    "results": "намерени резултата",
+    "result": "намерен резултат"
+  },
+  "searchBar": {
+    "placeholder": "Търсене на гласови елементи...",
+    "filterByType": "Филтриране по тип:",
+    "filterByDate": "Филтриране по дата:",
+    "clearFilters": "Изчистване на филтрите",
+    "dateRanges": {
+      "all": "Всички",
+      "today": "Днес",
+      "week": "Тази седмица",
+      "month": "Този месец"
+    }
+  },
+  "common": {
+    "cancel": "Отказ",
+    "confirm": "Потвърди",
+    "delete": "Изтрий",
+    "save": "Запази",
+    "includeAudio": "Включи аудио данни",
+    "format": "Формат"
+  },
+  "settings": {
+    "title": "Настройки",
+    "language": "Език",
+    "theme": "Тема",
+    "light": "Светла",
+    "dark": "Тъмна",
+    "system": "Системна",
+    "openaiApiKey": "OpenAI API ключ"
+  },
+  "detailView": {
+    "edit": "Редактирай",
+    "delete": "Изтрий",
+    "download": "Изтегли",
+    "originalTranscript": "Оригинален транскрипт",
+    "summary": "Резюме",
+    "keyFacts": "Ключови факти",
+    "noAudio": "Няма налично аудио за този запис",
+    "deleteTitle": "Изтриване на записа?",
+    "deleteConfirm": "Това ще изтрие завинаги \"{title}\" и всички свързани данни. Това действие не може да бъде отменено."
+  },
+  "export": {
+    "titleSingle": "Експортиране на елемент",
+    "titleMultiple": "Експортиране на {count} елемента",
+    "exportButton": "Експортиране"
+  },
+  "intents": {
+    "todo": "За задача",
+    "research": "Проучване",
+    "draft": "Чернова",
+    "note": "Бележка"
+  },
+  "status": {
+    "starting": "Започва след",
+    "recording": "Записване",
+    "processing": "Обработка на аудио...",
+    "error": "Грешка"
+  },
+  "emptyState": {
+    "title": "Все още няма записи",
+    "description": "Започнете нов запис, за да уловите мислите, задачите или въпросите си за проучване.",
+    "newRecording": "Започни запис"
+  },
+  "errors": {
+    "apiKeyEmpty": "API ключът не може да бъде празен",
+    "apiKeyInvalidFormat": "Невалиден формат на API ключа. OpenAI ключовете трябва да започват с \"sk-\"",
+    "apiKeyValidationFailed": "Неуспешна проверка на API ключа",
+    "audioProcessingFailed": "Неуспешна обработка на аудиото",
+    "rateLimitExceeded": "Границата на скоростта е надвишена. Моля, опитайте отново по-късно.",
+    "generic": "Грешка"
+  }
+}

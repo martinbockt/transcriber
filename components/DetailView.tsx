@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, forwardRef } from 'react';
+import type { VoiceItem } from '@/types/voice-item';
 import { ChevronDown, ChevronUp, Trash2, Download, Edit2, Check, Copy } from 'lucide-react';
+import { useTranslation } from '@/components/language-provider';
+import { useEffect, useState, forwardRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,7 +26,6 @@ import { ResearchView } from './ResearchView';
 import { DraftView } from './DraftView';
 import { AudioPlayer, AudioPlayerRef } from './AudioPlayer';
 import { ExportDialog } from './ExportDialog';
-import type { VoiceItem } from '@/types/voice-item';
 
 interface DetailViewProps {
   item: VoiceItem;
@@ -60,6 +61,23 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
   { item, onToggleTodo, onDelete, onUpdateTitle, onUpdateSummary, onUpdateTranscript },
   ref,
 ) {
+  const { dictionary: appDictionary, locale } = useTranslation();
+  const [localDictionary, setLocalDictionary] = useState(appDictionary);
+
+  useEffect(() => {
+    async function loadDict() {
+      if (item.language && (item.language === 'en' || item.language === 'de')) {
+        const dict = await import(`@/dictionaries/${item.language}.json`);
+        setLocalDictionary(dict.default || dict);
+      } else {
+        setLocalDictionary(appDictionary);
+      }
+    }
+    loadDict();
+  }, [item.language, appDictionary]);
+
+  const dictionary = localDictionary;
+
   const [showTranscript, setShowTranscript] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -143,19 +161,18 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Recording?</AlertDialogTitle>
+                      <AlertDialogTitle>{dictionary.detailView.deleteTitle}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This will permanently delete &ldquo;{item.title}
-                        &rdquo; and all associated data. This action cannot be undone.
+                        {dictionary.detailView.deleteConfirm.replace('{title}', item.title)}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>{dictionary.common.cancel}</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => onDelete(item.id)}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        Delete
+                        {dictionary.common.delete}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -164,7 +181,7 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
             </div>
           </div>
           <div className="text-muted-foreground mb-3 text-sm">
-            {new Date(item.createdAt).toLocaleDateString('en-US', {
+            {new Date(item.createdAt).toLocaleDateString(locale, {
               month: 'long',
               day: 'numeric',
               year: 'numeric',
@@ -185,7 +202,7 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
             <AudioPlayer ref={ref} audioData={item.audioData} className="mb-2" />
           ) : (
             <p className="text-muted-foreground mb-2 text-xs italic">
-              No audio available for this recording
+              {dictionary.detailView.noAudio}
             </p>
           )}
           {hasUnsavedChanges && (
@@ -203,7 +220,7 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
           {/* Summary */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Summary</CardTitle>
+              <CardTitle className="text-lg">{dictionary.detailView.summary}</CardTitle>
             </CardHeader>
             <CardContent>
               {isEditingSummary ? (
@@ -238,7 +255,9 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
           {item.keyFacts.length > 0 && (
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg font-semibold tracking-tight">Key Facts</CardTitle>
+                <CardTitle className="text-lg font-semibold tracking-tight">
+                  {dictionary.detailView.keyFacts}
+                </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="space-y-2">
@@ -269,7 +288,9 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
                 className="hover:bg-muted/50 hover:text-foreground -ml-2 h-auto flex-1 justify-between rounded-md p-2 transition-colors"
                 onClick={() => setShowTranscript(!showTranscript)}
               >
-                <CardTitle className="text-lg">Original Transcript</CardTitle>
+                <CardTitle className="text-lg">
+                  {dictionary.detailView.originalTranscript}
+                </CardTitle>
                 {showTranscript ? (
                   <ChevronUp className="h-5 w-5" />
                 ) : (
@@ -302,7 +323,7 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
                     className="ml-2"
                   >
                     <Edit2 className="mr-1 h-4 w-4" />
-                    Edit
+                    {dictionary.detailView.edit}
                   </Button>
                 )}
               </div>
@@ -326,10 +347,10 @@ export const DetailView = forwardRef<AudioPlayerRef, DetailViewProps>(function D
                   <div className="flex gap-2">
                     <Button onClick={handleSaveTranscript} size="sm" variant="default">
                       <Check className="mr-1 h-4 w-4" />
-                      Save
+                      {dictionary.common.save}
                     </Button>
                     <Button onClick={handleCancelTranscript} size="sm" variant="outline">
-                      Cancel
+                      {dictionary.common.cancel}
                     </Button>
                   </div>
                 </div>

@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Strona główna",
+    "settings": "Ustawienia",
+    "newRecording": "Nowe nagranie",
+    "searchPlaceholder": "Szukaj...",
+    "exportAll": "Eksportuj wszystko",
+    "noResults": "Brak wyników",
+    "tryAdjusting": "Spróbuj dostosować wyszukiwanie lub filtry",
+    "noRecordings": "Brak nagrań",
+    "startPrompt": "Kliknij przycisk powyżej, aby rozpocząć",
+    "results": "znaleziono wyników",
+    "result": "znaleziono wynik"
+  },
+  "searchBar": {
+    "placeholder": "Szukaj nagrań...",
+    "filterByType": "Filtruj wg typu:",
+    "filterByDate": "Filtruj wg daty:",
+    "clearFilters": "Wyczyść filtry",
+    "dateRanges": {
+      "all": "Cały czas",
+      "today": "Dzisiaj",
+      "week": "W tym tygodniu",
+      "month": "W tym miesiącu"
+    }
+  },
+  "common": {
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "delete": "Usuń",
+    "save": "Zapisz",
+    "includeAudio": "Dołącz dane audio",
+    "format": "Format"
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "language": "Język",
+    "theme": "Motyw",
+    "light": "Jasny",
+    "dark": "Ciemny",
+    "system": "Systemowy",
+    "openaiApiKey": "Klucz API OpenAI"
+  },
+  "detailView": {
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "download": "Pobierz",
+    "originalTranscript": "Oryginalna transkrypcja",
+    "summary": "Podsumowanie",
+    "keyFacts": "Kluczowe fakty",
+    "noAudio": "Brak dźwięku dla tego nagrania",
+    "deleteTitle": "Usunąć nagranie?",
+    "deleteConfirm": "To trwale usunie \"{title}\" i wszystkie powiązane dane. Tej operacji nie można cofnąć."
+  },
+  "export": {
+    "titleSingle": "Eksportuj element",
+    "titleMultiple": "Eksportuj {count} elementów",
+    "exportButton": "Eksportuj"
+  },
+  "intents": {
+    "todo": "Do zrobienia",
+    "research": "Badanie",
+    "draft": "Projekt",
+    "note": "Notatka"
+  },
+  "status": {
+    "starting": "Rozpoczęcie za",
+    "recording": "Nagrywanie",
+    "processing": "Przetwarzanie dźwięku...",
+    "error": "Błąd"
+  },
+  "emptyState": {
+    "title": "Brak nagrań",
+    "description": "Rozpocznij nowe nagranie, aby uchwycić swoje myśli, zadania lub pytania badawcze.",
+    "newRecording": "Rozpocznij nagranie"
+  },
+  "errors": {
+    "apiKeyEmpty": "Klucz API nie może być pusty",
+    "apiKeyInvalidFormat": "Nieprawidłowy format klucza API. Klucze OpenAI powinny zaczynać się od \"sk-\"",
+    "apiKeyValidationFailed": "Nie udało się zweryfikować klucza API",
+    "audioProcessingFailed": "Nie udało się przetworzyć dźwięku",
+    "rateLimitExceeded": "Przekroczono limit zapytań. Spróbuj ponownie później.",
+    "generic": "Błąd"
+  }
+}

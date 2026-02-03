@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Hem",
+    "settings": "Inställningar",
+    "newRecording": "Ny inspelning",
+    "searchPlaceholder": "Sök...",
+    "exportAll": "Exportera alla",
+    "noResults": "Inga resultat",
+    "tryAdjusting": "Försök justera din sökning eller filter",
+    "noRecordings": "Inga inspelningar än",
+    "startPrompt": "Klicka på knappen ovan för att börja",
+    "results": "resultat hittades",
+    "result": "resultat hittades"
+  },
+  "searchBar": {
+    "placeholder": "Sök röstobjekt...",
+    "filterByType": "Filtrera efter typ:",
+    "filterByDate": "Filtrera efter datum:",
+    "clearFilters": "Rensa alla filter",
+    "dateRanges": {
+      "all": "Hela tiden",
+      "today": "Idag",
+      "week": "Denna vecka",
+      "month": "Denna månad"
+    }
+  },
+  "common": {
+    "cancel": "Avbryt",
+    "confirm": "Bekräfta",
+    "delete": "Ta bort",
+    "save": "Spara",
+    "includeAudio": "Inkludera ljuddata",
+    "format": "Format"
+  },
+  "settings": {
+    "title": "Inställningar",
+    "language": "Språk",
+    "theme": "Tema",
+    "light": "Ljus",
+    "dark": "Mörk",
+    "system": "System",
+    "openaiApiKey": "OpenAI API-nyckel"
+  },
+  "detailView": {
+    "edit": "Redigera",
+    "delete": "Ta bort",
+    "download": "Ladda ner",
+    "originalTranscript": "Ursprunglig transkription",
+    "summary": "Sammanfattning",
+    "keyFacts": "Nyckelfakta",
+    "noAudio": "Inget ljud tillgängligt för denna inspelning",
+    "deleteTitle": "Ta bort inspelning?",
+    "deleteConfirm": "Detta kommer permanent att ta bort \"{title}\" och all tillhörande data. Denna åtgärd kan inte ångras."
+  },
+  "export": {
+    "titleSingle": "Exportera objekt",
+    "titleMultiple": "Exportera {count} objekt",
+    "exportButton": "Exportera"
+  },
+  "intents": {
+    "todo": "Att göra",
+    "research": "Forskning",
+    "draft": "Utkast",
+    "note": "Anteckning"
+  },
+  "status": {
+    "starting": "Startar om",
+    "recording": "Spelar in",
+    "processing": "Bearbetar ljud...",
+    "error": "Fel"
+  },
+  "emptyState": {
+    "title": "Inga inspelningar än",
+    "description": "Starta en ny inspelning för att fånga dina tankar, uppgifter eller forskningsfrågor.",
+    "newRecording": "Starta inspelning"
+  },
+  "errors": {
+    "apiKeyEmpty": "API-nyckeln får inte vara tom",
+    "apiKeyInvalidFormat": "Ogiltigt API-nyckelformat. OpenAI-nycklar ska börja med \"sk-\"",
+    "apiKeyValidationFailed": "Misslyckades med att validera API-nyckel",
+    "audioProcessingFailed": "Misslyckades med att bearbeta ljud",
+    "rateLimitExceeded": "Hastighetsgräns överskriden. Försök igen senare.",
+    "generic": "Fel"
+  }
+}

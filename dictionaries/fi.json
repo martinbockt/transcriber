@@ -1,0 +1,85 @@
+{
+  "navigation": {
+    "home": "Etusivu",
+    "settings": "Asetukset",
+    "newRecording": "Uusi tallenne",
+    "searchPlaceholder": "Haku...",
+    "exportAll": "Vie kaikki",
+    "noResults": "Ei tuloksia",
+    "tryAdjusting": "Kokeile muuttaa hakua tai suodattimia",
+    "noRecordings": "Ei vielä tallenteita",
+    "startPrompt": "Aloita napsauttamalla yllä olevaa painiketta",
+    "results": "tulosta löytyi",
+    "result": "tulos löytyi"
+  },
+  "searchBar": {
+    "placeholder": "Etsi äänitallenteita...",
+    "filterByType": "Suodata tyypin mukaan:",
+    "filterByDate": "Suodata päivämäärän mukaan:",
+    "clearFilters": "Tyhjennä kaikki suodattimet",
+    "dateRanges": {
+      "all": "Kaikki",
+      "today": "Tänään",
+      "week": "Tällä viikolla",
+      "month": "Tässä kuussa"
+    }
+  },
+  "common": {
+    "cancel": "Peruuta",
+    "confirm": "Vahvista",
+    "delete": "Poista",
+    "save": "Tallenna",
+    "includeAudio": "Sisällytä äänidata",
+    "format": "Muoto"
+  },
+  "settings": {
+    "title": "Asetukset",
+    "language": "Kieli",
+    "theme": "Teema",
+    "light": "Vaalea",
+    "dark": "Tumma",
+    "system": "Järjestelmä",
+    "openaiApiKey": "OpenAI API-avain"
+  },
+  "detailView": {
+    "edit": "Muokkaa",
+    "delete": "Poista",
+    "download": "Lataa",
+    "originalTranscript": "Alkuperäinen transkriptio",
+    "summary": "Yhteenveto",
+    "keyFacts": "Keskeiset faktat",
+    "noAudio": "Ääntä ei saatavilla tälle tallenteelle",
+    "deleteTitle": "Poista tallenne?",
+    "deleteConfirm": "Tämä poistaa pysyvästi kohteen \"{title}\" ja kaikki siihen liittyvät tiedot. Tätä toimintoa ei voi kumota."
+  },
+  "export": {
+    "titleSingle": "Vie kohde",
+    "titleMultiple": "Vie {count} kohdetta",
+    "exportButton": "Vie"
+  },
+  "intents": {
+    "todo": "Tehtävä",
+    "research": "Tutkimus",
+    "draft": "Luonnos",
+    "note": "Muistiinpano"
+  },
+  "status": {
+    "starting": "Alkaa",
+    "recording": "Tallennetaan",
+    "processing": "Käsitellään ääntä...",
+    "error": "Virhe"
+  },
+  "emptyState": {
+    "title": "Ei vielä tallenteita",
+    "description": "Aloita uusi tallenne ajatustesi, tehtäviesi tai tutkimuskysymystesi tallentamiseksi.",
+    "newRecording": "Aloita tallennus"
+  },
+  "errors": {
+    "apiKeyEmpty": "API-avain ei voi olla tyhjä",
+    "apiKeyInvalidFormat": "Virheellinen API-avaimen muoto. OpenAI-avainten tulee alkaa \"sk-\"",
+    "apiKeyValidationFailed": "API-avaimen vahvistus epäonnistui",
+    "audioProcessingFailed": "Äänen käsittely epäonnistui",
+    "rateLimitExceeded": "Hintaraja ylitetty. Yritä myöhemmin uudelleen.",
+    "generic": "Virhe"
+  }
+}
